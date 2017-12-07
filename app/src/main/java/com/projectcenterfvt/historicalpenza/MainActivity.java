@@ -5,6 +5,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 
+import java.sql.SQLException;
+
 public class MainActivity extends AppCompatActivity {
 //санина
     @Override
@@ -14,6 +16,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void test(View view) {
-        startActivity(new Intent(this,ActivityMap.class));
+        Intent intent = new Intent(this, ActivityMap.class);
+        DB_Position dbPosition = new DB_Position(this);
+        dbPosition.import_db();
+        if (!dbPosition.isCreate())
+            dbPosition.writeDB();
+        try {
+            dbPosition.open();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

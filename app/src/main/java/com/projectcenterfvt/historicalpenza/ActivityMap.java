@@ -16,6 +16,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -138,6 +139,8 @@ public class ActivityMap extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.setMinZoomPreference(12.0f);
+        mMap.setMaxZoomPreference(17.0f);
         getLocationPermission();
         updateLocationUI();
         getDeviceLocation();
@@ -244,5 +247,13 @@ public class ActivityMap extends AppCompatActivity
     @Override
     public void onConnectionSuspended(int i) {
 
+    }
+
+    public void plus(View view) {
+        mMap.animateCamera(CameraUpdateFactory.zoomBy(1.0f));
+    }
+
+    public void minus(View view){
+        mMap.animateCamera(CameraUpdateFactory.zoomBy(-1.0f));
     }
 }

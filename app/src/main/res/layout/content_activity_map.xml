@@ -25,8 +25,30 @@
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
+            android:layout_alignBottom="@+id/button2"
+            android:layout_alignParentStart="true"
             tools:context="com.projectcenterfvt.historicalpenza.ActivityMap" />
+
+        <Button
+            android:id="@+id/btn_plus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginEnd="15dp"
+            android:layout_marginTop="124dp"
+            android:onClick="plus"
+            android:text="+" />
+
+        <Button
+            android:id="@+id/btn_minus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@+id/btn_plus"
+            android:layout_below="@+id/btn_plus"
+            android:layout_marginTop="17dp"
+            android:onClick="minus"
+            android:text="-" />
+
     </RelativeLayout>
 </android.support.constraint.ConstraintLayout>
