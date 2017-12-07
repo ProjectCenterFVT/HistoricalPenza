@@ -6,11 +6,20 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowAnimationStyle">@style/DownUpActivity</item>
+    </style>
+
+    <style name="DownUpActivity" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/activity_down_up_enter</item>
+        <item name="android:activityOpenExitAnimation">@anim/activity_down_up_exit</item>
+        <item name="android:activityCloseExitAnimation">@anim/activity_down_up_close_exit</item>
+        <item name="android:activityCloseEnterAnimation">@anim/activity_down_up_close_enter</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="android:windowAnimationStyle">@style/DownUpActivity</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
