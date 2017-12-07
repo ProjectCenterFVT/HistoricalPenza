@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/name_sight"
+            android:title="@string/name_sight" />
+        <item
+            android:id="@+id/name_helpProject"
+            android:title="@string/name_helpProject" />
+        <item
+            android:id="@+id/name_moreSight"
+            android:title="@string/name_moreSight" />
+        <item
+            android:id="@+id/name_settings"
+            android:title="@string/name_settings" />
+        <item
+            android:id="@+id/name_help"
+            android:title="@string/name_help" />
+        <item
+            android:id="@+id/name_about"
+            android:title="@string/name_about" />
+    </group>
+
+</menu>
