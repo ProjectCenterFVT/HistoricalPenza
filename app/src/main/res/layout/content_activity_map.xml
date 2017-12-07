@@ -25,6 +25,8 @@
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
             tools:context="com.projectcenterfvt.historicalpenza.ActivityMap" />
     </RelativeLayout>
 </android.support.constraint.ConstraintLayout>

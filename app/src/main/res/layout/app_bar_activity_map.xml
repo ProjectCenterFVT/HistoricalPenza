@@ -31,6 +31,7 @@
 
     <include
         android:id="@+id/include"
-        layout="@layout/content_activity_map" />
+        layout="@layout/content_activity_map"
+        android:layout_width="match_parent" />
 
 </android.support.design.widget.CoordinatorLayout>
