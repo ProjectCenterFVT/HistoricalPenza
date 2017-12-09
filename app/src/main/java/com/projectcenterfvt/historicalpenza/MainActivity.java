@@ -17,14 +17,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void test(View view) {
         Intent intent = new Intent(this, ActivityMap.class);
-        DB_Position dbPosition = new DB_Position(this);
-        dbPosition.import_db();
-        if (!dbPosition.isCreate())
-            dbPosition.writeDB();
-        try {
-            dbPosition.open();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        startActivity(intent);
     }
 }

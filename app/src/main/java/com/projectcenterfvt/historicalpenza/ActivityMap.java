@@ -1,6 +1,7 @@
 package com.projectcenterfvt.historicalpenza;
 
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -27,15 +28,21 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class ActivityMap extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks{
 
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
-    private FusedLocationProviderClient mFusedLocationClient;
     private Location mLastKnownLocation;
     private boolean mLocationPermissionGranted;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
@@ -43,12 +50,16 @@ public class ActivityMap extends AppCompatActivity
     private static final String KEY_LOCATION = "location";
     private static final int DEFAULT_ZOOM = 15;
     private CameraPosition mCameraPosition;
+    private DB_Position dbPosition;
     private final LatLng mDefaultLocation = new LatLng(53.204020, 45.012645);
+    private ArrayList<Marker_info> markers = new ArrayList<Marker_info>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
+
+        openDB();
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this /* FragmentActivity */,
@@ -144,6 +155,8 @@ public class ActivityMap extends AppCompatActivity
         getLocationPermission();
         updateLocationUI();
         getDeviceLocation();
+        fillArray();
+        drawMarkers(mMap);
 
     }
 
@@ -256,4 +269,59 @@ public class ActivityMap extends AppCompatActivity
     public void minus(View view){
         mMap.animateCamera(CameraUpdateFactory.zoomBy(-1.0f));
     }
+
+    private synchronized void openDB(){
+        dbPosition = new DB_Position(this);
+        dbPosition.import_db();
+        if (!dbPosition.isCreate())
+            dbPosition.writeDB();
+        try {
+            dbPosition.open();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void fillArray(){
+        Cursor cursor = dbPosition.DB_geo.query(dbPosition.DB_TABLE, new String[]{dbPosition.COLUMN_ID, dbPosition.COLUMN_NAME, dbPosition.COLUMN_POSX, dbPosition.COLUMN_POSY, dbPosition.COLUMN_HISTORY, dbPosition.COLUMN_ISVISITED},null,null,null,null,null);
+        if (cursor.moveToFirst()){
+            final int id = cursor.getColumnIndex(dbPosition.COLUMN_ID);
+            final int id_name = cursor.getColumnIndex(dbPosition.COLUMN_NAME);
+            final int id_posx = cursor.getColumnIndex(dbPosition.COLUMN_POSX);
+            final int id_posy = cursor.getColumnIndex(dbPosition.COLUMN_POSY);
+            final int id_history = cursor.getColumnIndex(dbPosition.COLUMN_HISTORY);
+            final int id_isVisited = cursor.getColumnIndex(dbPosition.COLUMN_ISVISITED);
+
+            do {
+                String name = cursor.getString(id_name);
+                long x1 = cursor.getLong(id_posx);
+                long x2 = cursor.getLong(id_posy);
+                String history = cursor.getString(id_history);
+                int bol = cursor.getInt(id_isVisited);
+                boolean isVisited = (bol==1);
+                Marker_info marker_info = new Marker_info(x1,x2);
+                marker_info.name = name;
+                marker_info.history = history;
+                marker_info.isVisited = isVisited;
+                markers.add(marker_info);
+            } while(cursor.moveToNext());
+
+        }
+        cursor.close();
+        dbPosition.DB_geo.close();
+    }
+
+    private void drawMarkers(GoogleMap map ){
+        for (int i = 0; i < markers.size(); i++) {
+            MarkerOptions options = new MarkerOptions();
+            Marker_info marker_info = markers.get(i);
+            options.position(marker_info.position).title(marker_info.name);
+            if (marker_info.isVisited)
+                options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+            else
+                options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+            map.addMarker(options);
+        }
+    }
+
 }

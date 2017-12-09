@@ -22,7 +22,7 @@ public class DB_Position extends SQLiteOpenHelper {
     private static String DB_PATH = null;
     private static final int DB_VERSION = 1;
 
-    public static String DB_TABLE = "geo";
+    public static final String DB_TABLE = "geo";
     public static final String COLUMN_ID = "_id";
     public static final String COLUMN_NAME = "name";
     public static final String COLUMN_POSX = "pos x";
