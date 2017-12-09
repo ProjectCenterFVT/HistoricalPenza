@@ -18,17 +18,15 @@ import java.sql.SQLException;
 
 public class DB_Position extends SQLiteOpenHelper {
 
-    public static String DB_NAME_ID = "geo_db.db";
+    public static String DB_NAME_ID = "position.db";
     private static String DB_PATH = null;
     private static final int DB_VERSION = 1;
 
-    public static final String DB_TABLE = "geo";
-    public static final String COLUMN_ID = "_id";
-    public static final String COLUMN_NAME = "name";
-    public static final String COLUMN_POSX = "posX";
-    public static final String COLUMN_POSY = "posY";
-    public static final String COLUMN_HISTORY = "hist";
-    public static final String COLUMN_ISVISITED = "isVisited";
+    static final String DB_TABLE = "pos";
+    static final String COLUMN_ID = "_id";
+    static final String COLUMN_NAME = "name";
+    static final String COLUMN_LOC = "location";
+    static final String COLUMN_ISVISITED = "isVisited";
 
     public SQLiteDatabase DB_geo;
     private Context myContext;

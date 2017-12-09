@@ -1,5 +1,6 @@
 package com.projectcenterfvt.historicalpenza;
 
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.location.Location;
@@ -12,6 +13,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -39,7 +41,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class ActivityMap extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks{
+        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, GoogleMap.OnMarkerClickListener {
 
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
@@ -52,14 +54,11 @@ public class ActivityMap extends AppCompatActivity
     private CameraPosition mCameraPosition;
     private DB_Position dbPosition;
     private final LatLng mDefaultLocation = new LatLng(53.204020, 45.012645);
-    private ArrayList<Marker_info> markers = new ArrayList<Marker_info>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
-
-        openDB();
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this /* FragmentActivity */,
@@ -155,8 +154,8 @@ public class ActivityMap extends AppCompatActivity
         getLocationPermission();
         updateLocationUI();
         getDeviceLocation();
-        fillArray();
-        drawMarkers(mMap);
+        fillArray(mMap);
+        mMap.setOnMarkerClickListener(this);
 
     }
 
@@ -282,46 +281,73 @@ public class ActivityMap extends AppCompatActivity
         }
     }
 
-    private void fillArray(){
-        Cursor cursor = dbPosition.DB_geo.query(dbPosition.DB_TABLE, new String[]{dbPosition.COLUMN_ID, dbPosition.COLUMN_NAME, dbPosition.COLUMN_POSX, dbPosition.COLUMN_POSY, dbPosition.COLUMN_HISTORY, dbPosition.COLUMN_ISVISITED},null,null,null,null,null);
+    private void fillArray(GoogleMap map){
+        openDB();
+        Cursor cursor = dbPosition.DB_geo.query(DB_Position.DB_TABLE, new String[]{DB_Position.COLUMN_ID, DB_Position.COLUMN_NAME, DB_Position.COLUMN_LOC, DB_Position.COLUMN_ISVISITED},null,null,null,null,null);
         if (cursor.moveToFirst()){
             final int id = cursor.getColumnIndex(dbPosition.COLUMN_ID);
             final int id_name = cursor.getColumnIndex(dbPosition.COLUMN_NAME);
-            final int id_posx = cursor.getColumnIndex(dbPosition.COLUMN_POSX);
-            final int id_posy = cursor.getColumnIndex(dbPosition.COLUMN_POSY);
-            final int id_history = cursor.getColumnIndex(dbPosition.COLUMN_HISTORY);
+            final int id_loc = cursor.getColumnIndex(dbPosition.COLUMN_LOC);
             final int id_isVisited = cursor.getColumnIndex(dbPosition.COLUMN_ISVISITED);
 
             do {
                 String name = cursor.getString(id_name);
-                long x1 = cursor.getLong(id_posx);
-                long x2 = cursor.getLong(id_posy);
-                String history = cursor.getString(id_history);
+                String [] loc  = cursor.getString(id_loc).split(" ");
                 int bol = cursor.getInt(id_isVisited);
                 boolean isVisited = (bol==1);
-                Marker_info marker_info = new Marker_info(x1,x2);
-                marker_info.name = name;
-                marker_info.history = history;
-                marker_info.isVisited = isVisited;
-                markers.add(marker_info);
-            } while(cursor.moveToNext());
+                LatLng position = new LatLng(Double.parseDouble(loc[0]),Double.parseDouble(loc[1]));
+                MarkerOptions options = new MarkerOptions();
+                options.position(position).title(name);
+                if (isVisited)
+                    options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                else
+                    options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+                Marker marker = map.addMarker(options);
+                marker.setTag(isVisited);
+                Log.d("marker","нарисовал маркер с координатами "+position);
 
+            } while(cursor.moveToNext());
         }
         cursor.close();
         dbPosition.DB_geo.close();
     }
 
-    private void drawMarkers(GoogleMap map ){
-        for (int i = 0; i < markers.size(); i++) {
-            MarkerOptions options = new MarkerOptions();
-            Marker_info marker_info = markers.get(i);
-            options.position(marker_info.position).title(marker_info.name);
-            if (marker_info.isVisited)
-                options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-            else
-                options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-            map.addMarker(options);
-        }
-    }
 
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        Log.d("marker","Нажад на маркер "+marker.getId()+" "+marker.getTitle()+" "+marker.getPosition().toString());
+        boolean flag = (boolean)marker.getTag();
+        if (flag){
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Информационное окно о достопримечательности").setMessage(marker.getTitle()+"\n"+"тут типо расстояние").setPositiveButton("узнать больше", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+
+                }
+            }).setNegativeButton("назад", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+
+                }
+            });
+            AlertDialog alert = builder.create();
+            alert.show();
+        } else {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Информационное окно о достопримечательности").setMessage(marker.getTitle()+"\n"+"вы еще тут не были"+"\n"+"типо расстояние").setPositiveButton("хочу открыть", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+
+                }
+            }).setNegativeButton("назад", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+
+                }
+            });
+            AlertDialog alert = builder.create();
+            alert.show();
+        }
+        return false;
+    }
 }
