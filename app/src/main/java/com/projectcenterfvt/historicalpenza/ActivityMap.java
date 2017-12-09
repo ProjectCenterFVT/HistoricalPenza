@@ -319,12 +319,12 @@ public class ActivityMap extends AppCompatActivity
         boolean flag = (boolean)marker.getTag();
         if (flag){
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Информационное окно о достопримечательности").setMessage(marker.getTitle()+"\n"+"тут типо расстояние").setPositiveButton("узнать больше", new DialogInterface.OnClickListener() {
+            builder.setTitle(marker.getTitle()).setMessage("расстояние = "+calucateDistance(mLastKnownLocation, marker.getPosition())+" м.").setNegativeButton("узнать больше", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
 
                 }
-            }).setNegativeButton("назад", new DialogInterface.OnClickListener() {
+            }).setPositiveButton("назад", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
 
@@ -334,12 +334,12 @@ public class ActivityMap extends AppCompatActivity
             alert.show();
         } else {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Информационное окно о достопримечательности").setMessage(marker.getTitle()+"\n"+"вы еще тут не были"+"\n"+"типо расстояние").setPositiveButton("хочу открыть", new DialogInterface.OnClickListener() {
+            builder.setTitle(marker.getTitle()).setMessage("вы еще тут не были"+"\n"+"расстояние = "+calucateDistance(mLastKnownLocation, marker.getPosition())+" м.").setNegativeButton("хочу открыть", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
 
                 }
-            }).setNegativeButton("назад", new DialogInterface.OnClickListener() {
+            }).setPositiveButton("назад", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
 
@@ -349,5 +349,17 @@ public class ActivityMap extends AppCompatActivity
             alert.show();
         }
         return false;
+    }
+
+    private int calucateDistance(Location l1, LatLng l2){
+        Log.d("marker ", "Мое местоположение = "+l1.toString());
+        final int R = 6372795;
+        double x1 = l1.getLatitude()*Math.PI/180;
+        double x2 = l1.getLongitude()*Math.PI/180;
+        double x3 = l2.latitude*Math.PI/180;
+        double x4 = l2.longitude*Math.PI/180;
+        double res = Math.acos(Math.sin(x1)*Math.sin(x3)+Math.cos(x1)*Math.cos(x3)*Math.cos(x2-x4))*R;
+        Log.d("marker", "res = "+res);
+        return (int)res;
     }
 }
