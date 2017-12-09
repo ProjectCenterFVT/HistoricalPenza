@@ -25,8 +25,8 @@ public class DB_Position extends SQLiteOpenHelper {
     public static final String DB_TABLE = "geo";
     public static final String COLUMN_ID = "_id";
     public static final String COLUMN_NAME = "name";
-    public static final String COLUMN_POSX = "pos x";
-    public static final String COLUMN_POSY = "pos y";
+    public static final String COLUMN_POSX = "posX";
+    public static final String COLUMN_POSY = "posY";
     public static final String COLUMN_HISTORY = "hist";
     public static final String COLUMN_ISVISITED = "isVisited";
 
