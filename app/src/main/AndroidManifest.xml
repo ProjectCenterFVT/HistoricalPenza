@@ -31,7 +31,10 @@
             android:name=".ActivityMap"
             android:label="@string/title_activity_map"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".GreetingActivity"></activity>
+        <activity
+            android:name=".GreetingActivity"
+            android:noHistory="true">
+        </activity>
     </application>
 
 </manifest>
