@@ -36,6 +36,7 @@
             android:theme="@style/AppTheme.NoActionBar"
             android:noHistory="true">
         </activity>
+        <activity android:name=".info_activity"></activity>
     </application>
 
 </manifest>

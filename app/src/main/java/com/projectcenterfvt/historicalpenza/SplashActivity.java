@@ -22,7 +22,7 @@ public class SplashActivity extends AppCompatActivity {
             public void run() {
                 Intent intent;
 
-                if(true) {
+                if(isFirstTime()) {
                     getPreferences(Context.MODE_PRIVATE).edit().putBoolean(KEY_IS_FIRST_TIME, false).apply();
                     intent = new Intent(SplashActivity.this, GreetingActivity.class);
                 } else
