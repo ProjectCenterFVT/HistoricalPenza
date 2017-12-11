@@ -22,7 +22,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".MainActivity" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -32,6 +32,7 @@
             android:name=".ActivityMap"
             android:label="@string/title_activity_map"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".info_activity"></activity>
     </application>
 
 </manifest>

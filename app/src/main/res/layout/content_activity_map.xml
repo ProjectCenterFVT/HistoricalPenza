@@ -13,42 +13,54 @@
         android:layout_height="match_parent">
 
         <Button
-            android:id="@+id/button2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:id="@+id/btn_close_target"
+            android:layout_width="250dp"
+            android:layout_height="40dp"
             android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true"
-            android:text="Ближайшие точки" />
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center|bottom"
+            android:background="@drawable/btn_close_target"
+            android:text=" " />
 
         <fragment
             android:id="@+id/map"
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_alignBottom="@+id/button2"
             android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
             tools:context="com.projectcenterfvt.historicalpenza.ActivityMap" />
 
         <Button
             android:id="@+id/btn_plus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_alignParentEnd="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginEnd="15dp"
-            android:layout_marginTop="124dp"
-            android:onClick="plus"
-            android:text="+" />
+            android:layout_below="@+id/btn_position"
+            android:layout_marginRight="5dp"
+            android:background="@drawable/plus"
+            android:onClick="plus" />
 
         <Button
             android:id="@+id/btn_minus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignStart="@+id/btn_plus"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentEnd="true"
             android:layout_below="@+id/btn_plus"
-            android:layout_marginTop="17dp"
-            android:onClick="minus"
-            android:text="-" />
+            android:layout_marginRight="7dp"
+            android:background="@drawable/minus"
+            android:onClick="minus" />
+
+        <Button
+            android:id="@+id/btn_position"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="6dp"
+            android:layout_marginTop="155dp"
+            android:background="@drawable/my_pos"
+            android:onClick="lookAtMe" />
 
     </RelativeLayout>
 </android.support.constraint.ConstraintLayout>

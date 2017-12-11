@@ -12,4 +12,5 @@
     <string name="name_settings">Настройки</string>
     <string name="name_help">Помощь</string>
     <string name="name_about">О программе</string>
+    <string name="info_name">Достопримечательность</string>
 </resources>
