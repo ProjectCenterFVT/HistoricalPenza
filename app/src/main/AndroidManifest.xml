@@ -33,6 +33,7 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".GreetingActivity"
+            android:theme="@style/AppTheme.NoActionBar"
             android:noHistory="true">
         </activity>
     </application>
