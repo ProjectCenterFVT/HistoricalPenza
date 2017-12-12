@@ -176,6 +176,7 @@ public class ActivityMap extends AppCompatActivity
         mMap.setMinZoomPreference(12.0f);
         mMap.setMaxZoomPreference(17.0f);
         getLocationPermission();
+        setCameraPosition(mLastKnownLocation);
         getDeviceLocation();
         fillArray(mMap);
         mMap.setOnMarkerClickListener(this);
@@ -257,13 +258,7 @@ public class ActivityMap extends AppCompatActivity
             mLastKnownLocation = LocationServices.FusedLocationApi
                     .getLastLocation(mGoogleApiClient);
         }
-        // Set the map's camera position to the current location of the device.
-        if (mCameraPosition != null) {
-            mMap.moveCamera(CameraUpdateFactory.newCameraPosition(mCameraPosition));
-        } else if (mLastKnownLocation != null) {
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
-                    new LatLng(mLastKnownLocation.getLatitude(),
-                            mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
+        if (mLastKnownLocation!=null) {
             if (myMarker != null) {
                 Log.d("marker", "Моя позиция есть, изменяю её");
                 myMarker.setPosition(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
@@ -271,14 +266,7 @@ public class ActivityMap extends AppCompatActivity
                 Log.d("marker", "Моей позиции нет, делаю позицию");
                 myMarker = mMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.my_marker)).title("Я").position(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude())));
             }
-        } else {
-            Log.d("TAG", "Current location is null. Using defaults.");
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
-        }
-        try {
             Log.d("myPosition", "Моя позиция - " + mLastKnownLocation.toString());
-        } catch (NullPointerException ex) {
-            ex.printStackTrace();
         }
     }
 
@@ -325,6 +313,12 @@ public class ActivityMap extends AppCompatActivity
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        dbPosition.DB_geo.close();
+    }
+
     private void fillArray(GoogleMap map) {
         openDB();
         Cursor cursor = dbPosition.DB_geo.query(DB_Position.DB_TABLE, new String[]{DB_Position.COLUMN_ID, DB_Position.COLUMN_NAME, DB_Position.COLUMN_LOC, DB_Position.COLUMN_ISVISITED}, null, null, null, null, null);
@@ -358,35 +352,19 @@ public class ActivityMap extends AppCompatActivity
 
     @Override
     public boolean onMarkerClick(final Marker marker) {
+        //не настроил нихуя свое местоположение
         Log.d("marker", "Нажал на маркер " + marker.getId() + " " + marker.getTitle() + " " + marker.getPosition().toString());
         boolean flag = (boolean) marker.getTag();
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         final LayoutInflater inflater = this.getLayoutInflater();
         final View view = inflater.inflate(R.layout.dialog, null);
+        TextView info = (TextView) view.findViewById(R.id.dialog_text_info);
+        TextView distance = (TextView) view.findViewById(R.id.dialog_text_distance);
+        Button first = (Button) view.findViewById(R.id.first_btn);
+        Button second = (Button) view.findViewById(R.id.second_btn);
         builder.setView(view);
-        TextView caption = (TextView) view.findViewById(R.id.dialog_caption);
-        caption.setText(marker.getTitle());
         if (flag) {
-            TextView info = (TextView) view.findViewById(R.id.dialog_text_info);
-            if (mLastKnownLocation != null) {
-                double dist = calucateDistance(mLastKnownLocation, marker.getPosition());
-                if (dist > 1000.00) {
-                    dist = dist / 1000;
-                    info.setText("Расстояние = " + dist + " км");
-                } else {
-                    info.setText("Расстояние = " + dist + " м");
-                }
-            }
-            builder.setPositiveButton("Узнать больше", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    startActivity(new Intent(context, info_activity.class));
-                }
-            });
-        } else {
-            TextView info = (TextView) view.findViewById(R.id.dialog_text_info);
-            TextView distance = (TextView) view.findViewById(R.id.dialog_text_distance);
-            info.setText("Вы тут еще не были");
+            info.setText(marker.getTitle());
             if (mLastKnownLocation != null) {
                 double dist = calucateDistance(mLastKnownLocation, marker.getPosition());
                 if (dist > 1000.00) {
@@ -396,20 +374,32 @@ public class ActivityMap extends AppCompatActivity
                     distance.setText("Расстояние = " + dist + " м");
                 }
             }
-            builder.setPositiveButton("Хочу открыть", new DialogInterface.OnClickListener() {
+            first.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-
+                public void onClick(View view) {
+                    startActivity(new Intent(context, info_activity.class));
                 }
             });
+        } else {
+            info.setText(marker.getTitle()+"\n"+"Вы тут еще не были");
+            first.setBackgroundResource(R.drawable.first_btn_clon);
+            if (mLastKnownLocation != null) {
+                double dist = calucateDistance(mLastKnownLocation, marker.getPosition());
+                if (dist > 1000.00) {
+                    dist = dist / 1000;
+                    distance.setText("Расстояние = " + dist + " км");
+                } else {
+                    distance.setText("Расстояние = " + dist + " м");
+                }
+            }
         }
-        builder.setNegativeButton("Назад", new DialogInterface.OnClickListener() {
+        final AlertDialog alert = builder.create();
+        second.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.cancel();
+            public void onClick(View view) {
+                alert.hide();
             }
         });
-        final AlertDialog alert = builder.create();
         alert.show();
         return false;
     }
@@ -429,6 +419,38 @@ public class ActivityMap extends AppCompatActivity
     public void lookAtMe(View view) {
         Log.d("pos", "нажал на кнопку");
         getDeviceLocation();
+        setCameraPosition(mLastKnownLocation);
+    }
+
+    private void setCameraPosition(Location location){
+        if (mLocationPermissionGranted) {
+            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+        }
+        // Set the map's camera position to the current location of the device.
+        if (mCameraPosition != null) {
+            mMap.moveCamera(CameraUpdateFactory.newCameraPosition(mCameraPosition));
+        } else if (location != null) {
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                    new LatLng(location.getLatitude(),
+                            location.getLongitude()), DEFAULT_ZOOM));
+        } else {
+            Log.d("TAG", "Current location is null. Using defaults.");
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
+        }
+        try {
+            Log.d("myPosition", "Моя позиция - " + mLastKnownLocation.toString());
+        } catch (NullPointerException ex) {
+            ex.printStackTrace();
+        }
     }
 }
 
