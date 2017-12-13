@@ -41,23 +41,27 @@ public class GreetingActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabDots);
         tabLayout.setupWithViewPager(pager, true);
 
-        pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+//        pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+//
+//            @Override
+//            public void onPageSelected(int position) {
+//
+//            }
+//
+//            @Override
+//            public void onPageScrolled(int position, float positionOffset,
+//                                       int positionOffsetPixels) {
+//            }
+//
+//            @Override
+//            public void onPageScrollStateChanged(int state) {
+//            }
+//        });
 
-            @Override
-            public void onPageSelected(int position) {
+    }
 
-            }
-
-            @Override
-            public void onPageScrolled(int position, float positionOffset,
-                                       int positionOffsetPixels) {
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-            }
-        });
-
+    public void continueClick(View view) {
+        startActivity(new Intent(this, ActivityMap.class));
     }
 
 }

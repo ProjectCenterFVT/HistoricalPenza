@@ -11,7 +11,7 @@ import android.support.v4.view.PagerAdapter;
 
 class MyFragmentPagerAdapter extends FragmentPagerAdapter {
 
-    static final int PAGE_COUNT = 3;
+    private static final int PAGE_COUNT = 3;
 
     public MyFragmentPagerAdapter(FragmentManager fm) {
         super(fm);

@@ -1,15 +1,11 @@
 package com.projectcenterfvt.historicalpenza;
 
-
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
-
-import java.util.Random;
+import android.widget.ImageView;
 
 /**
  * Created by Dmitry on 13.12.2017.
@@ -18,9 +14,6 @@ import java.util.Random;
 public class PageFragment extends Fragment {
 
     static final String ARGUMENT_PAGE_NUMBER = "arg_page_number";
-
-    int pageNumber;
-    int backColor;
 
     public static PageFragment newInstance(int page) {
         PageFragment pageFragment = new PageFragment();
@@ -33,10 +26,6 @@ public class PageFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        pageNumber = getArguments().getInt(ARGUMENT_PAGE_NUMBER);
-
-        Random rnd = new Random();
-        backColor = Color.argb(40, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
     }
 
     @Override
@@ -44,9 +33,19 @@ public class PageFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment, null);
 
-        TextView tvPage = (TextView) view.findViewById(R.id.tvPage);
-        tvPage.setText("Page " + pageNumber);
-        tvPage.setBackgroundColor(backColor);
+        ImageView ivPage = (ImageView) view.findViewById(R.id.ivPage);
+
+        switch (getArguments().getInt(ARGUMENT_PAGE_NUMBER)) {
+            case 0:
+                ivPage.setImageResource(R.drawable.first_pager);
+                break;
+            case 1:
+                ivPage.setImageResource(R.drawable.second_pager);
+                break;
+            case 2:
+                ivPage.setImageResource(R.drawable.third_pager);
+                break;
+        }
 
         return view;
     }
