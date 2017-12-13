@@ -375,6 +375,7 @@ public class ActivityMap extends AppCompatActivity
         TextView info = (TextView) view.findViewById(R.id.dialog_text_info);
         TextView distance = (TextView) view.findViewById(R.id.dialog_text_distance);
         Button first = (Button) view.findViewById(R.id.first_btn);
+        first.setText("Узнать больше");
         Button second = (Button) view.findViewById(R.id.second_btn);
         builder.setView(view);
         if (flag) {
@@ -396,7 +397,8 @@ public class ActivityMap extends AppCompatActivity
             });
         } else {
             info.setText(marker.getTitle()+"\n"+"Вы тут еще не были");
-            first.setBackgroundResource(R.drawable.first_btn_clon);
+//            first.setBackgroundResource(R.drawable.first_btn_clon);
+            first.setText("Хочу открыть");
             if (mLastKnownLocation != null) {
                 int dist = calucateDistance(mLastKnownLocation, marker.getPosition());
                 if (dist > 1000.00) {
