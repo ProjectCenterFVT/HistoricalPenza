@@ -7,6 +7,7 @@
     tools:context="com.projectcenterfvt.historicalpenza.GreetingActivity">
 
     <android.support.constraint.ConstraintLayout
+        android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="146dp"
         android:background="#33adc7">
@@ -58,16 +59,16 @@
     <android.support.design.widget.TabLayout
         android:id="@+id/tabDots"
         android:layout_width="0dp"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="284dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/constraintLayout"
         app:tabBackground="@drawable/tab_selector"
         app:tabGravity="center"
-        app:tabIndicatorHeight="0dp"
-        tools:layout_editor_absoluteY="273dp" />
+        app:tabIndicatorHeight="0dp" />
 
 </android.support.constraint.ConstraintLayout>

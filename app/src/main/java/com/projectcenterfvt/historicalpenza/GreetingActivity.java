@@ -1,6 +1,7 @@
 package com.projectcenterfvt.historicalpenza;
 
 import android.content.Intent;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -31,11 +32,14 @@ public class GreetingActivity extends AppCompatActivity {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         setContentView(R.layout.activity_greeting);
-        
+
 
         pager = (ViewPager) findViewById(R.id.pager);
         pagerAdapter = new MyFragmentPagerAdapter(getSupportFragmentManager());
         pager.setAdapter(pagerAdapter);
+
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabDots);
+        tabLayout.setupWithViewPager(pager, true);
 
         pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
