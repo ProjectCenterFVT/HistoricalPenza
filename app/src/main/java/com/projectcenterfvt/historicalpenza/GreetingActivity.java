@@ -21,28 +21,7 @@ public class GreetingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_greeting);
 
-        fadein = AnimationUtils.loadAnimation(this, R.anim.fadein_alpha);
-        fadeout = AnimationUtils.loadAnimation(this, R.anim.fadeout_alpha);
 
-        final TextView tvQuote = (TextView) findViewById(R.id.tvQuote);
-        tvQuote.startAnimation(fadein);
-        tvQuote.setVisibility(View.VISIBLE);
-
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                tvQuote.startAnimation(fadeout);
-                tvQuote.setVisibility(View.GONE);
-
-                TextView tvDescription = (TextView) findViewById(R.id.tvDescription);
-                tvDescription.startAnimation(fadein);
-                tvDescription.setVisibility(View.VISIBLE);
-
-                Button btnContinue = (Button) findViewById(R.id.btnContinue);
-                btnContinue.startAnimation(fadein);
-                btnContinue.setVisibility(View.VISIBLE);
-            }
-        }, QUOTE_DISPLAY_LENGTH);
     }
 
     public void continueClick(View view) {

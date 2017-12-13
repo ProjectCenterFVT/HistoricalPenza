@@ -5,6 +5,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -263,8 +266,11 @@ public class ActivityMap extends AppCompatActivity
                 Log.d("marker", "Моя позиция есть, изменяю её");
                 myMarker.setPosition(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
             } else {
+                Bitmap bitmap = BitmapFactory.decodeResource(getResources(), getResources().
+                        getIdentifier("my_marker","drawable", getPackageName()));
+                bitmap = Bitmap.createScaledBitmap(bitmap, 44,70,false);
                 Log.d("marker", "Моей позиции нет, делаю позицию");
-                myMarker = mMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.my_marker)).title("Я").position(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude())));
+                myMarker = mMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromBitmap(bitmap)).title("Я").position(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude())));
             }
             Log.d("myPosition", "Моя позиция - " + mLastKnownLocation.toString());
         }
@@ -336,10 +342,18 @@ public class ActivityMap extends AppCompatActivity
                 LatLng position = new LatLng(Double.parseDouble(loc[0]), Double.parseDouble(loc[1]));
                 MarkerOptions options = new MarkerOptions();
                 options.position(position).title(name).flat(true);
-                if (isVisited)
-                    options.icon(BitmapDescriptorFactory.fromResource(R.drawable.unlock));
-                else
-                    options.icon(BitmapDescriptorFactory.fromResource(R.drawable.lock));
+                if (isVisited) {
+                    Bitmap bitmap = BitmapFactory.decodeResource(getResources(), getResources().
+                            getIdentifier("unlock","drawable", getPackageName()));
+                    bitmap = Bitmap.createScaledBitmap(bitmap, 54,70,false);
+                    options.icon(BitmapDescriptorFactory.fromBitmap(bitmap));
+                }
+                else {
+                    Bitmap bitmap = BitmapFactory.decodeResource(getResources(), getResources().
+                            getIdentifier("lock","drawable", getPackageName()));
+                    bitmap = Bitmap.createScaledBitmap(bitmap, 44,70,false);
+                    options.icon(BitmapDescriptorFactory.fromBitmap(bitmap));
+                }
                 Marker marker = map.addMarker(options);
                 marker.setTag(isVisited);
                 Log.d("marker", "нарисовал маркер с координатами " + position);
@@ -349,7 +363,6 @@ public class ActivityMap extends AppCompatActivity
         cursor.close();
     }
 
-
     @Override
     public boolean onMarkerClick(final Marker marker) {
         //не настроил нихуя свое местоположение
@@ -358,6 +371,7 @@ public class ActivityMap extends AppCompatActivity
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         final LayoutInflater inflater = this.getLayoutInflater();
         final View view = inflater.inflate(R.layout.dialog, null);
+        view.setBackgroundResource(R.drawable.dialog_bgn);
         TextView info = (TextView) view.findViewById(R.id.dialog_text_info);
         TextView distance = (TextView) view.findViewById(R.id.dialog_text_distance);
         Button first = (Button) view.findViewById(R.id.first_btn);
@@ -366,7 +380,7 @@ public class ActivityMap extends AppCompatActivity
         if (flag) {
             info.setText(marker.getTitle());
             if (mLastKnownLocation != null) {
-                double dist = calucateDistance(mLastKnownLocation, marker.getPosition());
+                int dist = calucateDistance(mLastKnownLocation, marker.getPosition());
                 if (dist > 1000.00) {
                     dist = dist / 1000;
                     distance.setText("Расстояние = " + dist + " км");
@@ -384,7 +398,7 @@ public class ActivityMap extends AppCompatActivity
             info.setText(marker.getTitle()+"\n"+"Вы тут еще не были");
             first.setBackgroundResource(R.drawable.first_btn_clon);
             if (mLastKnownLocation != null) {
-                double dist = calucateDistance(mLastKnownLocation, marker.getPosition());
+                int dist = calucateDistance(mLastKnownLocation, marker.getPosition());
                 if (dist > 1000.00) {
                     dist = dist / 1000;
                     distance.setText("Расстояние = " + dist + " км");
@@ -394,6 +408,7 @@ public class ActivityMap extends AppCompatActivity
             }
         }
         final AlertDialog alert = builder.create();
+        alert.getWindow().setBackgroundDrawable(new ColorDrawable(0));
         second.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
