@@ -103,13 +103,13 @@ public class ActivityMap extends AppCompatActivity
         }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
+//        setSupportActionBar(toolbar);
+//
+//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+//                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+//        drawer.addDrawerListener(toggle);
+//        toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -268,7 +268,7 @@ public class ActivityMap extends AppCompatActivity
             } else {
                 Bitmap bitmap = BitmapFactory.decodeResource(getResources(), getResources().
                         getIdentifier("my_marker","drawable", getPackageName()));
-                bitmap = Bitmap.createScaledBitmap(bitmap, 44,70,false);
+                bitmap = Bitmap.createScaledBitmap(bitmap, 57,100,false);
                 Log.d("marker", "Моей позиции нет, делаю позицию");
                 myMarker = mMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromBitmap(bitmap)).title("Я").position(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude())));
             }
@@ -345,13 +345,13 @@ public class ActivityMap extends AppCompatActivity
                 if (isVisited) {
                     Bitmap bitmap = BitmapFactory.decodeResource(getResources(), getResources().
                             getIdentifier("unlock","drawable", getPackageName()));
-                    bitmap = Bitmap.createScaledBitmap(bitmap, 54,70,false);
+                    bitmap = Bitmap.createScaledBitmap(bitmap, 74,100,false);
                     options.icon(BitmapDescriptorFactory.fromBitmap(bitmap));
                 }
                 else {
                     Bitmap bitmap = BitmapFactory.decodeResource(getResources(), getResources().
                             getIdentifier("lock","drawable", getPackageName()));
-                    bitmap = Bitmap.createScaledBitmap(bitmap, 44,70,false);
+                    bitmap = Bitmap.createScaledBitmap(bitmap, 62,100,false);
                     options.icon(BitmapDescriptorFactory.fromBitmap(bitmap));
                 }
                 Marker marker = map.addMarker(options);
@@ -375,6 +375,7 @@ public class ActivityMap extends AppCompatActivity
         TextView info = (TextView) view.findViewById(R.id.dialog_text_info);
         TextView distance = (TextView) view.findViewById(R.id.dialog_text_distance);
         Button first = (Button) view.findViewById(R.id.first_btn);
+        first.setText("Узнать больше");
         Button second = (Button) view.findViewById(R.id.second_btn);
         builder.setView(view);
         if (flag) {
@@ -396,7 +397,8 @@ public class ActivityMap extends AppCompatActivity
             });
         } else {
             info.setText(marker.getTitle()+"\n"+"Вы тут еще не были");
-            first.setBackgroundResource(R.drawable.first_btn_clon);
+//            first.setBackgroundResource(R.drawable.first_btn_clon);
+            first.setText("Хочу открыть");
             if (mLastKnownLocation != null) {
                 int dist = calucateDistance(mLastKnownLocation, marker.getPosition());
                 if (dist > 1000.00) {

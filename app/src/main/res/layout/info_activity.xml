@@ -51,10 +51,10 @@
         <Button
             android:id="@+id/button7"
             android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_height="38dp"
             android:layout_gravity="left|bottom"
-            android:background="@drawable/icon_camera"
-            android:layout_margin="15dip" />
+            android:layout_margin="15dip"
+            android:background="@drawable/icon_camera" />
 
         <Button
             android:id="@+id/button8"
