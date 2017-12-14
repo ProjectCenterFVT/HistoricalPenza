@@ -367,21 +367,26 @@ public class ActivityMap extends AppCompatActivity
     public boolean onMarkerClick(final Marker marker) {
         //не настроил нихуя свое местоположение
         Log.d("marker", "Нажал на маркер " + marker.getId() + " " + marker.getTitle() + " " + marker.getPosition().toString());
+
         boolean flag = (boolean) marker.getTag();
+
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         final LayoutInflater inflater = this.getLayoutInflater();
         final View view = inflater.inflate(R.layout.dialog, null);
         view.setBackgroundResource(R.drawable.dialog_bgn);
+
         TextView info = (TextView) view.findViewById(R.id.dialog_text_info);
         TextView distance = (TextView) view.findViewById(R.id.dialog_text_distance);
+
         Button first = (Button) view.findViewById(R.id.first_btn);
-        first.setText("Узнать больше");
         Button second = (Button) view.findViewById(R.id.second_btn);
+
         builder.setView(view);
         if (flag) {
             info.setText(marker.getTitle());
+            first.setText("Узнать больше");
             if (mLastKnownLocation != null) {
-                int dist = calucateDistance(mLastKnownLocation, marker.getPosition());
+                int dist = calculateDistance(mLastKnownLocation, marker.getPosition());
                 if (dist > 1000.00) {
                     dist = dist / 1000;
                     distance.setText("Расстояние = " + dist + " км");
@@ -397,10 +402,9 @@ public class ActivityMap extends AppCompatActivity
             });
         } else {
             info.setText(marker.getTitle()+"\n"+"Вы тут еще не были");
-//            first.setBackgroundResource(R.drawable.first_btn_clon);
             first.setText("Хочу открыть");
             if (mLastKnownLocation != null) {
-                int dist = calucateDistance(mLastKnownLocation, marker.getPosition());
+                int dist = calculateDistance(mLastKnownLocation, marker.getPosition());
                 if (dist > 1000.00) {
                     dist = dist / 1000;
                     distance.setText("Расстояние = " + dist + " км");
@@ -421,7 +425,7 @@ public class ActivityMap extends AppCompatActivity
         return false;
     }
 
-    private int calucateDistance(Location l1, LatLng l2) {
+    private int calculateDistance(Location l1, LatLng l2) {
         Log.d("marker ", "Мое местоположение = " + l1.toString());
         final int R = 6372795;
         double x1 = l1.getLatitude() * Math.PI / 180;
