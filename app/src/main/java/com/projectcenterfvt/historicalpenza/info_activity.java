@@ -3,6 +3,7 @@ package com.projectcenterfvt.historicalpenza;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
+import android.view.View;
 import android.widget.TextView;
 
 public class info_activity extends AppCompatActivity {
@@ -17,4 +18,7 @@ public class info_activity extends AppCompatActivity {
 
     }
 
+    public void onBackClick(View view) {
+        finish();
+    }
 }

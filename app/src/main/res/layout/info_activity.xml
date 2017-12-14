@@ -81,7 +81,8 @@
                 android:layout_height="48dp"
                 android:layout_gravity="right|bottom"
                 android:layout_margin="15dip"
-                android:background="@drawable/icon_back" />
+                android:background="@drawable/icon_back"
+                android:onClick="onBackClick" />
         </FrameLayout>
 
     </android.support.constraint.ConstraintLayout>
