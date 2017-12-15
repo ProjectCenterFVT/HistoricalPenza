@@ -11,9 +11,6 @@
             android:id="@+id/name_helpProject"
             android:title="@string/name_helpProject" />
         <item
-            android:id="@+id/name_moreSight"
-            android:title="@string/name_moreSight" />
-        <item
             android:id="@+id/name_settings"
             android:title="@string/name_settings" />
         <item

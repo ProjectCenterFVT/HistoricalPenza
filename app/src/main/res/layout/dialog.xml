@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/linearLayout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     android:orientation="vertical">
 
 
@@ -14,11 +14,12 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/sfuitext_light"
         android:gravity="center"
         android:text="Информация о месте"
         android:textColor="@color/colorBlack"
-        android:textSize="20sp"
+        android:textSize="17sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -26,64 +27,78 @@
     <TextView
         android:id="@+id/dialog_text_info"
         android:layout_width="match_parent"
-        android:layout_height="27dp"
-        android:layout_marginBottom="8dp"
+        android:layout_height="45dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="84dp"
+        android:layout_marginTop="12dp"
+        android:fontFamily="@font/sfuitext_light"
         android:gravity="center"
         android:textColor="@color/colorBlack"
-        android:textSize="20dp"
-        app:layout_constraintBottom_toTopOf="@+id/dialog_text_distance"
+        android:textSize="17dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/dialog_caption" />
+
+    <TextView
+        android:id="@+id/dialog_text_were"
+        android:layout_width="match_parent"
+        android:layout_height="24dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="12dp"
+        android:fontFamily="@font/sfuitext_light"
+        android:gravity="center"
+        android:textColor="@color/colorBlack"
+        android:textSize="17dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dialog_caption"
-        app:layout_constraintVertical_bias="0.836" />
+        app:layout_constraintTop_toBottomOf="@+id/dialog_text_info" />
 
     <TextView
         android:id="@+id/dialog_text_distance"
         android:layout_width="match_parent"
-        android:layout_height="31dp"
-        android:layout_marginBottom="60dp"
+        android:layout_height="24dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="12dp"
+        android:fontFamily="@font/sfuitext_light"
         android:gravity="center"
         android:textColor="@color/colorBlack"
-        android:textSize="25dp"
-        android:fontFamily="@font/sfuitext_bold"
-        app:layout_constraintBottom_toTopOf="@+id/first_btn"
+        android:textSize="21dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/dialog_text_were" />
 
     <Button
         android:id="@+id/first_btn"
         android:layout_width="180dp"
         android:layout_height="31dp"
-        android:layout_marginBottom="76dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="18dp"
         android:background="@drawable/icon_btn"
         android:textColor="@android:color/white"
         android:textSize="16sp"
-        app:layout_constraintBottom_toTopOf="@+id/second_btn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/dialog_text_distance"
         tools:text="Узнать больше" />
 
     <Button
         android:id="@+id/second_btn"
         android:layout_width="70dp"
         android:layout_height="25dp"
-        android:layout_marginBottom="18dp"
+        android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
         android:background="@color/transparent"
         android:text="Назад"
         android:textColor="@android:color/black"
-        android:textSize="18sp"
+        android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/first_btn" />
 </android.support.constraint.ConstraintLayout>

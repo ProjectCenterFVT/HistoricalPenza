@@ -21,9 +21,9 @@
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:layout_gravity="center|bottom"
-            android:layout_marginBottom="37dp"
-            android:background="@drawable/btn_close_target"
-            android:text=" " />
+            android:layout_marginBottom="12dp"
+            android:onClick="close_target"
+            android:background="@drawable/btn_close_target" />
 
         <fragment
             android:id="@+id/map"
@@ -40,7 +40,7 @@
             android:layout_height="48dp"
             android:layout_alignParentEnd="true"
             android:layout_marginRight="8dp"
-            android:layout_marginTop="178dp"
+            android:layout_marginTop="215dp"
             android:background="@drawable/plus"
             android:onClick="plus" />
 
@@ -56,11 +56,10 @@
 
         <Button
             android:id="@+id/btn_position"
-            android:layout_width="36dp"
-            android:layout_height="40dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_alignEnd="@+id/btn_minus"
             android:layout_below="@+id/btn_minus"
-            android:layout_marginRight="8dp"
             android:layout_marginTop="8dp"
             android:background="@drawable/get_location"
             android:onClick="lookAtMe" />
