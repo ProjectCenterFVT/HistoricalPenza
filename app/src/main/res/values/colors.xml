@@ -4,4 +4,5 @@
     <color name="colorPrimaryDark">#47adcb</color>
     <color name="colorAccent">#47adcb</color>
     <color name="colorBlack">#000000</color>
+    <color name="navItemBackground">#343434</color>
 </resources>

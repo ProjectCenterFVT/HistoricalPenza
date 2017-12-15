@@ -22,8 +22,10 @@
         android:animateLayoutChanges="false"
         android:animationCache="false"
         android:fitsSystemWindows="true"
+        android:background="#3d3d3d"
+        app:itemTextColor="#979797"
+        app:itemBackground="@drawable/nav_item_background"
         app:headerLayout="@layout/nav_header_activity_map"
-        app:menu="@menu/activity_map_drawer"
-        tools:itemTextColor="@android:color/black" />
+        app:menu="@menu/activity_map_drawer" />
 
 </android.support.v4.widget.DrawerLayout>
