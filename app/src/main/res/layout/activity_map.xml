@@ -26,6 +26,19 @@
         app:itemTextColor="#979797"
         app:itemBackground="@drawable/nav_item_background"
         app:headerLayout="@layout/nav_header_activity_map"
-        app:menu="@menu/activity_map_drawer" />
+        app:menu="@menu/menu_navigation_drawer">
+
+        <android.support.design.widget.NavigationView
+            android:id="@+id/navigation_drawer_bottom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:background="#979797"
+            android:elevation="0dp"
+            app:itemTextColor="#979797"
+            app:itemBackground="@drawable/nav_item_background"
+            app:menu="@menu/menu_navigation_drawer_bottom" />
+
+    </android.support.design.widget.NavigationView>
 
 </android.support.v4.widget.DrawerLayout>

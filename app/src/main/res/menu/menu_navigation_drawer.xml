@@ -10,15 +10,6 @@
         <item
             android:id="@+id/name_helpProject"
             android:title="@string/name_helpProject" />
-        <item
-            android:id="@+id/name_settings"
-            android:title="@string/name_settings" />
-        <item
-            android:id="@+id/name_help"
-            android:title="@string/name_help" />
-        <item
-            android:id="@+id/name_about"
-            android:title="@string/name_about" />
     </group>
 
 </menu>

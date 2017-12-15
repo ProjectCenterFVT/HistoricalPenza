@@ -8,13 +8,12 @@
     android:orientation="vertical"
     android:paddingBottom="8dp"
     android:paddingTop="32dp"
-    android:paddingLeft="24dp"
+    android:paddingLeft="16dp"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/sfuitext_bold"
         android:gravity="bottom"
         android:text="@string/hist_penza1"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
@@ -23,7 +22,6 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/sfuitext_bold"
         android:text="@string/hist_penza2"
         android:textAlignment="viewStart"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
