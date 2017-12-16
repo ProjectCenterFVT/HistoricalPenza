@@ -19,10 +19,13 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
@@ -184,24 +187,51 @@ public class ActivityMap extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        int id = item.getItemId();
 
-        if (id == R.id.name_sight) {
+        switch (item.getItemId()) {
+            case R.id.name_sight:
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                Card_dialog card_dialog = new Card_dialog();
+                card_dialog.setList(list);
+                card_dialog.show(fragmentManager, "dialog");
+                break;
+            case R.id.name_helpProject:
 
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            Card_dialog card_dialog = new Card_dialog();
-            card_dialog.setList(list);
-            card_dialog.show(fragmentManager, "dialog");
+                break;
+            case R.id.name_settings:
 
+                break;
+            case R.id.name_help:
+                final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                final LayoutInflater inflater = this.getLayoutInflater();
+                final View view = inflater.inflate(R.layout.dialog_guide, null);
+                view.setBackgroundResource(R.drawable.dialog_bgn);
 
-        } else if (id == R.id.name_helpProject) {
+                Button btnBack = (Button) view.findViewById(R.id.btnBack);
 
-        } else if (id == R.id.name_settings) {
+                ViewPager pager = (ViewPager) view.findViewById(R.id.pager1);
+                PagerAdapter pagerAdapter = new MyGuideFragmentPagerAdapter(getSupportFragmentManager());
+                pager.setAdapter(pagerAdapter);
 
-        } else if (id == R.id.name_help) {
+                TabLayout tabLayout = (TabLayout) view.findViewById(R.id.tabDots);
+                tabLayout.setupWithViewPager(pager, true);
 
-        } else if (id == R.id.name_about) {
+                builder.setView(view);
+                final AlertDialog alert = builder.create();
 
+                alert.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+                btnBack.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        alert.hide();
+                    }
+                });
+
+                alert.show();
+                break;
+            case R.id.name_about:
+
+                break;
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
