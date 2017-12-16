@@ -1,5 +1,6 @@
 package com.projectcenterfvt.historicalpenza;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -8,14 +9,17 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.ColorDrawable;
+import android.icu.text.IDNA;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -40,16 +44,34 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import com.arlib.floatingsearchview.FloatingSearchView;
+
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class ActivityMap extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, GoogleMap.OnMarkerClickListener {
+        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, GoogleMap.OnMarkerClickListener, GoogleMap.InfoWindowAdapter {
+
+    class Point {
+        String name;
+        LatLng location;
+        int distance;
+
+        Point(String name, LatLng loc, int distance) {
+            this.name = name;
+            this.location = loc;
+            this.distance = distance;
+        }
+    }
 
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
@@ -66,6 +88,10 @@ public class ActivityMap extends AppCompatActivity
     private Button btn_pos;
     private Context context = this;
     private Marker myMarker = null;
+    private DrawerLayout mDrawerLayout;
+    private FloatingSearchView searchView;
+    private ArrayList<Point> list = new ArrayList<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,7 +111,7 @@ public class ActivityMap extends AppCompatActivity
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, locationListener);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 4, locationListener);
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this /* FragmentActivity */,
@@ -102,17 +128,19 @@ public class ActivityMap extends AppCompatActivity
             mCameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
         }
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
-//
-//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-//        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-//                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-//        drawer.addDrawerListener(toggle);
-//        toggle.syncState();
-
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        searchView = (FloatingSearchView) findViewById(R.id.floating_search_view);
+        searchView.attachNavigationDrawerToMenuButton(mDrawerLayout);
+
+        searchView.setOnQueryChangeListener(new FloatingSearchView.OnQueryChangeListener() {
+            @Override
+            public void onSearchTextChanged(String oldQuery, String newQuery) {
+
+            }
+        });
 
     }
 
@@ -140,10 +168,6 @@ public class ActivityMap extends AppCompatActivity
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -156,9 +180,13 @@ public class ActivityMap extends AppCompatActivity
 
         if (id == R.id.name_sight) {
 
-        } else if (id == R.id.name_helpProject) {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            Card_dialog card_dialog = new Card_dialog();
+            card_dialog.setList(list);
+            card_dialog.show(fragmentManager, "dialog");
 
-        } else if (id == R.id.name_moreSight) {
+
+        } else if (id == R.id.name_helpProject) {
 
         } else if (id == R.id.name_settings) {
 
@@ -179,11 +207,13 @@ public class ActivityMap extends AppCompatActivity
         mMap.setMinZoomPreference(12.0f);
         mMap.setMaxZoomPreference(17.0f);
         getLocationPermission();
-        setCameraPosition(mLastKnownLocation);
         getDeviceLocation();
+        setCameraPosition(mLastKnownLocation);
         fillArray(mMap);
         mMap.setOnMarkerClickListener(this);
-
+        mMap.getUiSettings().setMapToolbarEnabled(false);
+        mMap.setInfoWindowAdapter(this);
+        setDistance();
     }
 
     @Override
@@ -213,7 +243,11 @@ public class ActivityMap extends AppCompatActivity
         @Override
         public void onLocationChanged(Location location) {
             Log.d("pos", "Смена позиции");
+            if (myMarker!=null) {
+                myMarker.setPosition(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
+            }
             getDeviceLocation();
+            setDistance();
         }
 
         @Override
@@ -261,16 +295,16 @@ public class ActivityMap extends AppCompatActivity
             mLastKnownLocation = LocationServices.FusedLocationApi
                     .getLastLocation(mGoogleApiClient);
         }
-        if (mLastKnownLocation!=null) {
+        if (mLastKnownLocation != null) {
             if (myMarker != null) {
-                Log.d("marker", "Моя позиция есть, изменяю её");
+                Log.d("myPosition", "Моя позиция есть, изменяю её");
                 myMarker.setPosition(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
             } else {
                 Bitmap bitmap = BitmapFactory.decodeResource(getResources(), getResources().
-                        getIdentifier("my_marker","drawable", getPackageName()));
-                bitmap = Bitmap.createScaledBitmap(bitmap, 57,100,false);
-                Log.d("marker", "Моей позиции нет, делаю позицию");
-                myMarker = mMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromBitmap(bitmap)).title("Я").position(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude())));
+                        getIdentifier("my_marker", "drawable", getPackageName()));
+                bitmap = Bitmap.createScaledBitmap(bitmap, 57, 100, false);
+                Log.d("myPosition", "Моей позиции нет, делаю позицию");
+                myMarker = mMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromBitmap(bitmap)).position(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude())));
             }
             Log.d("myPosition", "Моя позиция - " + mLastKnownLocation.toString());
         }
@@ -299,12 +333,10 @@ public class ActivityMap extends AppCompatActivity
 
     public void plus(View view) {
         mMap.animateCamera(CameraUpdateFactory.zoomBy(1.0f));
-        DEFAULT_ZOOM = (int) mMap.getCameraPosition().zoom;
     }
 
     public void minus(View view) {
         mMap.animateCamera(CameraUpdateFactory.zoomBy(-1.0f));
-        DEFAULT_ZOOM = (int) mMap.getCameraPosition().zoom;
     }
 
     private synchronized void openDB() {
@@ -329,7 +361,6 @@ public class ActivityMap extends AppCompatActivity
         openDB();
         Cursor cursor = dbPosition.DB_geo.query(DB_Position.DB_TABLE, new String[]{DB_Position.COLUMN_ID, DB_Position.COLUMN_NAME, DB_Position.COLUMN_LOC, DB_Position.COLUMN_ISVISITED}, null, null, null, null, null);
         if (cursor.moveToFirst()) {
-            final int id = cursor.getColumnIndex(dbPosition.COLUMN_ID);
             final int id_name = cursor.getColumnIndex(dbPosition.COLUMN_NAME);
             final int id_loc = cursor.getColumnIndex(dbPosition.COLUMN_LOC);
             final int id_isVisited = cursor.getColumnIndex(dbPosition.COLUMN_ISVISITED);
@@ -342,16 +373,20 @@ public class ActivityMap extends AppCompatActivity
                 LatLng position = new LatLng(Double.parseDouble(loc[0]), Double.parseDouble(loc[1]));
                 MarkerOptions options = new MarkerOptions();
                 options.position(position).title(name).flat(true);
+                if (mLastKnownLocation != null) {
+                    list.add(new Point(name, position, calculateDistance(mLastKnownLocation, position)));
+                } else {
+                    list.add(new Point(name, position, 0));
+                }
                 if (isVisited) {
                     Bitmap bitmap = BitmapFactory.decodeResource(getResources(), getResources().
-                            getIdentifier("unlock","drawable", getPackageName()));
-                    bitmap = Bitmap.createScaledBitmap(bitmap, 74,100,false);
+                            getIdentifier("unlock", "drawable", getPackageName()));
+                    bitmap = Bitmap.createScaledBitmap(bitmap, 74, 100, false);
                     options.icon(BitmapDescriptorFactory.fromBitmap(bitmap));
-                }
-                else {
+                } else {
                     Bitmap bitmap = BitmapFactory.decodeResource(getResources(), getResources().
-                            getIdentifier("lock","drawable", getPackageName()));
-                    bitmap = Bitmap.createScaledBitmap(bitmap, 62,100,false);
+                            getIdentifier("lock", "drawable", getPackageName()));
+                    bitmap = Bitmap.createScaledBitmap(bitmap, 62, 100, false);
                     options.icon(BitmapDescriptorFactory.fromBitmap(bitmap));
                 }
                 Marker marker = map.addMarker(options);
@@ -365,63 +400,55 @@ public class ActivityMap extends AppCompatActivity
 
     @Override
     public boolean onMarkerClick(final Marker marker) {
-        //не настроил нихуя свое местоположение
         Log.d("marker", "Нажал на маркер " + marker.getId() + " " + marker.getTitle() + " " + marker.getPosition().toString());
+        if (marker.getTag() != null) {
+            boolean flag = (boolean) marker.getTag();
+            final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            final LayoutInflater inflater = this.getLayoutInflater();
+            final View view = inflater.inflate(R.layout.dialog, null);
+            view.setBackgroundResource(R.drawable.dialog_bgn);
 
-        boolean flag = (boolean) marker.getTag();
+            TextView info = (TextView) view.findViewById(R.id.dialog_text_info);
+            TextView distance = (TextView) view.findViewById(R.id.dialog_text_distance);
+            TextView were = (TextView) view.findViewById(R.id.dialog_text_were);
 
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        final LayoutInflater inflater = this.getLayoutInflater();
-        final View view = inflater.inflate(R.layout.dialog, null);
-        view.setBackgroundResource(R.drawable.dialog_bgn);
+            Button first = (Button) view.findViewById(R.id.first_btn);
+            Button second = (Button) view.findViewById(R.id.second_btn);
 
-        TextView info = (TextView) view.findViewById(R.id.dialog_text_info);
-        TextView distance = (TextView) view.findViewById(R.id.dialog_text_distance);
-
-        Button first = (Button) view.findViewById(R.id.first_btn);
-        Button second = (Button) view.findViewById(R.id.second_btn);
-
-        builder.setView(view);
-        if (flag) {
-            info.setText(marker.getTitle());
-            first.setText("Узнать больше");
-            if (mLastKnownLocation != null) {
-                int dist = calculateDistance(mLastKnownLocation, marker.getPosition());
-                if (dist > 1000.00) {
-                    dist = dist / 1000;
-                    distance.setText("Расстояние = " + dist + " км");
-                } else {
-                    distance.setText("Расстояние = " + dist + " м");
+            builder.setView(view);
+            if (flag) {
+                info.setText(marker.getTitle());
+                were.setText("Вы тут были");
+                first.setText("Узнать больше");
+                if (mLastKnownLocation != null) {
+                    int dist = calculateDistance(mLastKnownLocation, marker.getPosition());
+                    distance.setText(dist + " м");
+                }
+                first.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        startActivity(new Intent(context, info_activity.class));
+                    }
+                });
+            } else {
+                info.setText(marker.getTitle());
+                were.setText("Вы тут еще не были");
+                first.setText("Хочу открыть");
+                if (mLastKnownLocation != null) {
+                    int dist = calculateDistance(mLastKnownLocation, marker.getPosition());
+                    distance.setText(dist + " м");
                 }
             }
-            first.setOnClickListener(new View.OnClickListener() {
+            final AlertDialog alert = builder.create();
+            alert.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+            second.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    startActivity(new Intent(context, info_activity.class));
+                    alert.hide();
                 }
             });
-        } else {
-            info.setText(marker.getTitle()+"\n"+"Вы тут еще не были");
-            first.setText("Хочу открыть");
-            if (mLastKnownLocation != null) {
-                int dist = calculateDistance(mLastKnownLocation, marker.getPosition());
-                if (dist > 1000.00) {
-                    dist = dist / 1000;
-                    distance.setText("Расстояние = " + dist + " км");
-                } else {
-                    distance.setText("Расстояние = " + dist + " м");
-                }
-            }
+            alert.show();
         }
-        final AlertDialog alert = builder.create();
-        alert.getWindow().setBackgroundDrawable(new ColorDrawable(0));
-        second.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                alert.hide();
-            }
-        });
-        alert.show();
         return false;
     }
 
@@ -443,7 +470,7 @@ public class ActivityMap extends AppCompatActivity
         setCameraPosition(mLastKnownLocation);
     }
 
-    private void setCameraPosition(Location location){
+    private void setCameraPosition(Location location) {
         if (mLocationPermissionGranted) {
             if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 // TODO: Consider calling
@@ -462,7 +489,7 @@ public class ActivityMap extends AppCompatActivity
         } else if (location != null) {
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
                     new LatLng(location.getLatitude(),
-                            location.getLongitude()), DEFAULT_ZOOM));
+                            location.getLongitude()), mMap.getCameraPosition().zoom));
         } else {
             Log.d("TAG", "Current location is null. Using defaults.");
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
@@ -471,6 +498,77 @@ public class ActivityMap extends AppCompatActivity
             Log.d("myPosition", "Моя позиция - " + mLastKnownLocation.toString());
         } catch (NullPointerException ex) {
             ex.printStackTrace();
+        }
+    }
+
+    private void setCameraPosition(LatLng location) {
+        if (mLocationPermissionGranted) {
+            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+        }
+        synchronized (location) {
+            if (mCameraPosition != null) {
+                mMap.moveCamera(CameraUpdateFactory.newCameraPosition(mCameraPosition));
+            } else if (location.latitude != 0) {
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                        new LatLng(location.latitude,
+                                location.longitude), 15.0f));
+            } else {
+                Log.d("TAG", "Current location is null. Using defaults.");
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
+            }
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        list.clear();
+    }
+
+    @Override
+    public View getInfoWindow(Marker marker) {
+        return null;
+    }
+
+    @Override
+    public View getInfoContents(Marker marker) {
+        return null;
+    }
+
+    private void sortList() {
+        Log.d("list", "start sort");
+        Collections.sort(list, new Comparator<Point>() {
+            @Override
+            public int compare(Point point, Point t1) {
+                return point.distance - t1.distance;
+            }
+        });
+        for (int i = 0; i < list.size(); i++) {
+            Log.d("list", "dist = " + list.get(i).distance);
+        }
+    }
+
+    private void setDistance(){
+        if (mLastKnownLocation != null) {
+            for (int i = 0; i < list.size(); i++) {
+                list.get(i).distance = calculateDistance(mLastKnownLocation, list.get(i).location);
+            }
+            sortList();
+        }
+    }
+
+    public void close_target(View view) {
+        if (mLastKnownLocation!=null){
+            setCameraPosition(list.get(0).location);
         }
     }
 }
