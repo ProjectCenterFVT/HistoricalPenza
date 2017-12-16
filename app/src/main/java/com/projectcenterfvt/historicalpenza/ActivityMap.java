@@ -146,6 +146,9 @@ public class ActivityMap extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        NavigationView navigationView1 = (NavigationView) findViewById(R.id.navigation_drawer_bottom);
+        navigationView1.setNavigationItemSelectedListener(this);
+
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         searchView = (FloatingSearchView) findViewById(R.id.floating_search_view);
         searchView.attachNavigationDrawerToMenuButton(mDrawerLayout);
@@ -191,67 +194,66 @@ public class ActivityMap extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
+        int id = item.getItemId();
 
-        switch (item.getItemId()) {
-            case R.id.name_sight:
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                Card_dialog card_dialog = new Card_dialog();
-                card_dialog.setList(list);
-                card_dialog.show(fragmentManager, "dialog");
-                break;
-            case R.id.name_helpProject:
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                LayoutInflater inflater = this.getLayoutInflater();
-                View view = inflater.inflate(R.layout.help_project_menu, null);
-                view.setBackgroundResource(R.drawable.dialog_bgn);
-                builder.setView(view);
-                AlertDialog alert = builder.create();
-                alert.getWindow().setBackgroundDrawable(new ColorDrawable(0));
-                alert.show();
-                break;
-            case R.id.name_settings:
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                LayoutInflater inflater = this.getLayoutInflater();
-                View view = inflater.inflate(R.layout.settings_menu, null);
-                view.setBackgroundResource(R.drawable.dialog_bgn);
-                builder.setView(view);
-                AlertDialog alert = builder.create();
-                alert.getWindow().setBackgroundDrawable(new ColorDrawable(0));
-                alert.show();
-                break;
-            case R.id.name_help:
-                final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                final LayoutInflater inflater = this.getLayoutInflater();
-                final View view = inflater.inflate(R.layout.dialog_guide, null);
-                view.setBackgroundResource(R.drawable.dialog_bgn);
+        if (id == R.id.name_sight) {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            Card_dialog card_dialog = new Card_dialog();
+            card_dialog.setList(list);
+            card_dialog.show(fragmentManager, "dialog");
+        } else if (id == R.id.name_helpProject) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            LayoutInflater inflater = this.getLayoutInflater();
+            View view = inflater.inflate(R.layout.help_project_menu, null);
+            view.setBackgroundResource(R.drawable.dialog_bgn);
+            builder.setView(view);
+            AlertDialog alert = builder.create();
+            alert.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+            alert.show();
+        } else if (id == R.id.name_settings) {
+            Log.d("click ", "нажал на кнопку сетингс");
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            LayoutInflater inflater = this.getLayoutInflater();
+            View view = inflater.inflate(R.layout.settings_menu, null);
+            view.setBackgroundResource(R.drawable.dialog_bgn);
+            builder.setView(view);
+            AlertDialog alert = builder.create();
+            alert.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+            alert.show();
+        } else if (id == R.id.name_help) {
+            Log.d("click ", "нажал на кнопку хелп");
+            final AlertDialog.Builder builder2 = new AlertDialog.Builder(this);
+            final LayoutInflater inflater2 = this.getLayoutInflater();
+            final View view2 = inflater2.inflate(R.layout.dialog_guide, null);
+            view2.setBackgroundResource(R.drawable.dialog_bgn);
 
-                Button btnBack = (Button) view.findViewById(R.id.btnBack);
+            Button btnBack = (Button) view2.findViewById(R.id.btnBack);
 
-                ViewPager pager = (ViewPager) view.findViewById(R.id.pager1);
-                PagerAdapter pagerAdapter = new MyGuideFragmentPagerAdapter(getSupportFragmentManager());
-                pager.setAdapter(pagerAdapter);
+            ViewPager pager = (ViewPager) view2.findViewById(R.id.pager1);
+            PagerAdapter pagerAdapter = new MyGuideFragmentPagerAdapter(getSupportFragmentManager());
+            pager.setAdapter(pagerAdapter);
 
-                TabLayout tabLayout = (TabLayout) view.findViewById(R.id.tabDots);
-                tabLayout.setupWithViewPager(pager, true);
+            TabLayout tabLayout = (TabLayout) view2.findViewById(R.id.tabDots);
+            tabLayout.setupWithViewPager(pager, true);
 
-                builder.setView(view);
-                final AlertDialog alert = builder.create();
+            builder2.setView(view2);
+            final AlertDialog alert2 = builder2.create();
 
-                alert.getWindow().setBackgroundDrawable(new ColorDrawable(0));
-                btnBack.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        alert.hide();
-                    }
-                });
+            alert2.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+            btnBack.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    alert2.hide();
+                }
+            });
 
-                alert.show();
-                break;
-            case R.id.name_about:
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                About_Dialog dialog = new About_Dialog();
-                dialog.show(fragmentManager, "dialog");
-                break;
+            alert2.show();
+
+        } else if (id == R.id.name_about) {
+            Log.d("click ", "нажал на кнопку абоут");
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            About_Dialog dialog = new About_Dialog();
+            dialog.show(fragmentManager, "dialog");
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
