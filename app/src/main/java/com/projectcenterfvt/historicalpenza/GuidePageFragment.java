@@ -16,9 +16,9 @@ public class GuidePageFragment extends Fragment {
     int mNum;
 
     int[] pages = {
-            R.drawable.first_pager,
-            R.drawable.second_pager,
-            R.drawable.third_pager,
+            R.drawable.help_location,
+            R.drawable.help_unlock,
+            R.drawable.help_lock,
     };
 
     static final String ARGUMENT_PAGE_NUMBER = "arg_page_number";
