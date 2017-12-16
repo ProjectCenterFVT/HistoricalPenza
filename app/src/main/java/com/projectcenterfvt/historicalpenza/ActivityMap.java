@@ -222,32 +222,9 @@ public class ActivityMap extends AppCompatActivity
             alert.show();
         } else if (id == R.id.name_help) {
             Log.d("click ", "нажал на кнопку хелп");
-            final AlertDialog.Builder builder2 = new AlertDialog.Builder(this);
-            final LayoutInflater inflater2 = this.getLayoutInflater();
-            final View view2 = inflater2.inflate(R.layout.dialog_guide, null);
-            view2.setBackgroundResource(R.drawable.dialog_bgn);
-
-            Button btnBack = (Button) view2.findViewById(R.id.btnBack);
-
-            ViewPager pager = (ViewPager) view2.findViewById(R.id.pager1);
-            PagerAdapter pagerAdapter = new MyGuideFragmentPagerAdapter(getSupportFragmentManager());
-            pager.setAdapter(pagerAdapter);
-
-            TabLayout tabLayout = (TabLayout) view2.findViewById(R.id.tabDots);
-            tabLayout.setupWithViewPager(pager, true);
-
-            builder2.setView(view2);
-            final AlertDialog alert2 = builder2.create();
-
-            alert2.getWindow().setBackgroundDrawable(new ColorDrawable(0));
-            btnBack.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    alert2.hide();
-                }
-            });
-
-            alert2.show();
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            PageDialog dialog = new PageDialog();
+            dialog.show(fragmentManager, "dialog");
 
         } else if (id == R.id.name_about) {
             Log.d("click ", "нажал на кнопку абоут");

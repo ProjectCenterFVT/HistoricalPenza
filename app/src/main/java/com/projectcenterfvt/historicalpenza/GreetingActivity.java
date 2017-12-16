@@ -16,12 +16,8 @@ import android.view.animation.Animation;
 
 public class GreetingActivity extends AppCompatActivity {
 
-    static final int PAGE_COUNT = 3;
-
     ViewPager pager;
     PagerAdapter pagerAdapter;
-
-    Animation fadein, fadeout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,23 +31,6 @@ public class GreetingActivity extends AppCompatActivity {
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabDots);
         tabLayout.setupWithViewPager(pager, true);
-
-//        pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-//
-//            @Override
-//            public void onPageSelected(int position) {
-//
-//            }
-//
-//            @Override
-//            public void onPageScrolled(int position, float positionOffset,
-//                                       int positionOffsetPixels) {
-//            }
-//
-//            @Override
-//            public void onPageScrollStateChanged(int state) {
-//            }
-//        });
 
     }
 
