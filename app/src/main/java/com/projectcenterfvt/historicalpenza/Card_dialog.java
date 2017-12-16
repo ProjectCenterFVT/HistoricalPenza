@@ -1,7 +1,12 @@
 package com.projectcenterfvt.historicalpenza;
 
+import android.app.Activity;
 import android.app.Dialog;
+import android.app.DialogFragment;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -14,6 +19,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
@@ -35,9 +42,25 @@ public class Card_dialog extends android.support.v4.app.DialogFragment {
         return dialog;
     }
 
+    public interface onEventListener {
+        public void setPosition(LatLng loc);
+    }
+
+    onEventListener listener;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            listener = (onEventListener) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString() + " must implement onSomeEventListener");
+        }
+    }
+
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(final LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.infocard, null);
         v.setBackgroundResource(R.drawable.dialog_bgn);
         v.findViewById(R.id.btn_info_back).setOnClickListener(new View.OnClickListener() {
@@ -53,7 +76,11 @@ public class Card_dialog extends android.support.v4.app.DialogFragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
+                ActivityMap.Point point = (ActivityMap.Point) adapterView.getAdapter().getItem(i);
+                Log.d("clicked", "id = "+point.id+" name = "+point.name+" loc = "+point.location.toString());
+                LatLng loc = point.location;
+                listener.setPosition(loc);
+                dismiss();
             }
         });
         return v;
@@ -73,8 +100,10 @@ public class Card_dialog extends android.support.v4.app.DialogFragment {
                Log.d("server", "все пошло нормальды");
                for (int i = 0; i <listPoint.size(); i++) {
                    ActivityMap.Point point = list.get(i);
-                   point.name = titles.get(i);
-                   listPoint.set(i,point);
+                   int id = point.id-1;
+                   Log.d("List", "id = "+id+" titile "+(id)+" = "+titles.get(id));
+                   point.name = titles.get(id);
+                   list.set(i, point);
                }
            }
         } catch (InterruptedException e) {

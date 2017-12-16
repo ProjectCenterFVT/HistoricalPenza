@@ -1,6 +1,7 @@
 package com.projectcenterfvt.historicalpenza;
 
 import android.annotation.TargetApi;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -62,7 +63,12 @@ import java.util.Comparator;
 import java.util.concurrent.ExecutionException;
 
 public class ActivityMap extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, GoogleMap.OnMarkerClickListener, GoogleMap.InfoWindowAdapter {
+        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, GoogleMap.OnMarkerClickListener, GoogleMap.InfoWindowAdapter, Card_dialog.onEventListener {
+
+    @Override
+    public void setPosition(LatLng loc) {
+        setCameraPosition(loc);
+    }
 
     class Point {
         int id;
@@ -70,8 +76,6 @@ public class ActivityMap extends AppCompatActivity
         int distance;
         int flag;
         String name;
-        String discription;
-        String uml;
 
         Point(int id, LatLng loc, int distance, int flag) {
             this.id = id;
@@ -190,15 +194,32 @@ public class ActivityMap extends AppCompatActivity
             FragmentManager fragmentManager = getSupportFragmentManager();
             Card_dialog card_dialog = new Card_dialog();
             card_dialog.setList(list);
+
             card_dialog.show(fragmentManager, "dialog");
         } else if (id == R.id.name_helpProject) {
-
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            LayoutInflater inflater = this.getLayoutInflater();
+            View view = inflater.inflate(R.layout.help_project_menu, null);
+            view.setBackgroundResource(R.drawable.dialog_bgn);
+            builder.setView(view);
+            AlertDialog alert = builder.create();
+            alert.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+            alert.show();
         } else if (id == R.id.name_settings) {
-
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            LayoutInflater inflater = this.getLayoutInflater();
+            View view = inflater.inflate(R.layout.settings_menu, null);
+            view.setBackgroundResource(R.drawable.dialog_bgn);
+            builder.setView(view);
+            AlertDialog alert = builder.create();
+            alert.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+            alert.show();
         } else if (id == R.id.name_help) {
 
         } else if (id == R.id.name_about) {
-
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            About_Dialog dialog = new About_Dialog();
+            dialog.show(fragmentManager, "dialog");
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -230,10 +251,10 @@ public class ActivityMap extends AppCompatActivity
         Log.d("pos", "upadeLoc");
         try {
             if (mLocationPermissionGranted && flag) {
-                btn_pos.setVisibility(View.VISIBLE);
+                btn_pos.setBackgroundResource(R.drawable.get_location);
                 Log.d("position", "visible");
             } else {
-                btn_pos.setVisibility(View.INVISIBLE);
+                btn_pos.setBackgroundResource(R.drawable.my_pos_un);
                 Log.d("position", "invisible");
                 mLastKnownLocation = null;
                 getLocationPermission();
@@ -434,6 +455,7 @@ public class ActivityMap extends AppCompatActivity
                         Intent intent = new Intent(context, info_activity.class);
                         intent.putExtra("description", finalPoint_info.get(1));
                         intent.putExtra("uml", finalPoint_info.get(2));
+                        intent.putExtra("name", finalPoint_info.get(0));
                         startActivity(intent);
                         alert.hide();
                     }
@@ -526,7 +548,7 @@ public class ActivityMap extends AppCompatActivity
             } else if (location.latitude != 0) {
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
                         new LatLng(location.latitude,
-                                location.longitude), 15.0f));
+                                location.longitude), 16.0f));
             } else {
                 Log.d("TAG", "Current location is null. Using defaults.");
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));

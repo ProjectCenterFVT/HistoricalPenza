@@ -29,9 +29,13 @@ public class info_activity extends AppCompatActivity {
         TextView tvDescription = (TextView) findViewById(R.id.tvDescription);
         tvDescription.setMovementMethod(new ScrollingMovementMethod());
 
+        TextView tvTitle = (TextView) findViewById(R.id.tvTitle);
+
         Intent intent = getIntent();
         String discription = intent.getStringExtra("description");
         String uml = intent.getStringExtra("uml");
+        String name = intent.getStringExtra("name");
+        tvTitle.setText(name);
 
         new DownloadImage((ImageView) findViewById(R.id.ivPhoto)).execute("http://"+uml);
         tvDescription.setText(discription);
