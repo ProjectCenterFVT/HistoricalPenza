@@ -1,7 +1,10 @@
 package com.projectcenterfvt.historicalpenza;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -17,6 +20,9 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
+        ClientServer clientServer = new ClientServer(this);
+        clientServer.execute("{\"getCoordinates\":\"0.0.0\"}");
+
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -24,8 +30,8 @@ public class SplashActivity extends AppCompatActivity {
 
                 if(isFirstTime()) {
                     getPreferences(Context.MODE_PRIVATE).edit().putBoolean(KEY_IS_FIRST_TIME, false).apply();
-                    intent = new Intent(SplashActivity.this, GreetingActivity.class);
-                } else
+                   intent = new Intent(SplashActivity.this, GreetingActivity.class);
+               } else
                     intent = new Intent(SplashActivity.this, ActivityMap.class);
 
                 SplashActivity.this.startActivity(intent);

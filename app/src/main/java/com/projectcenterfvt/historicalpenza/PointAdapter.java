@@ -45,7 +45,8 @@ public class PointAdapter extends BaseAdapter {
 
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
-        View v = inflater.inflate(R.layout.infocard, null);
+        View v = view;
+        v = inflater.inflate(R.layout.list_item, viewGroup, false);
         ActivityMap.Point point = (ActivityMap.Point) getItem(i);
         TextView card_name = (TextView) v.findViewById(R.id.card_name);
         TextView card_dist = (TextView) v.findViewById(R.id.card_distance);

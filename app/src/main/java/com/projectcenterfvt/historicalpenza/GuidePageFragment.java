@@ -11,7 +11,7 @@ import android.widget.ImageView;
  * Created by Dmitry on 13.12.2017.
  */
 
-public class PageFragment extends Fragment {
+public class GuidePageFragment extends Fragment {
 
     int mNum;
 
@@ -23,8 +23,8 @@ public class PageFragment extends Fragment {
 
     static final String ARGUMENT_PAGE_NUMBER = "arg_page_number";
 
-    public static PageFragment newInstance(int page) {
-        PageFragment pageFragment = new PageFragment();
+    public static GuidePageFragment newInstance(int page) {
+        GuidePageFragment pageFragment = new GuidePageFragment();
 
         Bundle arguments = new Bundle();
         arguments.putInt(ARGUMENT_PAGE_NUMBER, page);

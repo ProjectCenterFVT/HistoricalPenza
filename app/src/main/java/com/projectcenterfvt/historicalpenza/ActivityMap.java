@@ -1,11 +1,13 @@
 package com.projectcenterfvt.historicalpenza;
 
 import android.annotation.TargetApi;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.ColorDrawable;
@@ -18,10 +20,13 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
@@ -33,6 +38,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -57,19 +63,28 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.concurrent.ExecutionException;
 
 public class ActivityMap extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, GoogleMap.OnMarkerClickListener, GoogleMap.InfoWindowAdapter {
+        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, GoogleMap.OnMarkerClickListener, GoogleMap.InfoWindowAdapter, Card_dialog.onEventListener {
+
+    @Override
+    public void setPosition(LatLng loc) {
+        setCameraPosition(loc);
+    }
 
     class Point {
-        String name;
+        int id;
         LatLng location;
         int distance;
+        int flag;
+        String name;
 
-        Point(String name, LatLng loc, int distance) {
-            this.name = name;
+        Point(int id, LatLng loc, int distance, int flag) {
+            this.id = id;
             this.location = loc;
             this.distance = distance;
+            this.flag = flag;
         }
     }
 
@@ -176,24 +191,67 @@ public class ActivityMap extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        int id = item.getItemId();
 
-        if (id == R.id.name_sight) {
+        switch (item.getItemId()) {
+            case R.id.name_sight:
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                Card_dialog card_dialog = new Card_dialog();
+                card_dialog.setList(list);
+                card_dialog.show(fragmentManager, "dialog");
+                break;
+            case R.id.name_helpProject:
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                LayoutInflater inflater = this.getLayoutInflater();
+                View view = inflater.inflate(R.layout.help_project_menu, null);
+                view.setBackgroundResource(R.drawable.dialog_bgn);
+                builder.setView(view);
+                AlertDialog alert = builder.create();
+                alert.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+                alert.show();
+                break;
+            case R.id.name_settings:
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                LayoutInflater inflater = this.getLayoutInflater();
+                View view = inflater.inflate(R.layout.settings_menu, null);
+                view.setBackgroundResource(R.drawable.dialog_bgn);
+                builder.setView(view);
+                AlertDialog alert = builder.create();
+                alert.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+                alert.show();
+                break;
+            case R.id.name_help:
+                final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                final LayoutInflater inflater = this.getLayoutInflater();
+                final View view = inflater.inflate(R.layout.dialog_guide, null);
+                view.setBackgroundResource(R.drawable.dialog_bgn);
 
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            Card_dialog card_dialog = new Card_dialog();
-            card_dialog.setList(list);
-            card_dialog.show(fragmentManager, "dialog");
+                Button btnBack = (Button) view.findViewById(R.id.btnBack);
 
+                ViewPager pager = (ViewPager) view.findViewById(R.id.pager1);
+                PagerAdapter pagerAdapter = new MyGuideFragmentPagerAdapter(getSupportFragmentManager());
+                pager.setAdapter(pagerAdapter);
 
-        } else if (id == R.id.name_helpProject) {
+                TabLayout tabLayout = (TabLayout) view.findViewById(R.id.tabDots);
+                tabLayout.setupWithViewPager(pager, true);
 
-        } else if (id == R.id.name_settings) {
+                builder.setView(view);
+                final AlertDialog alert = builder.create();
 
-        } else if (id == R.id.name_help) {
+                alert.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+                btnBack.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        alert.hide();
+                    }
+                });
 
-        } else if (id == R.id.name_about) {
-
+                alert.show();
+                break;
+            case R.id.name_about:
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                About_Dialog dialog = new About_Dialog();
+                dialog.show(fragmentManager, "dialog");
+                break;
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -206,13 +264,13 @@ public class ActivityMap extends AppCompatActivity
         mMap = googleMap;
         mMap.setMinZoomPreference(12.0f);
         mMap.setMaxZoomPreference(17.0f);
+        mMap.setOnMarkerClickListener(this);
+        mMap.getUiSettings().setMapToolbarEnabled(false);
+        mMap.setInfoWindowAdapter(this);
         getLocationPermission();
         getDeviceLocation();
         setCameraPosition(mLastKnownLocation);
         fillArray(mMap);
-        mMap.setOnMarkerClickListener(this);
-        mMap.getUiSettings().setMapToolbarEnabled(false);
-        mMap.setInfoWindowAdapter(this);
         setDistance();
     }
 
@@ -225,10 +283,10 @@ public class ActivityMap extends AppCompatActivity
         Log.d("pos", "upadeLoc");
         try {
             if (mLocationPermissionGranted && flag) {
-                btn_pos.setVisibility(View.VISIBLE);
+                btn_pos.setBackgroundResource(R.drawable.get_location);
                 Log.d("position", "visible");
             } else {
-                btn_pos.setVisibility(View.INVISIBLE);
+                btn_pos.setBackgroundResource(R.drawable.my_pos_un);
                 Log.d("position", "invisible");
                 mLastKnownLocation = null;
                 getLocationPermission();
@@ -243,7 +301,7 @@ public class ActivityMap extends AppCompatActivity
         @Override
         public void onLocationChanged(Location location) {
             Log.d("pos", "Смена позиции");
-            if (myMarker!=null) {
+            if (myMarker!=null && mLastKnownLocation!=null) {
                 myMarker.setPosition(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
             }
             getDeviceLocation();
@@ -339,50 +397,36 @@ public class ActivityMap extends AppCompatActivity
         mMap.animateCamera(CameraUpdateFactory.zoomBy(-1.0f));
     }
 
-    private synchronized void openDB() {
-        dbPosition = new DB_Position(this);
-        dbPosition.import_db();
-        if (!dbPosition.isCreate())
-            dbPosition.writeDB();
-        try {
-            dbPosition.open();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        dbPosition.DB_geo.close();
-    }
-
     private void fillArray(GoogleMap map) {
-        openDB();
-        Cursor cursor = dbPosition.DB_geo.query(DB_Position.DB_TABLE, new String[]{DB_Position.COLUMN_ID, DB_Position.COLUMN_NAME, DB_Position.COLUMN_LOC, DB_Position.COLUMN_ISVISITED}, null, null, null, null, null);
+        DB_Position db = new DB_Position(context);
+        SQLiteDatabase databases = db.getReadableDatabase();
+        Cursor cursor = databases.query(DB_Position.DB_TABLE, new String[]{DB_Position.COLUMN_ID, DB_Position.COLUMN_X1, DB_Position.COLUMN_X2, DB_Position.COLUMN_flag}, null, null, null, null, null);
         if (cursor.moveToFirst()) {
-            final int id_name = cursor.getColumnIndex(dbPosition.COLUMN_NAME);
-            final int id_loc = cursor.getColumnIndex(dbPosition.COLUMN_LOC);
-            final int id_isVisited = cursor.getColumnIndex(dbPosition.COLUMN_ISVISITED);
+            final int id_id = cursor.getColumnIndex(dbPosition.COLUMN_ID);
+            final int id_x1 = cursor.getColumnIndex(dbPosition.COLUMN_X1);
+            final int id_x2 = cursor.getColumnIndex(dbPosition.COLUMN_X2);
+            final int id_flag = cursor.getColumnIndex(dbPosition.COLUMN_flag);
 
-            do {
-                String name = cursor.getString(id_name);
-                String[] loc = cursor.getString(id_loc).split(" ");
-                int bol = cursor.getInt(id_isVisited);
+           do {
+               Log.d("db ", "проверка");
+                int bol = cursor.getInt(id_flag);
+                int id = cursor.getInt(id_id);
                 boolean isVisited = (bol == 1);
-                LatLng position = new LatLng(Double.parseDouble(loc[0]), Double.parseDouble(loc[1]));
+                double x1 = cursor.getDouble(id_x1);
+                double x2 = cursor.getDouble(id_x2);
+                LatLng position = new LatLng(x1, x2);
                 MarkerOptions options = new MarkerOptions();
-                options.position(position).title(name).flat(true);
+                options.position(position).flat(true);
                 if (mLastKnownLocation != null) {
-                    list.add(new Point(name, position, calculateDistance(mLastKnownLocation, position)));
+                    list.add(new Point(id, position, calculateDistance(mLastKnownLocation, position), bol));
                 } else {
-                    list.add(new Point(name, position, 0));
+                    list.add(new Point(id, position,0,bol));
                 }
                 if (isVisited) {
                     Bitmap bitmap = BitmapFactory.decodeResource(getResources(), getResources().
                             getIdentifier("unlock", "drawable", getPackageName()));
                     bitmap = Bitmap.createScaledBitmap(bitmap, 74, 100, false);
-                    options.icon(BitmapDescriptorFactory.fromBitmap(bitmap));
+                   options.icon(BitmapDescriptorFactory.fromBitmap(bitmap));
                 } else {
                     Bitmap bitmap = BitmapFactory.decodeResource(getResources(), getResources().
                             getIdentifier("lock", "drawable", getPackageName()));
@@ -390,7 +434,7 @@ public class ActivityMap extends AppCompatActivity
                     options.icon(BitmapDescriptorFactory.fromBitmap(bitmap));
                 }
                 Marker marker = map.addMarker(options);
-                marker.setTag(isVisited);
+                marker.setTag(list.get(list.size()-1));
                 Log.d("marker", "нарисовал маркер с координатами " + position);
 
             } while (cursor.moveToNext());
@@ -402,7 +446,18 @@ public class ActivityMap extends AppCompatActivity
     public boolean onMarkerClick(final Marker marker) {
         Log.d("marker", "Нажал на маркер " + marker.getId() + " " + marker.getTitle() + " " + marker.getPosition().toString());
         if (marker.getTag() != null) {
-            boolean flag = (boolean) marker.getTag();
+            Point point = (Point) marker.getTag();
+            final int id = point.id;
+            ClientServer call = new ClientServer(this);
+            ArrayList <String> point_info = new ArrayList<>();
+            call.execute("{\"getInfo\":\""+id+"\"}");
+            try {
+                point_info = call.get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
             final AlertDialog.Builder builder = new AlertDialog.Builder(this);
             final LayoutInflater inflater = this.getLayoutInflater();
             final View view = inflater.inflate(R.layout.dialog, null);
@@ -416,22 +471,28 @@ public class ActivityMap extends AppCompatActivity
             Button second = (Button) view.findViewById(R.id.second_btn);
 
             builder.setView(view);
-            if (flag) {
-                info.setText(marker.getTitle());
+            final AlertDialog alert = builder.create();
+            info.setText(point_info.get(0));
+            if (point.flag==1) {
                 were.setText("Вы тут были");
                 first.setText("Узнать больше");
                 if (mLastKnownLocation != null) {
                     int dist = calculateDistance(mLastKnownLocation, marker.getPosition());
                     distance.setText(dist + " м");
                 }
+                final ArrayList<String> finalPoint_info = point_info;
                 first.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        startActivity(new Intent(context, info_activity.class));
+                        Intent intent = new Intent(context, info_activity.class);
+                        intent.putExtra("description", finalPoint_info.get(1));
+                        intent.putExtra("uml", finalPoint_info.get(2));
+                        intent.putExtra("name", finalPoint_info.get(0));
+                        startActivity(intent);
+                        alert.hide();
                     }
                 });
             } else {
-                info.setText(marker.getTitle());
                 were.setText("Вы тут еще не были");
                 first.setText("Хочу открыть");
                 if (mLastKnownLocation != null) {
@@ -439,7 +500,6 @@ public class ActivityMap extends AppCompatActivity
                     distance.setText(dist + " м");
                 }
             }
-            final AlertDialog alert = builder.create();
             alert.getWindow().setBackgroundDrawable(new ColorDrawable(0));
             second.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -520,7 +580,7 @@ public class ActivityMap extends AppCompatActivity
             } else if (location.latitude != 0) {
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
                         new LatLng(location.latitude,
-                                location.longitude), 15.0f));
+                                location.longitude), 16.0f));
             } else {
                 Log.d("TAG", "Current location is null. Using defaults.");
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
@@ -536,8 +596,17 @@ public class ActivityMap extends AppCompatActivity
 
     @Override
     public View getInfoWindow(Marker marker) {
-        return null;
-    }
+//        if (marker.getTag()!=null) {
+//            int badge;
+//            boolean flag = (boolean) marker.getTag();
+//            if (flag) {
+//                badge = R.drawable.info_unlock;
+//            } else {
+//                badge = R.drawable.info_lock;
+//            }
+//        }
+            return null;
+        }
 
     @Override
     public View getInfoContents(Marker marker) {
@@ -571,5 +640,6 @@ public class ActivityMap extends AppCompatActivity
             setCameraPosition(list.get(0).location);
         }
     }
+
 }
 
