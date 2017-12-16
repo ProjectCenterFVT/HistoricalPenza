@@ -1,6 +1,7 @@
 package com.projectcenterfvt.historicalpenza;
 
 import android.app.Dialog;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -9,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Adapter;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -28,6 +30,7 @@ public class Card_dialog extends android.support.v4.app.DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Dialog dialog = super.onCreateDialog(savedInstanceState);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
         return dialog;
     }
 
@@ -35,6 +38,7 @@ public class Card_dialog extends android.support.v4.app.DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.infocard, null);
+        v.setBackgroundResource(R.drawable.dialog_bgn);
         v.findViewById(R.id.btn_info_back).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -45,6 +49,12 @@ public class Card_dialog extends android.support.v4.app.DialogFragment {
         Log.d("adapter", "кол-во в списке "+listPoint.size());
         PointAdapter adapter = new PointAdapter(getContext(), listPoint);
         listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+            }
+        });
         return v;
     }
 

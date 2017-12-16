@@ -41,8 +41,7 @@
                     android:id="@+id/ivPhoto"
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
-                    android:layout_margin="15dp"
-                    android:background="@color/colorAccent" />
+                    android:layout_margin="15dp" />
 
                 <ScrollView
                     android:id="@+id/horizontalScrollView1"
@@ -73,6 +72,7 @@
                 android:layout_height="38dp"
                 android:layout_gravity="left|bottom"
                 android:layout_margin="15dip"
+                android:onClick="onCameraClick"
                 android:background="@drawable/icon_camera" />
 
             <Button

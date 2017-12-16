@@ -18,82 +18,35 @@ import java.sql.SQLException;
 
 public class DB_Position extends SQLiteOpenHelper {
 
-    public static String DB_NAME_ID = "position.db";
-    private static String DB_PATH = null;
+    public static String DB_NAME = "coordinatesDb";
     private static final int DB_VERSION = 1;
 
-    static final String DB_TABLE = "pos";
+    static final String DB_TABLE = "coordinates";
     static final String COLUMN_ID = "_id";
-    static final String COLUMN_NAME = "name";
-    static final String COLUMN_LOC = "location";
-    static final String COLUMN_ISVISITED = "isVisited";
+    static final String COLUMN_X1 = "x1";
+    static final String COLUMN_X2 = "x2";
+    static final String COLUMN_flag = "flag";
 
-    public SQLiteDatabase DB_geo;
     private Context myContext;
-    private File file;
-
 
     public DB_Position(Context context) {
-        super(context, DB_NAME_ID, null, DB_VERSION);
+        super(context, DB_NAME, null, DB_VERSION);
         this.myContext=context;
     }
 
     @Override
-    public void onCreate(SQLiteDatabase sqLiteDatabase) {
-
+    public void onCreate(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE coordinates (_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                " x1 REAL," +
+                " x2 REAL," +
+                " flag INTEGER);");
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
+    public void onUpgrade(SQLiteDatabase db, int i, int i1) {
+        db.execSQL("drop table if exists " + DB_TABLE);
 
-    }
-
-    public void import_db (){
-        Log.d("geo_db"," Захожу в метод импорта ");
-        DB_PATH="//data/data/"+myContext.getPackageName()+"/"+"databases/";
-        Log.d("geo_db"," путь : "+DB_PATH+DB_NAME_ID);
-        file= new File (DB_PATH+DB_NAME_ID);
-    }
-    public void open() throws SQLException {
-        Log.d("geo_db","открываю базу данных");
-        String path = DB_PATH + DB_NAME_ID;
-        DB_geo = SQLiteDatabase.openDatabase(path, null,
-                SQLiteDatabase.OPEN_READWRITE);
-        Log.d("geo_db","открыл базу данных");
-    }
-    @Override
-    public synchronized void close() {
-        if (DB_geo != null) {
-            DB_geo.close();
-        }
-        super.close();
-    }
-    public void writeDB(){
-        try {
-            Log.d("geo_db", "записываю файл");
-            this.getReadableDatabase();
-            InputStream Input = myContext.getAssets().open(DB_NAME_ID);
-            OutputStream Output = new FileOutputStream(file);
-            byte[] buffer = new byte[Input.available()];
-            Input.read(buffer, 0, buffer.length);
-            Output.write(buffer, 0, buffer.length);
-            Output.flush();
-            Output.close();
-            Input.close();
-            Log.d("geo_db", "закончил запись");
-        }catch(IOException e){
-            Log.d("geo_db", e.toString());
-        }
+        onCreate(db);
     }
 
-    public void deleteDB(){
-
-    }
-
-    public boolean isCreate(){
-        Log.d("geo_db","размер файла = "+file.length());
-        if (file.length()!=0)
-            return true;
-        else return false;
-    }
 }
