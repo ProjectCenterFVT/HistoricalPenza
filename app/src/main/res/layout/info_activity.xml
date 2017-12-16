@@ -33,6 +33,7 @@
                     android:layout_height="wrap_content"
                     android:paddingLeft="15dp"
                     android:paddingRight="15dp"
+                    android:paddingTop="8dp"
                     android:text="Памятник Ленин и Сталин в Горках"
                     android:textAlignment="center"
                     android:textSize="25sp" />
@@ -49,18 +50,21 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentTop="true"
+                    android:fillViewport="true"
                     android:scrollbars="none" >
 
                     <TextView
                         android:id="@+id/tvDescription"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:maxLines="200"
                         android:gravity="fill_horizontal"
+                        android:maxLines="200"
+                        android:paddingBottom="100dp"
                         android:paddingLeft="15dp"
                         android:paddingRight="15dp"
                         android:scrollbars="vertical"
-                        android:text="@string/description" />
+                        android:text="@string/description"
+                        android:textAlignment="center" />
 
                 </ScrollView>
 
@@ -72,7 +76,7 @@
                 android:layout_width="48dp"
                 android:layout_height="38dp"
                 android:layout_gravity="left|bottom"
-                android:layout_margin="15dip"
+                android:layout_margin="12dip"
                 android:onClick="onCameraClick"
                 android:background="@drawable/icon_camera" />
 
@@ -81,7 +85,7 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_gravity="right|bottom"
-                android:layout_margin="15dip"
+                android:layout_margin="10dip"
                 android:background="@drawable/icon_back"
                 android:onClick="onBackClick" />
         </FrameLayout>
