@@ -23,6 +23,7 @@ public class PageDialog extends DialogFragment {
 
     private ViewPager pager;
     private PagerAdapter pagerAdapter;
+    private Dialog dialog;
 
     @Nullable
     @Override
@@ -36,17 +37,25 @@ public class PageDialog extends DialogFragment {
         TabLayout tabLayout = (TabLayout) v.findViewById(R.id.tabDots_second);
         tabLayout.setupWithViewPager(pager, true);
 
+        v.findViewById(R.id.btnBackSecond).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.hide();
+            }
+        });
+
         return v;
     }
 
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        Dialog dialog = super.onCreateDialog(savedInstanceState);
+        dialog = super.onCreateDialog(savedInstanceState);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         Window dialogWindow = dialog.getWindow();
         dialogWindow.setLayout(200, 400);
         dialogWindow.setBackgroundDrawable(new ColorDrawable(0));
+
         return dialog;
     }
 }

@@ -15,12 +15,18 @@ import android.view.Window;
  */
 
 public class About_Dialog extends android.support.v4.app.DialogFragment {
+
+
+    private Dialog dialog;
+
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        Dialog dialog = super.onCreateDialog(savedInstanceState);
+        dialog = super.onCreateDialog(savedInstanceState);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+        Window dialogWindow = dialog.getWindow();
+        dialogWindow.setLayout(350, 400);
+        dialogWindow.setBackgroundDrawable(new ColorDrawable(0));
         return dialog;
     }
 
@@ -29,6 +35,12 @@ public class About_Dialog extends android.support.v4.app.DialogFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.about_menu, null);
         v.setBackgroundResource(R.drawable.dialog_bgn);
+        v.findViewById(R.id.btnBackFifth).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.hide();
+            }
+        });
         return v;
     }
 }
