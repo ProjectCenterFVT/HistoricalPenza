@@ -36,6 +36,16 @@ public class ClientServer extends AsyncTask<String, Void, ArrayList<String>>{
     }
 
     @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+    }
+
+    @Override
+    protected void onPostExecute(ArrayList<String> strings) {
+        super.onPostExecute(strings);
+    }
+
+    @Override
     protected ArrayList<String> doInBackground(String... from) {
         try{
             command = from[0];
@@ -78,6 +88,9 @@ public class ClientServer extends AsyncTask<String, Void, ArrayList<String>>{
             if (myjson.has("getInfo")){
                 return getInfo(resultString);
             }
+            if (myjson.has("getAllInfo")){
+                return getAllInfo(resultString);
+            }
 
         } catch (Exception e){
             Log.d("server", e.getMessage());
@@ -97,20 +110,20 @@ public class ClientServer extends AsyncTask<String, Void, ArrayList<String>>{
             JSONArray the_json_array = myjson.getJSONArray("result");
             int size = the_json_array.length();
             ArrayList<JSONObject> arrays = new ArrayList<JSONObject>();
-            Log.d("server", ""+size);
+            Log.d("server", "size = "+size);
             for(int i=0;i<size;i++)
             {
                 ContentValues contentValues = new ContentValues();
                 JSONObject another_json_object = the_json_array.getJSONObject(i);
                 contentValues.put(db.COLUMN_ID, another_json_object.getInt("_id"));
-                Log.d("server", "вствавил "+another_json_object.getInt("_id"));
+                Log.d("server", "вствавил  id = "+another_json_object.getInt("_id"));
                 String coord = another_json_object.getString("coordinates");
+                Log.d("server", "вствавил  x1 = "+Double.parseDouble(coord.substring(0,coord.indexOf(","))));
                 contentValues.put(db.COLUMN_X1, Double.parseDouble(coord.substring(0,coord.indexOf(","))));
-                Log.d("server", "вствавил "+Double.parseDouble(coord.substring(0,coord.indexOf(","))));
+                Log.d("server", "вствавил  x2 = "+Double.parseDouble(coord.substring(coord.indexOf(" ")+1, coord.length()-1)));
                 contentValues.put(db.COLUMN_X2, Double.parseDouble(coord.substring(coord.indexOf(" ")+1, coord.length()-1)));
-                Log.d("server", "вствавил "+Double.parseDouble(coord.substring(coord.indexOf(" ")+1, coord.length()-1)));
                 contentValues.put(db.COLUMN_flag, another_json_object.getInt("flag"));
-                Log.d("server", "вствавил "+another_json_object.getInt("flag"));
+                Log.d("server", "вствавил  flag = "+another_json_object.getInt("flag"));
                 databases.insert(db.DB_TABLE, null, contentValues);
             }
             db.close();
@@ -137,5 +150,24 @@ public class ClientServer extends AsyncTask<String, Void, ArrayList<String>>{
             e.printStackTrace();
         }
         return cache;
+    }
+
+    private ArrayList<String> getAllInfo(String json){
+        ArrayList<String> arrayList = new ArrayList<>();
+        try {
+            JSONObject myjson = new JSONObject(json);
+            JSONArray the_json_array = myjson.getJSONArray("result");
+            int size = the_json_array.length();
+            for(int i=0;i<size;i++)
+            {
+                JSONObject another_json_object = the_json_array.getJSONObject(i);
+                arrayList.add(another_json_object.getString("title"));
+                Log.d("server", "добавил "+another_json_object.getString("title"));
+            }
+            Log.d("server", "список - "+arrayList.get(size-1));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return arrayList;
     }
 }
