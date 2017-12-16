@@ -24,7 +24,7 @@
         android:fitsSystemWindows="true"
         android:background="#3d3d3d"
         app:itemTextColor="#979797"
-        app:itemBackground="@drawable/nav_item_background"
+        app:itemBackground="@drawable/drawer_item_bg"
         app:headerLayout="@layout/nav_header_activity_map"
         app:menu="@menu/menu_navigation_drawer">
 
@@ -33,10 +33,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:background="#979797"
+            android:background="#3d3d3d"
             android:elevation="0dp"
             app:itemTextColor="#979797"
-            app:itemBackground="@drawable/nav_item_background"
+            app:itemBackground="@drawable/drawer_item_bg"
             app:menu="@menu/menu_navigation_drawer_bottom" />
 
     </android.support.design.widget.NavigationView>
