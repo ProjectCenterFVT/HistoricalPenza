@@ -29,6 +29,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -473,6 +474,12 @@ public class ActivityMap extends AppCompatActivity
             } else {
                 were.setText("Вы тут еще не были");
                 first.setText("Хочу открыть");
+                first.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Toast.makeText(ActivityMap.this, "Доступно в следующий версиях", Toast.LENGTH_SHORT).show();
+                    }
+                });
                 if (mLastKnownLocation != null) {
                     int dist = calculateDistance(mLastKnownLocation, marker.getPosition());
                     distance.setText(dist + " м");
