@@ -16,6 +16,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by Roman on 15.12.2017.
@@ -60,5 +61,26 @@ public class Card_dialog extends android.support.v4.app.DialogFragment {
 
     public void setList(ArrayList<ActivityMap.Point> list){
         listPoint = list;
+        ClientServer call = new ClientServer(getContext());
+        call.execute("{\"getAllInfo\":\"1\"}");
+        try {
+
+            ArrayList <String> titles = new ArrayList<>();
+           titles = call.get();
+           if (titles==null){
+               Log.d("server", "все пошло по пизде");
+           } else {
+               Log.d("server", "все пошло нормальды");
+               for (int i = 0; i <listPoint.size(); i++) {
+                   ActivityMap.Point point = list.get(i);
+                   point.name = titles.get(i);
+                   listPoint.set(i,point);
+               }
+           }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
     }
 }

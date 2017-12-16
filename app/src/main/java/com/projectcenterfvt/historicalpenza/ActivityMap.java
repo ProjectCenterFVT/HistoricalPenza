@@ -187,13 +187,10 @@ public class ActivityMap extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.name_sight) {
-
             FragmentManager fragmentManager = getSupportFragmentManager();
             Card_dialog card_dialog = new Card_dialog();
             card_dialog.setList(list);
             card_dialog.show(fragmentManager, "dialog");
-
-
         } else if (id == R.id.name_helpProject) {
 
         } else if (id == R.id.name_settings) {
@@ -367,7 +364,6 @@ public class ActivityMap extends AppCompatActivity
                 LatLng position = new LatLng(x1, x2);
                 MarkerOptions options = new MarkerOptions();
                 options.position(position).flat(true);
-                Point point = null;
                 if (mLastKnownLocation != null) {
                     list.add(new Point(id, position, calculateDistance(mLastKnownLocation, position), bol));
                 } else {
@@ -391,7 +387,6 @@ public class ActivityMap extends AppCompatActivity
             } while (cursor.moveToNext());
         }
         cursor.close();
-        databases.close();
     }
 
     @Override

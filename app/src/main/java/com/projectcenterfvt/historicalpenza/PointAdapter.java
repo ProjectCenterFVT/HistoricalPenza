@@ -50,7 +50,7 @@ public class PointAdapter extends BaseAdapter {
         ActivityMap.Point point = (ActivityMap.Point) getItem(i);
         TextView card_name = (TextView) v.findViewById(R.id.card_name);
         TextView card_dist = (TextView) v.findViewById(R.id.card_distance);
-        card_name.setText("Бюст М. Ю. Лермонтову в сквере им. Лермонтова");
+        card_name.setText(point.name);
         card_dist.setText(point.distance+" м");
 
         return v;
