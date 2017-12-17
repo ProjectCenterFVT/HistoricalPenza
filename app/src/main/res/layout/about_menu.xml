@@ -15,7 +15,7 @@
         android:layout_marginTop="8dp"
         android:fontFamily="@font/sfuitext_light"
         android:gravity="center"
-        android:text="Информация об указателях"
+        android:text="О программе"
         android:textColor="@color/colorBlack"
         android:textSize="17sp"
         app:layout_constraintBottom_toTopOf="@+id/imageView"

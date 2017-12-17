@@ -5,31 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/dialog_caption_fifth"
-        android:layout_width="350dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:fontFamily="@font/sfuitext_light"
-        android:gravity="center"
-        android:text="Информация об указателях"
-        android:textColor="@color/colorBlack"
-        android:textSize="17sp"
-        app:layout_constraintBottom_toTopOf="@id/info_list"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.153" />
-
-    app:layout_constraintStart_toStartOf="parent"
-
     <ListView
         android:id="@+id/info_list"
         android:layout_width="match_parent"
-        android:layout_height="450dp"
+        android:layout_height="506dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:divider="@color/colorPrimary"
@@ -37,7 +16,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="55dp" />
+        tools:layout_editor_absoluteY="4dp" />
 
     <Button
         android:id="@+id/btn_info_back"
@@ -54,5 +33,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/info_list" />
+        app:layout_constraintTop_toBottomOf="@+id/info_list"
+        app:layout_constraintVertical_bias="1.0" />
 </android.support.constraint.ConstraintLayout>
