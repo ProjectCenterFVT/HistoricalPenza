@@ -395,7 +395,7 @@ public class ActivityMap extends AppCompatActivity
                 double x2 = cursor.getDouble(id_x2);
                 LatLng position = new LatLng(x1, x2);
                 MarkerOptions options = new MarkerOptions();
-                options.position(position).flat(true);
+                options.position(position);
                 if (mLastKnownLocation != null) {
                     list.add(new Point(id, position, calculateDistance(mLastKnownLocation, position), bol));
                 } else {
