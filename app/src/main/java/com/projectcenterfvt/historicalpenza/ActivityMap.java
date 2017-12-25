@@ -79,10 +79,6 @@ public class ActivityMap extends AppCompatActivity
     }
 
     private GoogleMap mMap;
-    private GoogleApiClient mGoogleApiClient;
-    private Location mLastKnownLocation;
-    private boolean mLocationPermissionGranted;
-    private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
     private static int DEFAULT_ZOOM = 9;
@@ -94,6 +90,7 @@ public class ActivityMap extends AppCompatActivity
     private Context context = this;
     private Marker myMarker = null;
     private DrawerLayout mDrawerLayout;
+    private Location mLastKnowLocation;
 
     private FloatingSearchView searchView;
     private String lastQuery = "";
@@ -123,20 +120,9 @@ public class ActivityMap extends AppCompatActivity
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 4, locationListener);
-
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this /* FragmentActivity */,
-                        this /* OnConnectionFailedListener */)
-                .addConnectionCallbacks((GoogleApiClient.ConnectionCallbacks) this)
-                .addApi(LocationServices.API)
-                .addApi(Places.GEO_DATA_API)
-                .addApi(Places.PLACE_DETECTION_API)
-                .build();
-        mGoogleApiClient.connect();
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 4000, 6, locationListener);
 
         if (savedInstanceState != null) {
-            mLastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
             mCameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
         }
 
@@ -149,6 +135,8 @@ public class ActivityMap extends AppCompatActivity
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         searchView = (FloatingSearchView) findViewById(R.id.floating_search_view);
         searchView.attachNavigationDrawerToMenuButton(mDrawerLayout);
+
+        mLastKnowLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
         setupSearch();
 
@@ -250,9 +238,7 @@ public class ActivityMap extends AppCompatActivity
         mMap.setOnMarkerClickListener(this);
         mMap.getUiSettings().setMapToolbarEnabled(false);
         mMap.setInfoWindowAdapter(this);
-        getLocationPermission();
-        getDeviceLocation();
-        setCameraPosition(mLastKnownLocation);
+        setCameraPosition(mLastKnowLocation);
         fillArray(mMap);
         setDistance();
     }
@@ -265,14 +251,12 @@ public class ActivityMap extends AppCompatActivity
     private void updateLocationUI(boolean flag) {
         Log.d("pos", "upadeLoc");
         try {
-            if (mLocationPermissionGranted && flag) {
+            if (mLastKnowLocation!=null) {
                 btn_pos.setBackgroundResource(R.drawable.get_location);
                 Log.d("position", "visible");
             } else {
                 btn_pos.setBackgroundResource(R.drawable.my_pos_un);
                 Log.d("position", "invisible");
-                mLastKnownLocation = null;
-                getLocationPermission();
             }
         } catch (SecurityException e) {
             Log.d("pos", e.getMessage());
@@ -284,10 +268,19 @@ public class ActivityMap extends AppCompatActivity
         @Override
         public void onLocationChanged(Location location) {
             Log.d("pos", "Смена позиции");
-            if (myMarker!=null && mLastKnownLocation!=null) {
-                myMarker.setPosition(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
+            if (mLastKnowLocation != null) {
+                if (myMarker != null) {
+                    Log.d("myPosition", "Моя позиция есть, изменяю её");
+                    myMarker.setPosition(new LatLng(mLastKnowLocation.getLatitude(), mLastKnowLocation.getLongitude()));
+                } else {
+                    Bitmap bitmap = BitmapFactory.decodeResource(getResources(), getResources().
+                            getIdentifier("my_marker", "drawable", getPackageName()));
+                    bitmap = Bitmap.createScaledBitmap(bitmap, 57, 100, false);
+                    Log.d("myPosition", "Моей позиции нет, делаю позицию");
+                    myMarker = mMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromBitmap(bitmap)).position(new LatLng(mLastKnowLocation.getLatitude(), mLastKnowLocation.getLongitude())));
+                }
+                Log.d("myPosition", "Моя позиция - " + mLastKnowLocation.toString());
             }
-            getDeviceLocation();
             setDistance();
         }
 
@@ -307,55 +300,11 @@ public class ActivityMap extends AppCompatActivity
         }
     };
 
-    private void getLocationPermission() {
-        if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
-                android.Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            Log.d("pos", "пользователь дал согласие");
-            mLocationPermissionGranted = true;
-        } else {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-            Log.d("pos", "пользователь не дал согласие");
-        }
-    }
-
-    private void getDeviceLocation() {
-        if (mLocationPermissionGranted) {
-            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return;
-            }
-            mLastKnownLocation = LocationServices.FusedLocationApi
-                    .getLastLocation(mGoogleApiClient);
-        }
-        if (mLastKnownLocation != null) {
-            if (myMarker != null) {
-                Log.d("myPosition", "Моя позиция есть, изменяю её");
-                myMarker.setPosition(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
-            } else {
-                Bitmap bitmap = BitmapFactory.decodeResource(getResources(), getResources().
-                        getIdentifier("my_marker", "drawable", getPackageName()));
-                bitmap = Bitmap.createScaledBitmap(bitmap, 57, 100, false);
-                Log.d("myPosition", "Моей позиции нет, делаю позицию");
-                myMarker = mMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromBitmap(bitmap)).position(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude())));
-            }
-            Log.d("myPosition", "Моя позиция - " + mLastKnownLocation.toString());
-        }
-    }
-
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         if (mMap != null) {
             outState.putParcelable(KEY_CAMERA_POSITION, mMap.getCameraPosition());
-            outState.putParcelable(KEY_LOCATION, mLastKnownLocation);
+            outState.putParcelable(KEY_LOCATION, mLastKnowLocation);
             super.onSaveInstanceState(outState);
         }
     }
@@ -400,13 +349,13 @@ public class ActivityMap extends AppCompatActivity
                 LatLng position = new LatLng(x1, x2);
                 MarkerOptions options = new MarkerOptions();
                 options.position(position);
-                if (mLastKnownLocation != null) {
-                    list.add(new Point(id, position, calculateDistance(mLastKnownLocation, position), bol));
-                    searchList.add(new Point(id, position, calculateDistance(mLastKnownLocation, position), bol));
+                if (mLastKnowLocation != null) {
+                    list.add(new Point(id, position, calculateDistance(mLastKnowLocation, position), bol));
+                    searchList.add(new Point(id, position, calculateDistance(mLastKnowLocation, position), bol));
 
                 } else {
                     list.add(new Point(id, position,0,bol));
-                    searchList.add(new Point(id, position, calculateDistance(mLastKnownLocation, position), bol));
+                    searchList.add(new Point(id, position, calculateDistance(mLastKnowLocation, position), bol));
 
                 }
                 if (isVisited) {
@@ -463,8 +412,8 @@ public class ActivityMap extends AppCompatActivity
             if (point.flag==1) {
                 were.setText("Вы тут были");
                 first.setText("Узнать больше");
-                if (mLastKnownLocation != null) {
-                    int dist = calculateDistance(mLastKnownLocation, marker.getPosition());
+                if (mLastKnowLocation != null) {
+                    int dist = calculateDistance(mLastKnowLocation, marker.getPosition());
                     distance.setText(dist + " м");
                 }
                 final ArrayList<String> finalPoint_info = point_info;
@@ -488,8 +437,8 @@ public class ActivityMap extends AppCompatActivity
                         Toast.makeText(ActivityMap.this, "Доступно в следующий версиях", Toast.LENGTH_SHORT).show();
                     }
                 });
-                if (mLastKnownLocation != null) {
-                    int dist = calculateDistance(mLastKnownLocation, marker.getPosition());
+                if (mLastKnowLocation != null) {
+                    int dist = calculateDistance(mLastKnowLocation, marker.getPosition());
                     distance.setText(dist + " м");
                 }
             }
@@ -519,23 +468,10 @@ public class ActivityMap extends AppCompatActivity
 
     public void lookAtMe(View view) {
         Log.d("pos", "нажал на кнопку");
-        getDeviceLocation();
-        setCameraPosition(mLastKnownLocation);
+        setCameraPosition(mLastKnowLocation);
     }
 
     private void setCameraPosition(Location location) {
-        if (mLocationPermissionGranted) {
-            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return;
-            }
-        }
         // Set the map's camera position to the current location of the device.
         if (mCameraPosition != null) {
             mMap.moveCamera(CameraUpdateFactory.newCameraPosition(mCameraPosition));
@@ -548,14 +484,13 @@ public class ActivityMap extends AppCompatActivity
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
         }
         try {
-            Log.d("myPosition", "Моя позиция - " + mLastKnownLocation.toString());
+            Log.d("myPosition", "Моя позиция - " + mLastKnowLocation.toString());
         } catch (NullPointerException ex) {
             ex.printStackTrace();
         }
     }
 
     private void setCameraPosition(LatLng location) {
-        if (mLocationPermissionGranted) {
             if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 // TODO: Consider calling
                 //    ActivityCompat#requestPermissions
@@ -566,7 +501,6 @@ public class ActivityMap extends AppCompatActivity
                 // for ActivityCompat#requestPermissions for more details.
                 return;
             }
-        }
         synchronized (location) {
             if (mCameraPosition != null) {
                 mMap.moveCamera(CameraUpdateFactory.newCameraPosition(mCameraPosition));
@@ -620,16 +554,16 @@ public class ActivityMap extends AppCompatActivity
     }
 
     private void setDistance(){
-        if (mLastKnownLocation != null) {
+        if (mLastKnowLocation != null) {
             for (int i = 0; i < list.size(); i++) {
-                list.get(i).distance = calculateDistance(mLastKnownLocation, list.get(i).location);
+                list.get(i).distance = calculateDistance(mLastKnowLocation, list.get(i).location);
             }
             sortList();
         }
     }
 
     public void close_target(View view) {
-        if (mLastKnownLocation!=null){
+        if (mLastKnowLocation!=null){
             setCameraPosition(list.get(0).location);
         }
     }
@@ -733,7 +667,7 @@ public class ActivityMap extends AppCompatActivity
                 } catch (ExecutionException e) {
                     e.printStackTrace();
                 }
-
+                //дима пидр
                 //show suggestions when search bar gains focus (typically history suggestions)
                 searchView.swapSuggestions(DataHelper.getHistory(this, 3));
 
