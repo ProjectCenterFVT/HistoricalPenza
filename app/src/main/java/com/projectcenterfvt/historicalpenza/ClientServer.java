@@ -13,18 +13,26 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Array;
+import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Created by Roman on 15.12.2017.
  */
 
 
-public class ClientServer extends AsyncTask<String, Void, ArrayList<String>>{
+public class ClientServer extends AsyncTask<String, Void, Sight[]>{
+
+    private Exception mExeption;
+
+    public interface OnResponseListener<T> {
+        public void onSuccess(T[] result);
+        public void onFailure(Exception e);
+    }
+
+    OnResponseListener<Sight> listener;
 
     private Context context;
     private String server = "http://d95344yu.beget.tech/api/api.request.php";
@@ -36,22 +44,13 @@ public class ClientServer extends AsyncTask<String, Void, ArrayList<String>>{
     }
 
     @Override
-    protected void onPreExecute() {
-        super.onPreExecute();
-    }
-
-    @Override
-    protected void onPostExecute(ArrayList<String> strings) {
-        super.onPostExecute(strings);
-    }
-
-    @Override
-    protected ArrayList<String> doInBackground(String... from) {
-        try{
+    protected Sight[] doInBackground(String... from) {
+        try {
             command = from[0];
             Log.d("server", command);
             JSONObject myjson = new JSONObject(command);
             URL url = new URL(server);
+
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setDoOutput(true);
@@ -65,8 +64,8 @@ public class ClientServer extends AsyncTask<String, Void, ArrayList<String>>{
 
             conn.connect();
 
-            int i = conn.getResponseCode();
-            Log.d("server", "код = "+i);
+            int code = conn.getResponseCode();
+            Log.d("server", "код = "+code);
 
             is = conn.getInputStream();
 
@@ -80,25 +79,62 @@ public class ClientServer extends AsyncTask<String, Void, ArrayList<String>>{
             data = baos.toByteArray();
             String resultString = new String(data, "UTF-8");
             Log.d("server", "result = "+resultString);
-            if (myjson.has("getCoordinates")) {
-                Log.d("server", "переписываю");
-                writeBD(resultString);
-                return null;
-            }
-            if (myjson.has("getInfo")){
-                return getInfo(resultString);
-            }
-            if (myjson.has("getAllInfo")){
-                return getAllInfo(resultString);
+
+            JSONObject jsonResult = new JSONObject(resultString);
+            JSONArray jsonArr = jsonResult.getJSONArray("result");
+            int size = jsonArr.length();
+
+            Sight[] resultArr = new Sight[size];
+
+            for(int i=0;i<size;i++)
+            {
+                JSONObject item = jsonArr.getJSONObject(i);
+
+                int id = 1;
+                String title = item.getString("title");
+                String description = item.getString("description");
+                String img = item.getString("img");
+
+                resultArr[i] = new Sight(id, title, description, img);
             }
 
+            return resultArr;
+
+//            if (myjson.has("getCoordinates")) {
+//                Log.d("server", "переписываю");
+//                writeBD(resultString);
+//                return null;
+//            }
+//            if (myjson.has("getInfo")){
+//                return getInfo(resultString);
+//            }
+//            if (myjson.has("getAllInfo")){
+//                return getAllInfo(resultString);
+//            }
+
         } catch (Exception e){
+            e.printStackTrace();
+            mExeption = e;
             Log.d("server", e.getMessage());
         }
 
         return null;
     }
 
+    @Override
+    protected void onPostExecute(Sight[] result) {
+        if (listener != null) {
+            if (mExeption == null) {
+                listener.onSuccess(result);
+            } else {
+                listener.onFailure(mExeption);
+            }
+        }
+    }
+
+    public void setOnResponseListener(OnResponseListener<Sight> listener) {
+        this.listener = listener;
+    }
 
     private void writeBD(String json){
 

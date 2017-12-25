@@ -20,8 +20,8 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        ClientServer clientServer = new ClientServer(this);
-        clientServer.execute("{\"getCoordinates\":\"0.0.0\"}");
+//        ClientServer clientServer = new ClientServer(this);
+//        clientServer.execute("{\"getCoordinates\":\"0.0.0\"}");
 
         new Handler().postDelayed(new Runnable() {
             @Override
