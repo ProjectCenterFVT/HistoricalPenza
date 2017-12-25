@@ -12,9 +12,16 @@ class PlaceSuggestion implements SearchSuggestion {
 
     private boolean isHistory = false;
     private String placeName;
+    private int id;
 
-    public PlaceSuggestion(String suggestion) {
+    public int getId() {
+        return id;
+    }
+
+    public PlaceSuggestion(int id, String suggestion) {
         this.placeName = suggestion.toLowerCase();
+        this.id = id;
+
     }
 
     public PlaceSuggestion(Parcel source) {
