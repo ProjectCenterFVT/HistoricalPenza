@@ -100,6 +100,7 @@ public class ActivityMap extends AppCompatActivity
     public static final long FIND_SUGGESTION_SIMULATED_DELAY = 250;
 
     private ArrayList<Point> list = new ArrayList<>();
+    private ArrayList<Point> searchList = new ArrayList<>();
 
     public final static String LOG_SEARCH = "searchView";
 
@@ -401,8 +402,12 @@ public class ActivityMap extends AppCompatActivity
                 options.position(position);
                 if (mLastKnownLocation != null) {
                     list.add(new Point(id, position, calculateDistance(mLastKnownLocation, position), bol));
+                    searchList.add(new Point(id, position, calculateDistance(mLastKnownLocation, position), bol));
+
                 } else {
                     list.add(new Point(id, position,0,bol));
+                    searchList.add(new Point(id, position, calculateDistance(mLastKnownLocation, position), bol));
+
                 }
                 if (isVisited) {
                     Bitmap bitmap = BitmapFactory.decodeResource(getResources(), getResources().
@@ -673,8 +678,8 @@ public class ActivityMap extends AppCompatActivity
             public void onSuggestionClicked(final SearchSuggestion searchSuggestion) {
 
 
-
                 PlaceSuggestion placeSuggestion = (PlaceSuggestion) searchSuggestion;
+                int id = placeSuggestion.getId();
 //                DataHelper.findSuggestions(this, PlaceSuggestion.getBody(),
 //                        new DataHelper.OnFindColorsListener() {
 //
@@ -685,8 +690,11 @@ public class ActivityMap extends AppCompatActivity
 //
 //                        });
                 Log.d(LOG_SEARCH, "onSuggestionClicked()");
+                setCameraPosition(searchList.get(id).location);
 
                 lastQuery = searchSuggestion.getBody();
+                searchView.setSearchBarTitle(lastQuery);
+                searchView.clearSuggestions();
             }
 
             @Override
@@ -717,7 +725,7 @@ public class ActivityMap extends AppCompatActivity
                 try {
                     list = call.get();
                     for (int i=0;i<list.size();i++) {
-                        placeSuggestionArrayList.add(new PlaceSuggestion(list.get(i)));
+                        placeSuggestionArrayList.add(new PlaceSuggestion((i),list.get(i)));
                     }
                     DataHelper.setsPlaceSuggestions(placeSuggestionArrayList);
                 } catch (InterruptedException e) {
@@ -736,7 +744,7 @@ public class ActivityMap extends AppCompatActivity
             public void onFocusCleared() {
 
                 //set the title of the bar so that when focus is returned a new query begins
-                searchView.setSearchBarTitle(lastQuery);
+                searchView.setSearchBarTitle("Поиск по городу");
 
                 //you can also set setSearchText(...) to make keep the query there when not focused and when focus returns
                 //mSearchView.setSearchText(searchSuggestion.getBody());
