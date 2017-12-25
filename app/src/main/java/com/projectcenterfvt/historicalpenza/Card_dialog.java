@@ -85,7 +85,7 @@ public class Card_dialog extends android.support.v4.app.DialogFragment {
         });
         return v;
     }
-
+    //здесь был я
     public void setList(ArrayList<ActivityMap.Point> list){
         listPoint = list;
         ClientServer call = new ClientServer(getContext());

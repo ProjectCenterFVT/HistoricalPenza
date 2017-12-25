@@ -11,6 +11,8 @@ import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -94,11 +96,9 @@ public class ActivityMap extends AppCompatActivity
     private Context context = this;
     private Marker myMarker = null;
     private DrawerLayout mDrawerLayout;
-
     private FloatingSearchView searchView;
     private String lastQuery = "";
     public static final long FIND_SUGGESTION_SIMULATED_DELAY = 250;
-
     private ArrayList<Point> list = new ArrayList<>();
     private ArrayList<Point> searchList = new ArrayList<>();
 
@@ -150,7 +150,8 @@ public class ActivityMap extends AppCompatActivity
         searchView = (FloatingSearchView) findViewById(R.id.floating_search_view);
         searchView.attachNavigationDrawerToMenuButton(mDrawerLayout);
 
-        setupSearch();
+        if (isOnline(this))
+            setupSearch();
 
     }
 
@@ -189,10 +190,15 @@ public class ActivityMap extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.name_sight) {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            Card_dialog card_dialog = new Card_dialog();
-            card_dialog.setList(list);
-            card_dialog.show(fragmentManager, "dialog");
+            if (isOnline(getApplicationContext())) {
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                Card_dialog card_dialog = new Card_dialog();
+                card_dialog.setList(list);
+                card_dialog.show(fragmentManager, "dialog");
+            } else {
+                Toast.makeText(ActivityMap.this, "Включите интернет!", Toast.LENGTH_SHORT).show();
+            }
+
         } else if (id == R.id.name_helpProject) {
             final AlertDialog.Builder builder = new AlertDialog.Builder(this);
             LayoutInflater inflater = this.getLayoutInflater();
@@ -283,11 +289,7 @@ public class ActivityMap extends AppCompatActivity
     private LocationListener locationListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location location) {
-            Log.d("pos", "Смена позиции");
-            if (myMarker!=null && mLastKnownLocation!=null) {
-                myMarker.setPosition(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
-            }
-            getDeviceLocation();
+            mLastKnownLocation = location;
             setDistance();
         }
 
@@ -440,67 +442,83 @@ public class ActivityMap extends AppCompatActivity
             call.execute("{\"getInfo\":\""+id+"\"}");
             try {
                 point_info = call.get();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            }
-            final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            final LayoutInflater inflater = this.getLayoutInflater();
-            final View view = inflater.inflate(R.layout.dialog, null);
-            view.setBackgroundResource(R.drawable.dialog_bgn);
+                final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                final LayoutInflater inflater = this.getLayoutInflater();
+                final View view = inflater.inflate(R.layout.dialog, null);
+                view.setBackgroundResource(R.drawable.dialog_bgn);
 
-            TextView info = (TextView) view.findViewById(R.id.dialog_text_info);
-            TextView distance = (TextView) view.findViewById(R.id.dialog_text_distance);
-            TextView were = (TextView) view.findViewById(R.id.dialog_text_were);
+                TextView info = (TextView) view.findViewById(R.id.dialog_text_info);
+                TextView distance = (TextView) view.findViewById(R.id.dialog_text_distance);
+                TextView were = (TextView) view.findViewById(R.id.dialog_text_were);
 
-            Button first = (Button) view.findViewById(R.id.first_btn);
-            Button second = (Button) view.findViewById(R.id.second_btn);
+                Button first = (Button) view.findViewById(R.id.first_btn);
+                Button second = (Button) view.findViewById(R.id.second_btn);
 
-            builder.setView(view);
-            final AlertDialog alert = builder.create();
-            info.setText(point_info.get(0));
-            if (point.flag==1) {
-                were.setText("Вы тут были");
-                first.setText("Узнать больше");
-                if (mLastKnownLocation != null) {
-                    int dist = calculateDistance(mLastKnownLocation, marker.getPosition());
-                    distance.setText(dist + " м");
+                builder.setView(view);
+                final AlertDialog alert = builder.create();
+                info.setText(point_info.get(0));
+                if (point.flag==1) {
+                    were.setText("Вы тут были");
+                    first.setText("Узнать больше");
+                    if (mLastKnownLocation != null) {
+                        int dist = calculateDistance(mLastKnownLocation, marker.getPosition());
+                        distance.setText(dist + " м");
+                    }
+                    final ArrayList<String> finalPoint_info = point_info;
+                    first.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Intent intent = new Intent(context, info_activity.class);
+                            intent.putExtra("description", finalPoint_info.get(1));
+                            intent.putExtra("uml", finalPoint_info.get(2));
+                            intent.putExtra("name", finalPoint_info.get(0));
+                            startActivity(intent);
+                            alert.hide();
+                        }
+                    });
+                } else {
+                    were.setText("Вы тут еще не были");
+                    first.setText("Хочу открыть");
+                    first.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Toast.makeText(ActivityMap.this, "Доступно в следующий версиях", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    if (mLastKnownLocation != null) {
+                        int dist = calculateDistance(mLastKnownLocation, marker.getPosition());
+                        distance.setText(dist + " м");
+                    }
                 }
-                final ArrayList<String> finalPoint_info = point_info;
-                first.setOnClickListener(new View.OnClickListener() {
+                alert.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+                second.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Intent intent = new Intent(context, info_activity.class);
-                        intent.putExtra("description", finalPoint_info.get(1));
-                        intent.putExtra("uml", finalPoint_info.get(2));
-                        intent.putExtra("name", finalPoint_info.get(0));
-                        startActivity(intent);
                         alert.hide();
                     }
                 });
-            } else {
-                were.setText("Вы тут еще не были");
-                first.setText("Хочу открыть");
-                first.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Toast.makeText(ActivityMap.this, "Доступно в следующий версиях", Toast.LENGTH_SHORT).show();
-                    }
-                });
-                if (mLastKnownLocation != null) {
-                    int dist = calculateDistance(mLastKnownLocation, marker.getPosition());
-                    distance.setText(dist + " м");
-                }
+                alert.show();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                Toast.makeText(ActivityMap.this, "Включите интернет!", Toast.LENGTH_SHORT).show();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+                Toast.makeText(ActivityMap.this, "Включите интернет!", Toast.LENGTH_SHORT).show();
+            } catch (NullPointerException ex){
+                Toast.makeText(ActivityMap.this, "Включите интернет!", Toast.LENGTH_SHORT).show();
             }
-            alert.getWindow().setBackgroundDrawable(new ColorDrawable(0));
-            second.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    alert.hide();
-                }
-            });
-            alert.show();
+        }
+        return false;
+    }
+
+    public static boolean isOnline(Context context)
+    {
+        ConnectivityManager cm =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        if (netInfo != null && netInfo.isConnectedOrConnecting())
+        {
+            return true;
         }
         return false;
     }
@@ -718,26 +736,28 @@ public class ActivityMap extends AppCompatActivity
         searchView.setOnFocusChangeListener(new FloatingSearchView.OnFocusChangeListener() {
             @Override
             public void onFocus() {
-                ArrayList <String> list = new ArrayList();
-                ArrayList<PlaceSuggestion> placeSuggestionArrayList = new ArrayList<>();
-                ClientServer call = new ClientServer(getApplicationContext());
-                call.execute("{\"getAllInfo\":\"1\"}");
-                try {
-                    list = call.get();
-                    for (int i=0;i<list.size();i++) {
-                        placeSuggestionArrayList.add(new PlaceSuggestion((i),list.get(i)));
+                if (isOnline(getApplicationContext())) {
+                    ArrayList<String> list = new ArrayList();
+                    ArrayList<PlaceSuggestion> placeSuggestionArrayList = new ArrayList<>();
+                    ClientServer call = new ClientServer(getApplicationContext());
+                    call.execute("{\"getAllInfo\":\"1\"}");
+                    try {
+                        list = call.get();
+                        for (int i = 0; i < list.size(); i++) {
+                            placeSuggestionArrayList.add(new PlaceSuggestion((i), list.get(i)));
+                        }
+                        DataHelper.setsPlaceSuggestions(placeSuggestionArrayList);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
                     }
-                    DataHelper.setsPlaceSuggestions(placeSuggestionArrayList);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
+
+                    //show suggestions when search bar gains focus (typically history suggestions)
+                    searchView.swapSuggestions(DataHelper.getHistory(this, 3));
+
+                    Log.d(LOG_SEARCH, "onFocus()");
                 }
-
-                //show suggestions when search bar gains focus (typically history suggestions)
-                searchView.swapSuggestions(DataHelper.getHistory(this, 3));
-
-                Log.d(LOG_SEARCH, "onFocus()");
             }
 
             @Override
