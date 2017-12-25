@@ -672,6 +672,8 @@ public class ActivityMap extends AppCompatActivity
             @Override
             public void onSuggestionClicked(final SearchSuggestion searchSuggestion) {
 
+
+
                 PlaceSuggestion placeSuggestion = (PlaceSuggestion) searchSuggestion;
 //                DataHelper.findSuggestions(this, PlaceSuggestion.getBody(),
 //                        new DataHelper.OnFindColorsListener() {
@@ -708,6 +710,21 @@ public class ActivityMap extends AppCompatActivity
         searchView.setOnFocusChangeListener(new FloatingSearchView.OnFocusChangeListener() {
             @Override
             public void onFocus() {
+                ArrayList <String> list = new ArrayList();
+                ArrayList<PlaceSuggestion> placeSuggestionArrayList = new ArrayList<>();
+                ClientServer call = new ClientServer(getApplicationContext());
+                call.execute("{\"getAllInfo\":\"1\"}");
+                try {
+                    list = call.get();
+                    for (int i=0;i<list.size();i++) {
+                        placeSuggestionArrayList.add(new PlaceSuggestion(list.get(i)));
+                    }
+                    DataHelper.setsPlaceSuggestions(placeSuggestionArrayList);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
 
                 //show suggestions when search bar gains focus (typically history suggestions)
                 searchView.swapSuggestions(DataHelper.getHistory(this, 3));

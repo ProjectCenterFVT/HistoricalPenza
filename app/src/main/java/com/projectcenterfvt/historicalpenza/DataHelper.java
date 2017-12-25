@@ -19,26 +19,30 @@ import java.util.List;
 
 class DataHelper {
 
-    private static List<PlaceSuggestion> sPlaceSuggestions =
-            new ArrayList<>(Arrays.asList(
-                    new PlaceSuggestion("green"),
-                    new PlaceSuggestion("blue"),
-                    new PlaceSuggestion("pink"),
-                    new PlaceSuggestion("purple"),
-                    new PlaceSuggestion("brown"),
-                    new PlaceSuggestion("gray"),
-                    new PlaceSuggestion("Granny Smith Apple"),
-                    new PlaceSuggestion("Indigo"),
-                    new PlaceSuggestion("Periwinkle"),
-                    new PlaceSuggestion("Mahogany"),
-                    new PlaceSuggestion("Maize"),
-                    new PlaceSuggestion("Mahogany"),
-                    new PlaceSuggestion("Outer Space"),
-                    new PlaceSuggestion("Melon"),
-                    new PlaceSuggestion("Yellow"),
-                    new PlaceSuggestion("Orange"),
-                    new PlaceSuggestion("Red"),
-                    new PlaceSuggestion("Orchid")));
+    private static List<PlaceSuggestion> sPlaceSuggestions;
+//            new ArrayList<>(Arrays.asList(
+//                    new PlaceSuggestion("green"),
+//                    new PlaceSuggestion("blue"),
+//                    new PlaceSuggestion("pink"),
+//                    new PlaceSuggestion("purple"),
+//                    new PlaceSuggestion("brown"),
+//                    new PlaceSuggestion("gray"),
+//                    new PlaceSuggestion("Granny Smith Apple"),
+//                    new PlaceSuggestion("Indigo"),
+//                    new PlaceSuggestion("Periwinkle"),
+//                    new PlaceSuggestion("Mahogany"),
+//                    new PlaceSuggestion("Maize"),
+//                    new PlaceSuggestion("Mahogany"),
+//                    new PlaceSuggestion("Outer Space"),
+//                    new PlaceSuggestion("Melon"),
+//                    new PlaceSuggestion("Yellow"),
+//                    new PlaceSuggestion("Orange"),
+//                    new PlaceSuggestion("Red"),
+//                    new PlaceSuggestion("Orchid")));
+
+    public static void setsPlaceSuggestions(List<PlaceSuggestion> sPlaceSuggestions) {
+        DataHelper.sPlaceSuggestions = sPlaceSuggestions;
+    }
 
     public interface OnFindPlacesListener {
         void onResults(List<PlaceSuggestion> results);
@@ -87,16 +91,16 @@ class DataHelper {
                 if (!(constraint == null || constraint.length() == 0)) {
 
 
-//                    for (PlaceSuggestion suggestion : sPlaceSuggestions) {
-//                        if (suggestion.getBody().toUpperCase()
-//                                .startsWith(constraint.toString().toUpperCase())) {
-//
-//                            suggestionList.add(suggestion);
-//                            if (limit != -1 && suggestionList.size() == limit) {
-//                                break;
-//                            }
-//                        }
-//                    }
+                    for (PlaceSuggestion suggestion : sPlaceSuggestions) {
+                        if (suggestion.getBody().toUpperCase()
+                                .startsWith(constraint.toString().toUpperCase())) {
+
+                            suggestionList.add(suggestion);
+                            if (limit != -1 && suggestionList.size() == limit) {
+                                break;
+                            }
+                        }
+                    }
                 }
 
                 FilterResults results = new FilterResults();
