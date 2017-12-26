@@ -177,10 +177,31 @@ public class ActivityMap extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.name_sight) {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            Card_dialog card_dialog = new Card_dialog();
-            card_dialog.setList(list);
-            card_dialog.show(fragmentManager, "dialog");
+            ClientServer call = new ClientServer(this);
+            call.setOnResponseListener(new ClientServer.OnResponseListener<Sight>() {
+                @Override
+                public void onSuccess(Sight[] result) {
+                    FragmentManager fragmentManager = getSupportFragmentManager();
+                    Card_dialog card_dialog = new Card_dialog();
+
+                    for (int i = 0; i < result.length; i++) {
+                        ActivityMap.Point point = list.get(i);
+                        int id = point.id - 1;
+                        point.name = result[id].title;
+                        list.set(i, point);
+                    }
+
+                    card_dialog.setList(list);
+                    card_dialog.show(fragmentManager, "dialog");
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    Toast.makeText(ActivityMap.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                }
+            });
+            call.getAllInfo();
         } else if (id == R.id.name_helpProject) {
             final AlertDialog.Builder builder = new AlertDialog.Builder(this);
             LayoutInflater inflater = this.getLayoutInflater();
@@ -382,74 +403,80 @@ public class ActivityMap extends AppCompatActivity
     public boolean onMarkerClick(final Marker marker) {
         Log.d("marker", "Нажал на маркер " + marker.getId() + " " + marker.getTitle() + " " + marker.getPosition().toString());
         if (marker.getTag() != null) {
-            Point point = (Point) marker.getTag();
+            final Point point = (Point) marker.getTag();
             final int id = point.id;
-            ClientServer call = new ClientServer(this);
-            ArrayList <String> point_info = new ArrayList<>();
-            call.execute("{\"getInfo\":\""+id+"\"}");
-            try {
-                point_info = call.get();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            }
+
             final AlertDialog.Builder builder = new AlertDialog.Builder(this);
             final LayoutInflater inflater = this.getLayoutInflater();
             final View view = inflater.inflate(R.layout.dialog, null);
             view.setBackgroundResource(R.drawable.dialog_bgn);
 
-            TextView info = (TextView) view.findViewById(R.id.dialog_text_info);
-            TextView distance = (TextView) view.findViewById(R.id.dialog_text_distance);
-            TextView were = (TextView) view.findViewById(R.id.dialog_text_were);
+            final TextView info = (TextView) view.findViewById(R.id.dialog_text_info);
+            final TextView distance = (TextView) view.findViewById(R.id.dialog_text_distance);
+            final TextView were = (TextView) view.findViewById(R.id.dialog_text_were);
 
-            Button first = (Button) view.findViewById(R.id.first_btn);
-            Button second = (Button) view.findViewById(R.id.second_btn);
+            final Button first = (Button) view.findViewById(R.id.first_btn);
+            final Button second = (Button) view.findViewById(R.id.second_btn);
 
             builder.setView(view);
             final AlertDialog alert = builder.create();
-            info.setText(point_info.get(0));
-            if (point.flag==1) {
-                were.setText("Вы тут были");
-                first.setText("Узнать больше");
-                if (mLastKnowLocation != null) {
-                    int dist = calculateDistance(mLastKnowLocation, marker.getPosition());
-                    distance.setText(dist + " м");
-                }
-                final ArrayList<String> finalPoint_info = point_info;
-                first.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent intent = new Intent(context, info_activity.class);
-                        intent.putExtra("description", finalPoint_info.get(1));
-                        intent.putExtra("uml", finalPoint_info.get(2));
-                        intent.putExtra("name", finalPoint_info.get(0));
-                        startActivity(intent);
-                        alert.hide();
-                    }
-                });
-            } else {
-                were.setText("Вы тут еще не были");
-                first.setText("Хочу открыть");
-                first.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Toast.makeText(ActivityMap.this, "Доступно в следующий версиях", Toast.LENGTH_SHORT).show();
-                    }
-                });
-                if (mLastKnowLocation != null) {
-                    int dist = calculateDistance(mLastKnowLocation, marker.getPosition());
-                    distance.setText(dist + " м");
-                }
-            }
-            alert.getWindow().setBackgroundDrawable(new ColorDrawable(0));
-            second.setOnClickListener(new View.OnClickListener() {
+
+            ClientServer call = new ClientServer(this);
+            call.setOnResponseListener(new ClientServer.OnResponseListener<Sight>() {
                 @Override
-                public void onClick(View view) {
-                    alert.hide();
+                public void onSuccess(final Sight[] result) {
+                    info.setText(result[0].title);
+                    if (point.flag==1) {
+                        were.setText("Вы тут были");
+                        first.setText("Узнать больше");
+
+                        if (mLastKnownLocation != null) {
+                            int dist = calculateDistance(mLastKnownLocation, marker.getPosition());
+                            distance.setText(dist + " м");
+                        }
+
+                        first.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                Intent intent = new Intent(context, info_activity.class);
+                                intent.putExtra("title", result[0].title);
+                                intent.putExtra("description", result[0].description);
+                                intent.putExtra("uml", result[0].img);
+                                startActivity(intent);
+                                alert.hide();
+                            }
+                        });
+
+                    } else {
+                        were.setText("Вы тут еще не были");
+                        first.setText("Хочу открыть");
+                        first.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                Toast.makeText(ActivityMap.this, "Доступно в следующий версиях", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                        if (mLastKnownLocation != null) {
+                            int dist = calculateDistance(mLastKnownLocation, marker.getPosition());
+                            distance.setText(dist + " м");
+                        }
+                    }
+                    alert.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+                    second.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            alert.hide();
+                        }
+                    });
+                    alert.show();
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    Toast.makeText(ActivityMap.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
-            alert.show();
+            call.getInfo(id);
         }
         return false;
     }
