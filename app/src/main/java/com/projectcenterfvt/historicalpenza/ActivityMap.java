@@ -195,7 +195,7 @@ public class ActivityMap extends AppCompatActivity
                     for (int i = 0; i < result.length; i++) {
                         ActivityMap.Point point = list.get(i);
                         int id = point.id - 1;
-                        point.name = result[i].title;
+                        point.name = result[id].title;
                         list.set(i, point);
                     }
 
