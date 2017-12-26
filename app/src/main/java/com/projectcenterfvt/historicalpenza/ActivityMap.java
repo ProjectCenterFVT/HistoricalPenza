@@ -185,10 +185,31 @@ public class ActivityMap extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.name_sight) {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            Card_dialog card_dialog = new Card_dialog();
-//            card_dialog.setList(list);
-            card_dialog.show(fragmentManager, "dialog");
+            ClientServer call = new ClientServer(this);
+            call.setOnResponseListener(new ClientServer.OnResponseListener<Sight>() {
+                @Override
+                public void onSuccess(Sight[] result) {
+                    FragmentManager fragmentManager = getSupportFragmentManager();
+                    Card_dialog card_dialog = new Card_dialog();
+
+                    for (int i = 0; i < result.length; i++) {
+                        ActivityMap.Point point = list.get(i);
+                        int id = point.id - 1;
+                        point.name = result[i].title;
+                        list.set(i, point);
+                    }
+
+                    card_dialog.setList(list);
+                    card_dialog.show(fragmentManager, "dialog");
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    Toast.makeText(ActivityMap.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                }
+            });
+            call.getAllInfo();
         } else if (id == R.id.name_helpProject) {
             final AlertDialog.Builder builder = new AlertDialog.Builder(this);
             LayoutInflater inflater = this.getLayoutInflater();
@@ -461,9 +482,9 @@ public class ActivityMap extends AppCompatActivity
                             @Override
                             public void onClick(View view) {
                                 Intent intent = new Intent(context, info_activity.class);
+                                intent.putExtra("title", result[0].title);
                                 intent.putExtra("description", result[0].description);
                                 intent.putExtra("uml", result[0].img);
-                                intent.putExtra("name", result[0].title);
                                 startActivity(intent);
                                 alert.hide();
                             }
@@ -498,7 +519,7 @@ public class ActivityMap extends AppCompatActivity
                     Toast.makeText(ActivityMap.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
-            call.execute("{\"getInfo\":\""+id+"\"}");
+            call.getInfo(id);
         }
         return false;
     }

@@ -32,13 +32,13 @@ public class info_activity extends AppCompatActivity {
         TextView tvTitle = (TextView) findViewById(R.id.tvTitle);
 
         Intent intent = getIntent();
-        String discription = intent.getStringExtra("description");
+        String title = intent.getStringExtra("title");
+        String description = intent.getStringExtra("description");
         String uml = intent.getStringExtra("uml");
-        String name = intent.getStringExtra("name");
-        tvTitle.setText(name);
+        tvTitle.setText(title);
 
         new DownloadImage((ImageView) findViewById(R.id.ivPhoto)).execute("http://"+uml);
-        tvDescription.setText(discription);
+        tvDescription.setText(description);
     }
 
     public void onBackClick(View view) {
