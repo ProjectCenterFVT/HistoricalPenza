@@ -679,7 +679,7 @@ public class ActivityMap extends AppCompatActivity
 
                     //simulates a query call to a data source
                     //with a new query.
-                    DataHelper.findSuggestions(this, newQuery, 5,
+                    DataHelper.findSuggestions(newQuery, 5,
                             FIND_SUGGESTION_SIMULATED_DELAY, new DataHelper.OnFindSuggestionsListener() {
 
                                 @Override
@@ -717,7 +717,7 @@ public class ActivityMap extends AppCompatActivity
 //
 //                        });
                 Log.d(LOG_SEARCH, "onSuggestionClicked()");
-                setCameraPosition(searchList.get(id).location);
+                setCameraPosition(searchList.get(id-1).location);
 
                 lastQuery = searchSuggestion.getBody();
                 searchView.setSearchBarTitle(lastQuery);
@@ -745,24 +745,29 @@ public class ActivityMap extends AppCompatActivity
         searchView.setOnFocusChangeListener(new FloatingSearchView.OnFocusChangeListener() {
             @Override
             public void onFocus() {
-                ArrayList <String> list = new ArrayList();
-                ArrayList<PlaceSuggestion> placeSuggestionArrayList = new ArrayList<>();
                 ClientServer call = new ClientServer(getApplicationContext());
-                call.execute("{\"getAllInfo\":\"1\"}");
-                try {
-                    list = call.get();
-                    for (int i=0;i<list.size();i++) {
-                        placeSuggestionArrayList.add(new PlaceSuggestion((i),list.get(i)));
-                    }
-                    DataHelper.setsPlaceSuggestions(placeSuggestionArrayList);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                }
+                call.setOnResponseListener(new ClientServer.OnResponseListener<Sight>() {
+                    @Override
+                    public void onSuccess(Sight[] result) {
+                        ArrayList<PlaceSuggestion> placeSuggestionArrayList = new ArrayList<>();
+                        for (Sight item :
+                                result) {
+                            placeSuggestionArrayList.add(new PlaceSuggestion(item.id, item.title));
+                        }
 
-                //show suggestions when search bar gains focus (typically history suggestions)
-                searchView.swapSuggestions(DataHelper.getHistory(this, 3));
+                        DataHelper.setsPlaceSuggestions(placeSuggestionArrayList);
+
+                        //show suggestions when search bar gains focus (typically history suggestions)
+                        searchView.swapSuggestions(DataHelper.getHistory(3));
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        e.printStackTrace();
+                        Toast.makeText(ActivityMap.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+                call.getAllInfo();
 
                 Log.d(LOG_SEARCH, "onFocus()");
             }
