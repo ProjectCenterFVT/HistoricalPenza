@@ -31,6 +31,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -51,6 +52,7 @@ import com.arlib.floatingsearchview.FloatingSearchView;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class ActivityMap extends AppCompatActivity
@@ -92,8 +94,15 @@ public class ActivityMap extends AppCompatActivity
     private Context context = this;
     private Marker myMarker = null;
     private DrawerLayout mDrawerLayout;
+
     private FloatingSearchView searchView;
+    private String lastQuery = "";
+    public static final long FIND_SUGGESTION_SIMULATED_DELAY = 250;
+
     private ArrayList<Point> list = new ArrayList<>();
+    private ArrayList<Point> searchList = new ArrayList<>();
+
+    public final static String LOG_SEARCH = "searchView";
 
 
     @Override
@@ -141,12 +150,7 @@ public class ActivityMap extends AppCompatActivity
         searchView = (FloatingSearchView) findViewById(R.id.floating_search_view);
         searchView.attachNavigationDrawerToMenuButton(mDrawerLayout);
 
-        searchView.setOnQueryChangeListener(new FloatingSearchView.OnQueryChangeListener() {
-            @Override
-            public void onSearchTextChanged(String oldQuery, String newQuery) {
-
-            }
-        });
+        setupSearch();
 
     }
 
@@ -419,8 +423,12 @@ public class ActivityMap extends AppCompatActivity
                 options.position(position);
                 if (mLastKnownLocation != null) {
                     list.add(new Point(id, position, calculateDistance(mLastKnownLocation, position), bol));
+                    searchList.add(new Point(id, position, calculateDistance(mLastKnownLocation, position), bol));
+
                 } else {
                     list.add(new Point(id, position,0,bol));
+                    searchList.add(new Point(id, position, calculateDistance(mLastKnownLocation, position), bol));
+
                 }
                 if (isVisited) {
                     Bitmap bitmap = BitmapFactory.decodeResource(getResources(), getResources().
@@ -651,6 +659,126 @@ public class ActivityMap extends AppCompatActivity
         if (mLastKnownLocation!=null){
             setCameraPosition(list.get(0).location);
         }
+    }
+
+    private void setupSearch() {
+        searchView.setOnQueryChangeListener(new FloatingSearchView.OnQueryChangeListener() {
+
+            @Override
+            public void onSearchTextChanged(String oldQuery, final String newQuery) {
+
+                if (!oldQuery.equals("") && newQuery.equals("")) {
+                    searchView.clearSuggestions();
+                } else {
+
+                    //this shows the top left circular progress
+                    //you can call it where ever you want, but
+                    //it makes sense to do it when loading something in
+                    //the background.
+                    searchView.showProgress();
+
+                    //simulates a query call to a data source
+                    //with a new query.
+                    DataHelper.findSuggestions(this, newQuery, 5,
+                            FIND_SUGGESTION_SIMULATED_DELAY, new DataHelper.OnFindSuggestionsListener() {
+
+                                @Override
+                                public void onResults(List<PlaceSuggestion> results) {
+
+                                    //this will swap the data and
+                                    //render the collapse/expand animations as necessary
+                                    searchView.swapSuggestions(results);
+
+                                    //let the users know that the background
+                                    //process has completed
+                                    searchView.hideProgress();
+                                }
+                            });
+                }
+
+                Log.d(LOG_SEARCH, "onSearchTextChanged()");
+            }
+        });
+
+        searchView.setOnSearchListener(new FloatingSearchView.OnSearchListener() {
+            @Override
+            public void onSuggestionClicked(final SearchSuggestion searchSuggestion) {
+
+
+                PlaceSuggestion placeSuggestion = (PlaceSuggestion) searchSuggestion;
+                int id = placeSuggestion.getId();
+//                DataHelper.findSuggestions(this, PlaceSuggestion.getBody(),
+//                        new DataHelper.OnFindColorsListener() {
+//
+//                            @Override
+//                            public void onResults(List<PlaceSuggestion> results) {
+//                                //show search results
+//                            }
+//
+//                        });
+                Log.d(LOG_SEARCH, "onSuggestionClicked()");
+                setCameraPosition(searchList.get(id).location);
+
+                lastQuery = searchSuggestion.getBody();
+                searchView.setSearchBarTitle(lastQuery);
+                searchView.clearSuggestions();
+            }
+
+            @Override
+            public void onSearchAction(String query) {
+                lastQuery = query;
+
+//                DataHelper.findColors(getActivity(), query,
+//                        new DataHelper.OnFindColorsListener() {
+//
+//                            @Override
+//                            public void onResults(List<ColorWrapper> results) {
+//                                //show search results
+//                            }
+//
+//                        });
+                Log.d(LOG_SEARCH, "onSearchAction()");
+                Toast.makeText(ActivityMap.this, "onSearchAction()", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        searchView.setOnFocusChangeListener(new FloatingSearchView.OnFocusChangeListener() {
+            @Override
+            public void onFocus() {
+                ArrayList <String> list = new ArrayList();
+                ArrayList<PlaceSuggestion> placeSuggestionArrayList = new ArrayList<>();
+                ClientServer call = new ClientServer(getApplicationContext());
+                call.execute("{\"getAllInfo\":\"1\"}");
+                try {
+                    list = call.get();
+                    for (int i=0;i<list.size();i++) {
+                        placeSuggestionArrayList.add(new PlaceSuggestion((i),list.get(i)));
+                    }
+                    DataHelper.setsPlaceSuggestions(placeSuggestionArrayList);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+
+                //show suggestions when search bar gains focus (typically history suggestions)
+                searchView.swapSuggestions(DataHelper.getHistory(this, 3));
+
+                Log.d(LOG_SEARCH, "onFocus()");
+            }
+
+            @Override
+            public void onFocusCleared() {
+
+                //set the title of the bar so that when focus is returned a new query begins
+                searchView.setSearchBarTitle("Поиск по городу");
+
+                //you can also set setSearchText(...) to make keep the query there when not focused and when focus returns
+                //mSearchView.setSearchText(searchSuggestion.getBody());
+
+                Log.d(LOG_SEARCH, "onFocusCleared()");
+            }
+        });
     }
 
 }
