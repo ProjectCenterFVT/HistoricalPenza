@@ -8,8 +8,12 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.widget.Toast;
 
 public class SplashActivity extends AppCompatActivity {
+
+    static final String TAG = "server";
 
     private final int SPLASH_DISPLAY_LENGTH = 2000;
 
@@ -20,24 +24,54 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        ClientServer clientServer = new ClientServer(this);
-        clientServer.execute("{\"getCoordinates\":\"0.0.0\"}");
+        final DB_Position db = new DB_Position(this);
 
-        new Handler().postDelayed(new Runnable() {
+        ClientServer call = new ClientServer(this);
+        call.setOnResponseListener(new ClientServer.OnResponseListener<Sight>() {
             @Override
-            public void run() {
+            public void onSuccess(Sight[] result) {
+                SQLiteDatabase databases = db.getWritableDatabase();
+                databases.delete(db.DB_TABLE, null, null);
+
+                for (Sight aResult : result) {
+                    ContentValues contentValues = new ContentValues();
+
+                    contentValues.put(db.COLUMN_ID, aResult.id);
+                    Log.d(TAG, "вствавил  id = " + aResult.id);
+
+                    contentValues.put(db.COLUMN_X1, aResult.x1);
+                    Log.d(TAG, "вствавил  x1 = " + aResult.x1);
+
+                    contentValues.put(db.COLUMN_X2, aResult.x2);
+                    Log.d(TAG, "вствавил  x2 = " + aResult.x2);
+
+                    contentValues.put(db.COLUMN_flag, aResult.flag);
+                    Log.d(TAG, "вствавил  flag = " + aResult.flag);
+
+                    databases.insert(db.DB_TABLE, null, contentValues);
+                }
+
+                db.close();
+
                 Intent intent;
 
                 if(isFirstTime()) {
                     getPreferences(Context.MODE_PRIVATE).edit().putBoolean(KEY_IS_FIRST_TIME, false).apply();
-                   intent = new Intent(SplashActivity.this, GreetingActivity.class);
-               } else
+                    intent = new Intent(SplashActivity.this, GreetingActivity.class);
+                } else
                     intent = new Intent(SplashActivity.this, ActivityMap.class);
 
                 SplashActivity.this.startActivity(intent);
                 SplashActivity.this.finish();
             }
-        }, SPLASH_DISPLAY_LENGTH);
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(SplashActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
+            }
+        });
+        call.getCoordinates();
     }
 
     public boolean isFirstTime() {

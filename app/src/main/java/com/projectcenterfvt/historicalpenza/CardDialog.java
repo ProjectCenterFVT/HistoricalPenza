@@ -85,31 +85,8 @@ public class Card_dialog extends android.support.v4.app.DialogFragment {
         });
         return v;
     }
-
+    //здесь был я
     public void setList(ArrayList<ActivityMap.Point> list){
         listPoint = list;
-        ClientServer call = new ClientServer(getContext());
-        call.execute("{\"getAllInfo\":\"1\"}");
-        try {
-
-            ArrayList <String> titles = new ArrayList<>();
-           titles = call.get();
-           if (titles==null){
-               Log.d("server", "все пошло по пизде");
-           } else {
-               Log.d("server", "все пошло нормальды");
-               for (int i = 0; i <listPoint.size(); i++) {
-                   ActivityMap.Point point = list.get(i);
-                   int id = point.id-1;
-                   Log.d("List", "id = "+id+" titile "+(id)+" = "+titles.get(id));
-                   point.name = titles.get(id);
-                   list.set(i, point);
-               }
-           }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
     }
 }
