@@ -52,7 +52,7 @@ class DataHelper {
         void onResults(List<PlaceSuggestion> results);
     }
 
-    public static List<PlaceSuggestion> getHistory(FloatingSearchView.OnFocusChangeListener context, int count) {
+    public static List<PlaceSuggestion> getHistory(int count) {
 
         List<PlaceSuggestion> suggestionList = new ArrayList<>();
         PlaceSuggestion placeSuggestion;
@@ -73,7 +73,7 @@ class DataHelper {
         }
     }
 
-    public static void findSuggestions(final FloatingSearchView.OnQueryChangeListener context, String query, final int limit, final long simulatedDelay,
+    public static void findSuggestions(String query, final int limit, final long simulatedDelay,
                                        final OnFindSuggestionsListener listener) {
         new Filter() {
 
