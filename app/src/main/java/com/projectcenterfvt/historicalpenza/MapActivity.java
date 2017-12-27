@@ -53,10 +53,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
-public class ActivityMap extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, GoogleMap.OnMarkerClickListener, GoogleMap.InfoWindowAdapter, Card_dialog.onEventListener {
+public class MapActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, GoogleMap.OnMarkerClickListener, GoogleMap.InfoWindowAdapter, CardDialog.onEventListener {
 
     @Override
     public void setPosition(LatLng loc) {
@@ -194,10 +193,10 @@ public class ActivityMap extends AppCompatActivity
                 @Override
                 public void onSuccess(Sight[] result) {
                     FragmentManager fragmentManager = getSupportFragmentManager();
-                    Card_dialog card_dialog = new Card_dialog();
+                    CardDialog card_dialog = new CardDialog();
 
                     for (int i = 0; i < result.length; i++) {
-                        ActivityMap.Point point = list.get(i);
+                        MapActivity.Point point = list.get(i);
                         int id = point.id - 1;
                         point.name = result[id].title;
                         list.set(i, point);
@@ -209,7 +208,7 @@ public class ActivityMap extends AppCompatActivity
 
                 @Override
                 public void onFailure(Exception e) {
-                    Toast.makeText(ActivityMap.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MapActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
                 }
             });
@@ -254,7 +253,7 @@ public class ActivityMap extends AppCompatActivity
         } else if (id == R.id.name_about) {
             Log.d("click ", "нажал на кнопку абоут");
             FragmentManager fragmentManager = getSupportFragmentManager();
-            About_Dialog dialog = new About_Dialog();
+            AboutDialog dialog = new AboutDialog();
             dialog.show(fragmentManager, "dialog");
         }
 
@@ -489,7 +488,7 @@ public class ActivityMap extends AppCompatActivity
                         first.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                Intent intent = new Intent(context, info_activity.class);
+                                Intent intent = new Intent(context, InfoActivity.class);
                                 intent.putExtra("title", result[0].title);
                                 intent.putExtra("description", result[0].description);
                                 intent.putExtra("uml", result[0].img);
@@ -504,7 +503,7 @@ public class ActivityMap extends AppCompatActivity
                         first.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                Toast.makeText(ActivityMap.this, "Доступно в следующий версиях", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(MapActivity.this, "Доступно в следующий версиях", Toast.LENGTH_SHORT).show();
                             }
                         });
                         if (mLastKnownLocation != null) {
@@ -524,7 +523,7 @@ public class ActivityMap extends AppCompatActivity
 
                 @Override
                 public void onFailure(Exception e) {
-                    Toast.makeText(ActivityMap.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MapActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
             call.getInfo(id);
@@ -738,7 +737,7 @@ public class ActivityMap extends AppCompatActivity
 //
 //                        });
                 Log.d(LOG_SEARCH, "onSearchAction()");
-                Toast.makeText(ActivityMap.this, "onSearchAction()", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MapActivity.this, "onSearchAction()", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -764,7 +763,7 @@ public class ActivityMap extends AppCompatActivity
                     @Override
                     public void onFailure(Exception e) {
                         e.printStackTrace();
-                        Toast.makeText(ActivityMap.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MapActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
                 call.getAllInfo();

@@ -1,12 +1,8 @@
 package com.projectcenterfvt.historicalpenza;
 
-import android.app.Activity;
 import android.app.Dialog;
-import android.app.DialogFragment;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
-import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -14,24 +10,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.Adapter;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Created by Roman on 15.12.2017.
  */
 
-public class Card_dialog extends android.support.v4.app.DialogFragment {
+public class CardDialog extends android.support.v4.app.DialogFragment {
 
-    private ArrayList<ActivityMap.Point> listPoint;
+    private ArrayList<MapActivity.Point> listPoint;
     private ArrayList<String> listString = new ArrayList<>();
 
     @Override
@@ -76,7 +68,7 @@ public class Card_dialog extends android.support.v4.app.DialogFragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                ActivityMap.Point point = (ActivityMap.Point) adapterView.getAdapter().getItem(i);
+                MapActivity.Point point = (MapActivity.Point) adapterView.getAdapter().getItem(i);
                 Log.d("clicked", "id = "+point.id+" name = "+point.name+" loc = "+point.location.toString());
                 LatLng loc = point.location;
                 listener.setPosition(loc);
@@ -86,7 +78,7 @@ public class Card_dialog extends android.support.v4.app.DialogFragment {
         return v;
     }
     //здесь был я
-    public void setList(ArrayList<ActivityMap.Point> list){
+    public void setList(ArrayList<MapActivity.Point> list){
         listPoint = list;
     }
 }

@@ -4,9 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
@@ -59,7 +57,7 @@ public class SplashActivity extends AppCompatActivity {
                     getPreferences(Context.MODE_PRIVATE).edit().putBoolean(KEY_IS_FIRST_TIME, false).apply();
                     intent = new Intent(SplashActivity.this, GreetingActivity.class);
                 } else
-                    intent = new Intent(SplashActivity.this, ActivityMap.class);
+                    intent = new Intent(SplashActivity.this, MapActivity.class);
 
                 SplashActivity.this.startActivity(intent);
                 SplashActivity.this.finish();

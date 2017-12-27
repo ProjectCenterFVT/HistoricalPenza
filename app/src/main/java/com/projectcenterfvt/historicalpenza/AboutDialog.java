@@ -14,7 +14,7 @@ import android.view.Window;
  * Created by Roman on 16.12.2017.
  */
 
-public class About_Dialog extends android.support.v4.app.DialogFragment {
+public class AboutDialog extends android.support.v4.app.DialogFragment {
 
 
     private Dialog dialog;

@@ -18,12 +18,12 @@ import java.io.InputStream;
  *
  */
 
-public class info_activity extends AppCompatActivity {
+public class InfoActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.info_activity);
+        setContentView(R.layout.activity_info);
 
         TextView tvDescription = (TextView) findViewById(R.id.tvDescription);
         tvDescription.setMovementMethod(new ScrollingMovementMethod());

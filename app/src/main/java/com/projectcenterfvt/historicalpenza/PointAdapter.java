@@ -18,10 +18,10 @@ public class PointAdapter extends BaseAdapter {
 
     private Context context;
     private LayoutInflater inflater;
-    ArrayList<ActivityMap.Point> points;
+    ArrayList<MapActivity.Point> points;
 
 
-    PointAdapter(Context context, ArrayList<ActivityMap.Point> points){
+    PointAdapter(Context context, ArrayList<MapActivity.Point> points){
         this.context = context;
         this.points = points;
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -47,7 +47,7 @@ public class PointAdapter extends BaseAdapter {
     public View getView(int i, View view, ViewGroup viewGroup) {
         View v = view;
         v = inflater.inflate(R.layout.list_item, viewGroup, false);
-        ActivityMap.Point point = (ActivityMap.Point) getItem(i);
+        MapActivity.Point point = (MapActivity.Point) getItem(i);
         TextView card_name = (TextView) v.findViewById(R.id.card_name);
         TextView card_dist = (TextView) v.findViewById(R.id.card_distance);
         card_name.setText(point.name);
