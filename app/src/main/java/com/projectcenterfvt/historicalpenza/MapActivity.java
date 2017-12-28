@@ -49,6 +49,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import com.arlib.floatingsearchview.FloatingSearchView;
 
+import net.hockeyapp.android.CrashManager;
+import net.hockeyapp.android.UpdateManager;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -151,6 +154,12 @@ public class MapActivity extends AppCompatActivity
 
         setupSearch();
 
+        checkForUpdates();
+    }
+
+    private void checkForUpdates() {
+        // Remove this for store builds!
+        UpdateManager.register(this);
     }
 
     @Override
@@ -193,7 +202,7 @@ public class MapActivity extends AppCompatActivity
                 @Override
                 public void onSuccess(Sight[] result) {
                     FragmentManager fragmentManager = getSupportFragmentManager();
-                    CardDialog card_dialog = new CardDialog();
+                    CardDialog cardDialog = new CardDialog();
 
                     for (int i = 0; i < result.length; i++) {
                         MapActivity.Point point = list.get(i);
@@ -202,8 +211,8 @@ public class MapActivity extends AppCompatActivity
                         list.set(i, point);
                     }
 
-                    card_dialog.setList(list);
-                    card_dialog.show(fragmentManager, "dialog");
+                    cardDialog.setList(list);
+                    cardDialog.show(fragmentManager, "dialog");
                 }
 
                 @Override
@@ -611,6 +620,28 @@ public class MapActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         list.clear();
+
+        checkForCrashes();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterManagers();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterManagers();
+    }
+
+    private void unregisterManagers() {
+        UpdateManager.unregister();
+    }
+
+    private void checkForCrashes() {
+        CrashManager.register(this);
     }
 
     @Override

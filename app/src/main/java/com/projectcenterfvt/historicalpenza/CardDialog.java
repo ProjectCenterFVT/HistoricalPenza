@@ -77,7 +77,7 @@ public class CardDialog extends android.support.v4.app.DialogFragment {
         });
         return v;
     }
-    //здесь был я
+
     public void setList(ArrayList<MapActivity.Point> list){
         listPoint = list;
     }

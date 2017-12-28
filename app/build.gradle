@@ -10,6 +10,7 @@ android {
         versionName "1.0"
         multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        manifestPlaceholders = [HOCKEYAPP_APP_ID: "e242b3a6a5b04e47b9a49dd5de3f9828"]
     }
     buildTypes {
         release {
@@ -17,6 +18,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+}
+
+repositories {
+    jcenter()
 }
 
 dependencies {
@@ -31,4 +36,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     implementation 'com.google.android.gms:play-services-maps:11.6.2'
     compile 'com.github.arimorty:floatingsearchview:2.1.1'
+    compile 'net.hockeyapp.android:HockeySDK:5.0.4'
 }
