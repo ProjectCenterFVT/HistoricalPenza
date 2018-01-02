@@ -25,7 +25,7 @@ public class InfoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info);
 
-        TextView tvDescription = (TextView) findViewById(R.id.tvDescription);
+        TextViewEx tvDescription = (TextViewEx) findViewById(R.id.tvDescription);
         tvDescription.setMovementMethod(new ScrollingMovementMethod());
 
         TextView tvTitle = (TextView) findViewById(R.id.tvTitle);
@@ -37,7 +37,7 @@ public class InfoActivity extends AppCompatActivity {
         tvTitle.setText(title);
 
         new DownloadImage((ImageView) findViewById(R.id.ivPhoto)).execute("http://"+uml);
-        tvDescription.setText(description);
+        tvDescription.setText(description, true);
     }
 
     public void onBackClick(View view) {
