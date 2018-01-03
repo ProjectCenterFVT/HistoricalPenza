@@ -23,7 +23,7 @@ import java.util.ArrayList;
 
 public class CardDialog extends android.support.v4.app.DialogFragment {
 
-    private ArrayList<Sight> listPoint;
+    private ArrayList<Sight> sights;
     private ArrayList<String> listString = new ArrayList<>();
 
     @Override
@@ -62,8 +62,8 @@ public class CardDialog extends android.support.v4.app.DialogFragment {
             }
         });
         ListView listView = (ListView) v.findViewById(R.id.info_list);
-        Log.d("adapter", "кол-во в списке "+listPoint.size());
-        PointAdapter adapter = new PointAdapter(getContext(), listPoint);
+        Log.d("adapter", "кол-во в списке "+sights.size());
+        PointAdapter adapter = new PointAdapter(getContext(), sights);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -77,8 +77,8 @@ public class CardDialog extends android.support.v4.app.DialogFragment {
         });
         return v;
     }
-    //здесь был я
+
     public void setList(ArrayList<Sight> list){
-        listPoint = list;
+        sights = list;
     }
 }

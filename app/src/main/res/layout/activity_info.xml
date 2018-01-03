@@ -53,18 +53,16 @@
                     android:fillViewport="true"
                     android:scrollbars="none" >
 
-                    <TextView
+                    <com.projectcenterfvt.historicalpenza.TextViewEx
                         android:id="@+id/tvDescription"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="fill_horizontal"
                         android:maxLines="200"
                         android:paddingBottom="100dp"
                         android:paddingLeft="15dp"
                         android:paddingRight="15dp"
                         android:scrollbars="vertical"
-                        android:text="@string/description"
-                        android:textAlignment="center" />
+                        android:text="@string/description" />
 
                 </ScrollView>
 
