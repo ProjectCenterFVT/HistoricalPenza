@@ -12,41 +12,38 @@ import android.widget.Toast;
 public class SplashActivity extends AppCompatActivity {
 
     static final String TAG = "server";
-
-    private final int SPLASH_DISPLAY_LENGTH = 2000;
-
+    private static DB_Position db;
     static final String KEY_IS_FIRST_TIME = "first_time";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-
-        final DB_Position db = new DB_Position(this);
+        db = new DB_Position(this);
 
         ClientServer call = new ClientServer(this);
         call.setOnResponseListener(new ClientServer.OnResponseListener<Sight>() {
             @Override
             public void onSuccess(Sight[] result) {
-                SQLiteDatabase databases = db.getWritableDatabase();
-                databases.delete(db.DB_TABLE, null, null);
+                db.connectToWrite();
+                db.getDB().delete(db.DB_TABLE, null, null);
 
                 for (Sight aResult : result) {
                     ContentValues contentValues = new ContentValues();
 
-                    contentValues.put(db.COLUMN_ID, aResult.id);
-                    Log.d(TAG, "вствавил  id = " + aResult.id);
+                    contentValues.put(db.COLUMN_ID, aResult.getId());
+                    Log.d(TAG, "вствавил  id = " + aResult.getId());
 
-                    contentValues.put(db.COLUMN_X1, aResult.x1);
-                    Log.d(TAG, "вствавил  x1 = " + aResult.x1);
+                    contentValues.put(db.COLUMN_X1, aResult.getLatitude());
+                    Log.d(TAG, "вствавил  x1 = " + aResult.getLatitude());
 
-                    contentValues.put(db.COLUMN_X2, aResult.x2);
-                    Log.d(TAG, "вствавил  x2 = " + aResult.x2);
+                    contentValues.put(db.COLUMN_X2, aResult.getLongitude());
+                    Log.d(TAG, "вствавил  x2 = " + aResult.getLongitude());
 
-                    contentValues.put(db.COLUMN_flag, aResult.flag);
-                    Log.d(TAG, "вствавил  flag = " + aResult.flag);
+                    contentValues.put(db.COLUMN_flag, aResult.getFlag());
+                    Log.d(TAG, "вствавил  flag = " + aResult.getFlag());
 
-                    databases.insert(db.DB_TABLE, null, contentValues);
+                    db.getDB().insert(db.DB_TABLE, null, contentValues);
                 }
 
                 db.close();
@@ -67,6 +64,17 @@ public class SplashActivity extends AppCompatActivity {
             public void onFailure(Exception e) {
                 Toast.makeText(SplashActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                 e.printStackTrace();
+                Intent intent;
+                if(isFirstTime()) {
+                    getPreferences(Context.MODE_PRIVATE).edit().putBoolean(KEY_IS_FIRST_TIME, false).apply();
+                    intent = new Intent(SplashActivity.this, GreetingActivity.class);
+                } else
+                    intent = new Intent(SplashActivity.this, MapActivity.class);
+
+                SplashActivity.this.startActivity(intent);
+                SplashActivity.this.finish();
+                SplashActivity.this.startActivity(intent);
+                SplashActivity.this.finish();
             }
         });
         call.getCoordinates();

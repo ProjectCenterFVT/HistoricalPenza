@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.ColorDrawable;
@@ -12,6 +11,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
@@ -62,21 +62,6 @@ public class MapActivity extends AppCompatActivity
         setCameraPosition(loc);
     }
 
-    class Point {
-        int id;
-        LatLng location;
-        int distance;
-        int flag;
-        String name;
-
-        Point(int id, LatLng loc, int distance, int flag) {
-            this.id = id;
-            this.location = loc;
-            this.distance = distance;
-            this.flag = flag;
-        }
-    }
-
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
     private Location mLastKnownLocation;
@@ -93,22 +78,18 @@ public class MapActivity extends AppCompatActivity
     private Context context = this;
     private Marker myMarker = null;
     private DrawerLayout mDrawerLayout;
-
     private FloatingSearchView searchView;
     private String lastQuery = "";
     public static final long FIND_SUGGESTION_SIMULATED_DELAY = 250;
-
-    private ArrayList<Point> list = new ArrayList<>();
-    private ArrayList<Point> searchList = new ArrayList<>();
-
+    private ArrayList<Sight> list = new ArrayList<>();
     public final static String LOG_SEARCH = "searchView";
-
+    private DB_Position db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
-
+        db = new DB_Position(this);
         btn_pos = (Button) findViewById(R.id.btn_position);
 
         final LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
@@ -133,11 +114,6 @@ public class MapActivity extends AppCompatActivity
                 .addApi(Places.PLACE_DETECTION_API)
                 .build();
         mGoogleApiClient.connect();
-
-        if (savedInstanceState != null) {
-            mLastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
-            mCameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
-        }
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -196,10 +172,10 @@ public class MapActivity extends AppCompatActivity
                     CardDialog card_dialog = new CardDialog();
 
                     for (int i = 0; i < result.length; i++) {
-                        MapActivity.Point point = list.get(i);
-                        int id = point.id - 1;
-                        point.name = result[id].title;
-                        list.set(i, point);
+                        Sight sight = list.get(i);
+                        int id = sight.getId() - 1;
+                        sight.setTitle(result[id].getTitle());
+                        list.set(i, sight);
                     }
 
                     card_dialog.setList(list);
@@ -265,6 +241,7 @@ public class MapActivity extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        Log.d("saved", "первый запуск");
         mMap.setMinZoomPreference(12.0f);
         mMap.setMaxZoomPreference(17.0f);
         mMap.setOnMarkerClickListener(this);
@@ -275,6 +252,11 @@ public class MapActivity extends AppCompatActivity
         setCameraPosition(mLastKnownLocation);
         fillArray(mMap);
         setDistance();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
     }
 
     @Override
@@ -358,16 +340,16 @@ public class MapActivity extends AppCompatActivity
         }
         if (mLastKnownLocation != null) {
             if (myMarker != null) {
-                Log.d("myPosition", "Моя позиция есть, изменяю её");
+                Log.d("pos", "Моя позиция есть, изменяю её");
                 myMarker.setPosition(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
             } else {
                 Bitmap bitmap = BitmapFactory.decodeResource(getResources(), getResources().
                         getIdentifier("my_marker", "drawable", getPackageName()));
                 bitmap = Bitmap.createScaledBitmap(bitmap, 57, 100, false);
-                Log.d("myPosition", "Моей позиции нет, делаю позицию");
+                Log.d("pos", "Моей позиции нет, делаю позицию");
                 myMarker = mMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromBitmap(bitmap)).position(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude())));
             }
-            Log.d("myPosition", "Моя позиция - " + mLastKnownLocation.toString());
+            Log.d("pos", "Моя позиция - " + mLastKnownLocation.toString());
         }
     }
 
@@ -401,9 +383,8 @@ public class MapActivity extends AppCompatActivity
     }
 
     private void fillArray(GoogleMap map) {
-        DB_Position db = new DB_Position(context);
-        SQLiteDatabase databases = db.getReadableDatabase();
-        Cursor cursor = databases.query(DB_Position.DB_TABLE, new String[]{DB_Position.COLUMN_ID, DB_Position.COLUMN_X1, DB_Position.COLUMN_X2, DB_Position.COLUMN_flag}, null, null, null, null, null);
+        db.connectToRead();
+        Cursor cursor = db.getDB().query(DB_Position.DB_TABLE, new String[]{DB_Position.COLUMN_ID, DB_Position.COLUMN_X1, DB_Position.COLUMN_X2, DB_Position.COLUMN_flag}, null, null, null, null, null);
         if (cursor.moveToFirst()) {
             final int id_id = cursor.getColumnIndex(dbPosition.COLUMN_ID);
             final int id_x1 = cursor.getColumnIndex(dbPosition.COLUMN_X1);
@@ -420,15 +401,13 @@ public class MapActivity extends AppCompatActivity
                 LatLng position = new LatLng(x1, x2);
                 MarkerOptions options = new MarkerOptions();
                 options.position(position);
+                Sight sight = new Sight(id, x1,x2,isVisited);
                 if (mLastKnownLocation != null) {
-                    list.add(new Point(id, position, calculateDistance(mLastKnownLocation, position), bol));
-                    searchList.add(new Point(id, position, calculateDistance(mLastKnownLocation, position), bol));
-
+                    sight.setDistance(calculateDistance(mLastKnownLocation, position));
                 } else {
-                    list.add(new Point(id, position,0,bol));
-                    searchList.add(new Point(id, position, calculateDistance(mLastKnownLocation, position), bol));
-
+                    sight.setDistance(0);
                 }
+                list.add(sight);
                 if (isVisited) {
                     Bitmap bitmap = BitmapFactory.decodeResource(getResources(), getResources().
                             getIdentifier("unlock", "drawable", getPackageName()));
@@ -447,14 +426,15 @@ public class MapActivity extends AppCompatActivity
             } while (cursor.moveToNext());
         }
         cursor.close();
+        db.close();
     }
 
     @Override
     public boolean onMarkerClick(final Marker marker) {
         Log.d("marker", "Нажал на маркер " + marker.getId() + " " + marker.getTitle() + " " + marker.getPosition().toString());
         if (marker.getTag() != null) {
-            final Point point = (Point) marker.getTag();
-            final int id = point.id;
+            final Sight sight = (Sight) marker.getTag();
+            final int id = sight.getId();
 
             final AlertDialog.Builder builder = new AlertDialog.Builder(this);
             final LayoutInflater inflater = this.getLayoutInflater();
@@ -475,8 +455,8 @@ public class MapActivity extends AppCompatActivity
             call.setOnResponseListener(new ClientServer.OnResponseListener<Sight>() {
                 @Override
                 public void onSuccess(final Sight[] result) {
-                    info.setText(result[0].title);
-                    if (point.flag==1) {
+                    info.setText(result[0].getTitle());
+                    if (sight.getFlag()) {
                         were.setText("Вы тут были");
                         first.setText("Узнать больше");
 
@@ -489,9 +469,9 @@ public class MapActivity extends AppCompatActivity
                             @Override
                             public void onClick(View view) {
                                 Intent intent = new Intent(context, InfoActivity.class);
-                                intent.putExtra("title", result[0].title);
-                                intent.putExtra("description", result[0].description);
-                                intent.putExtra("uml", result[0].img);
+                                intent.putExtra("title", result[0].getTitle());
+                                intent.putExtra("description", result[0].getDescription());
+                                intent.putExtra("uml", result[0].getImg());
                                 startActivity(intent);
                                 alert.hide();
                             }
@@ -634,21 +614,22 @@ public class MapActivity extends AppCompatActivity
 
     private void sortList() {
         Log.d("list", "start sort");
-        Collections.sort(list, new Comparator<Point>() {
+        Collections.sort(list, new Comparator<Sight>() {
             @Override
-            public int compare(Point point, Point t1) {
-                return point.distance - t1.distance;
+            public int compare(Sight point, Sight t1) {
+                return point.getDistance() - t1.getDistance();
             }
         });
         for (int i = 0; i < list.size(); i++) {
-            Log.d("list", "dist = " + list.get(i).distance);
+            Log.d("list", "dist = " + list.get(i).getDistance());
         }
+        Log.d("list", "end sort");
     }
 
     private void setDistance(){
         if (mLastKnownLocation != null) {
             for (int i = 0; i < list.size(); i++) {
-                list.get(i).distance = calculateDistance(mLastKnownLocation, list.get(i).location);
+                list.get(i).setDistance(calculateDistance(mLastKnownLocation, list.get(i).getLocation()));
             }
             sortList();
         }
@@ -656,7 +637,7 @@ public class MapActivity extends AppCompatActivity
 
     public void close_target(View view) {
         if (mLastKnownLocation!=null){
-            setCameraPosition(list.get(0).location);
+            setCameraPosition(list.get(0).getLocation());
         }
     }
 
@@ -702,8 +683,6 @@ public class MapActivity extends AppCompatActivity
         searchView.setOnSearchListener(new FloatingSearchView.OnSearchListener() {
             @Override
             public void onSuggestionClicked(final SearchSuggestion searchSuggestion) {
-
-
                 PlaceSuggestion placeSuggestion = (PlaceSuggestion) searchSuggestion;
                 int id = placeSuggestion.getId();
 //                DataHelper.findSuggestions(this, PlaceSuggestion.getBody(),
@@ -716,7 +695,8 @@ public class MapActivity extends AppCompatActivity
 //
 //                        });
                 Log.d(LOG_SEARCH, "onSuggestionClicked()");
-                setCameraPosition(searchList.get(id-1).location);
+                Sight sight = db.getCell(id);
+                setCameraPosition(sight.getLocation());
 
                 lastQuery = searchSuggestion.getBody();
                 searchView.setSearchBarTitle(lastQuery);
@@ -751,7 +731,7 @@ public class MapActivity extends AppCompatActivity
                         ArrayList<PlaceSuggestion> placeSuggestionArrayList = new ArrayList<>();
                         for (Sight item :
                                 result) {
-                            placeSuggestionArrayList.add(new PlaceSuggestion(item.id, item.title));
+                            placeSuggestionArrayList.add(new PlaceSuggestion(item.getId(), item.getTitle()));
                         }
 
                         DataHelper.setsPlaceSuggestions(placeSuggestionArrayList);

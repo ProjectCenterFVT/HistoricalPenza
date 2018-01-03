@@ -1,16 +1,9 @@
 package com.projectcenterfvt.historicalpenza;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.sql.SQLException;
 
 /**
  * Created by Roman on 08.12.2017.
@@ -28,6 +21,7 @@ public class DB_Position extends SQLiteOpenHelper {
     static final String COLUMN_flag = "flag";
 
     private Context myContext;
+    private SQLiteDatabase db;
 
     public DB_Position(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -47,6 +41,38 @@ public class DB_Position extends SQLiteOpenHelper {
         db.execSQL("drop table if exists " + DB_TABLE);
 
         onCreate(db);
+    }
+
+    public void connectToRead (){
+       db = this.getReadableDatabase();
+    }
+
+    public void connectToWrite(){
+        db = this.getWritableDatabase();
+    }
+
+    public void close(){
+        super.close();
+    }
+
+    public SQLiteDatabase getDB(){
+        return db;
+    }
+
+    public Sight getCell(int id){
+        Sight sight = new Sight();
+        connectToRead();
+        Cursor cursor = db.query(DB_Position.DB_TABLE, new String[]{DB_Position.COLUMN_ID, DB_Position.COLUMN_X1, DB_Position.COLUMN_X2, DB_Position.COLUMN_flag}, null, null, null, null, null);
+        cursor.move(id);
+        final int id_x1 = cursor.getColumnIndex(COLUMN_X1);
+        final int id_x2 = cursor.getColumnIndex(COLUMN_X2);
+        double latitude = cursor.getDouble(id_x1);
+        double longtitude = cursor.getDouble(id_x2);
+        sight.setLatitude(latitude);
+        sight.setLongitude(longtitude);
+        cursor.close();
+        close();
+        return sight;
     }
 
 }

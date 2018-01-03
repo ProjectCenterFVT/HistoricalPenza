@@ -18,24 +18,24 @@ public class PointAdapter extends BaseAdapter {
 
     private Context context;
     private LayoutInflater inflater;
-    ArrayList<MapActivity.Point> points;
+    ArrayList<Sight> sights;
 
 
-    PointAdapter(Context context, ArrayList<MapActivity.Point> points){
+    PointAdapter(Context context, ArrayList<Sight> sights){
         this.context = context;
-        this.points = points;
+        this.sights = sights;
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        Log.d("adapter", "кол-во в списке "+points.size());
+        Log.d("adapter", "кол-во в списке "+sights.size());
     }
 
     @Override
     public int getCount() {
-        return points.size();
+        return sights.size();
     }
 
     @Override
     public Object getItem(int i) {
-        return points.get(i);
+        return sights.get(i);
     }
 
     @Override
@@ -47,12 +47,11 @@ public class PointAdapter extends BaseAdapter {
     public View getView(int i, View view, ViewGroup viewGroup) {
         View v = view;
         v = inflater.inflate(R.layout.list_item, viewGroup, false);
-        MapActivity.Point point = (MapActivity.Point) getItem(i);
+        Sight sight = (Sight) getItem(i);
         TextView card_name = (TextView) v.findViewById(R.id.card_name);
         TextView card_dist = (TextView) v.findViewById(R.id.card_distance);
-        card_name.setText(point.name);
-        card_dist.setText(point.distance+" м");
-
+        card_name.setText(sight.getTitle());
+        card_dist.setText(sight.getDistance()+" м");
         return v;
     }
 }

@@ -174,7 +174,7 @@ public class ClientServer extends AsyncTask<String, Void, Sight[]>{
 
             resultArr[i] = new Sight(id);
             resultArr[i].setCoordinates(coordRaw);
-            resultArr[i].setFlag(flag);
+            resultArr[i].setFlag(flag==1);
         }
 
         return resultArr;
