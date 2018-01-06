@@ -16,15 +16,15 @@ import java.util.ArrayList;
 
 public class PointAdapter extends BaseAdapter {
 
-    private Context context;
-    private LayoutInflater inflater;
+    private LayoutInflater mInflater;
+    private int mResource;
     ArrayList<Sight> sights;
 
 
-    PointAdapter(Context context, ArrayList<Sight> sights){
-        this.context = context;
+    PointAdapter(Context context, ArrayList<Sight> sights, int resource){
+        this.mResource = resource;
         this.sights = sights;
-        inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         Log.d("adapter", "кол-во в списке "+sights.size());
     }
 
@@ -44,14 +44,28 @@ public class PointAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int i, View view, ViewGroup viewGroup) {
-        View v = view;
-        v = inflater.inflate(R.layout.list_item, viewGroup, false);
-        Sight sight = (Sight) getItem(i);
-        TextView card_name = (TextView) v.findViewById(R.id.card_name);
-        TextView card_dist = (TextView) v.findViewById(R.id.card_distance);
+    public View getView(int position, View convertView, ViewGroup parent) {
+        return createViewFromResource(position, convertView, parent, mResource);
+    }
+
+    private View createViewFromResource(int position, View convertView, ViewGroup parent, int resource) {
+        View v;
+        if (convertView == null) {
+            v = mInflater.inflate(resource, parent, false);
+        } else {
+            v = convertView;
+        }
+        
+        bindView(position, v);
+        
+        return v;
+    }
+
+    private void bindView(int position, View view) {
+        Sight sight = (Sight) getItem(position);
+        TextView card_name = (TextView) view.findViewById(R.id.card_name);
+        TextView card_dist = (TextView) view.findViewById(R.id.card_distance);
         card_name.setText(sight.getTitle());
         card_dist.setText(sight.getDistance()+" м");
-        return v;
     }
 }

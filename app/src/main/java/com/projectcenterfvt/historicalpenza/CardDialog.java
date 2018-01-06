@@ -63,7 +63,7 @@ public class CardDialog extends android.support.v4.app.DialogFragment {
         });
         ListView listView = (ListView) v.findViewById(R.id.info_list);
         Log.d("adapter", "кол-во в списке "+sights.size());
-        PointAdapter adapter = new PointAdapter(getContext(), sights);
+        PointAdapter adapter = new PointAdapter(getContext(), sights, R.layout.list_item);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
