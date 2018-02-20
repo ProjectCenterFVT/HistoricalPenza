@@ -1,6 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        config {
+            keyAlias 'Creativity Project Center'
+            keyPassword 'fd5df2e122ff4e88e02b46375759df5d'
+            storeFile file('C:/Users/Dmitry/Desktop/my_key_store.jks')
+            storePassword '0e72ae7177d74be65adeb5b875719e96'
+        }
+    }
     compileSdkVersion 26
     defaultConfig {
         applicationId "com.projectcenterfvt.historicalpenza"
@@ -16,6 +24,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
         }
     }
 }
@@ -25,7 +34,7 @@ repositories {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     implementation 'com.android.support:design:26.1.0'
