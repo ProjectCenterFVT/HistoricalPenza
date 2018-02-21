@@ -1,4 +1,4 @@
-package com.projectcenterfvt.historicalpenza;
+package com.projectcenterfvt.historicalpenza.Adapters;
 
 import android.content.Context;
 import android.util.Log;
@@ -8,6 +8,9 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.projectcenterfvt.historicalpenza.DataBases.Sight;
+import com.projectcenterfvt.historicalpenza.R;
+
 import java.util.ArrayList;
 
 /**
@@ -16,16 +19,16 @@ import java.util.ArrayList;
 
 public class PointAdapter extends BaseAdapter {
 
+    ArrayList<Sight> sights;
     private LayoutInflater mInflater;
     private int mResource;
-    ArrayList<Sight> sights;
 
 
-    PointAdapter(Context context, ArrayList<Sight> sights, int resource){
+    public PointAdapter(Context context, ArrayList<Sight> sights, int resource) {
         this.mResource = resource;
         this.sights = sights;
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        Log.d("adapter", "кол-во в списке "+sights.size());
+        Log.d("adapter", "кол-во в списке " + sights.size());
     }
 
     @Override
@@ -55,17 +58,17 @@ public class PointAdapter extends BaseAdapter {
         } else {
             v = convertView;
         }
-        
+
         bindView(position, v);
-        
+
         return v;
     }
 
     private void bindView(int position, View view) {
         Sight sight = (Sight) getItem(position);
-        TextView card_name = (TextView) view.findViewById(R.id.card_name);
-        TextView card_dist = (TextView) view.findViewById(R.id.card_distance);
+        TextView card_name = view.findViewById(R.id.card_name);
+        TextView card_dist = view.findViewById(R.id.card_distance);
         card_name.setText(sight.getTitle());
-        card_dist.setText(sight.getDistance()+" м");
+        card_dist.setText(sight.getDistance() + " м");
     }
 }

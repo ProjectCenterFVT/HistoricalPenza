@@ -1,9 +1,9 @@
-package com.projectcenterfvt.historicalpenza;
+package com.projectcenterfvt.historicalpenza.DataBases;
 
 import com.google.android.gms.maps.model.LatLng;
 
 /**
- * Created by Dmitry on 25.12.2017.
+ *
  */
 
 public class Sight {
@@ -15,6 +15,28 @@ public class Sight {
     private double longitude;
     private boolean flag;
     private int distance;
+
+    public Sight(int id) {
+        this.id = id;
+    }
+
+    public Sight(int id, double latitude, double longitude, boolean flag) {
+        this.id = id;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.flag = flag;
+    }
+
+    public Sight() {
+
+    }
+
+    public Sight(int id, String title, String description, String img) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.img = img;
+    }
 
     public int getId() {
         return id;
@@ -67,8 +89,14 @@ public class Sight {
     public boolean getFlag() {
         return flag;
     }
-    
-    public void setFlag(){ this.flag = flag;}
+
+    public void setFlag(boolean flag) {
+        this.flag = flag;
+    }
+
+    public void setFlag() {
+        this.flag = flag;
+    }
 
     public int getDistance() {
         return distance;
@@ -78,38 +106,12 @@ public class Sight {
         this.distance = distance;
     }
 
-    public LatLng getLocation(){
-        return new LatLng(latitude,longitude);
-    }
-
-
-    Sight(int id) {
-        this.id = id;
-    }
-
-    Sight(int id, String title, String description, String img) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.img = img;
-    }
-    Sight(int id, double latitude, double longitude, boolean flag){
-        this.id = id;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.flag = flag;
-    }
-
-    Sight(){
-
+    public LatLng getLocation() {
+        return new LatLng(latitude, longitude);
     }
 
     public void setCoordinates(String coordRaw) {
         this.latitude = Double.parseDouble(coordRaw.substring(0, coordRaw.indexOf(",")));
-        this.longitude = Double.parseDouble(coordRaw.substring(coordRaw.indexOf(" ")+1, coordRaw.length()-1));
-    }
-
-    public void setFlag(boolean flag) {
-        this.flag = flag;
+        this.longitude = Double.parseDouble(coordRaw.substring(coordRaw.indexOf(" ") + 1, coordRaw.length() - 1));
     }
 }

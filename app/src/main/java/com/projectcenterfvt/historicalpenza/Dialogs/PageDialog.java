@@ -1,4 +1,4 @@
-package com.projectcenterfvt.historicalpenza;
+package com.projectcenterfvt.historicalpenza.Dialogs;
 
 import android.app.Dialog;
 import android.graphics.drawable.ColorDrawable;
@@ -13,6 +13,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+
+import com.projectcenterfvt.historicalpenza.Adapters.MyGuideFragmentPagerAdapter;
+import com.projectcenterfvt.historicalpenza.R;
 
 /**
  * Created by Roman on 16.12.2017.
@@ -30,11 +33,11 @@ public class PageDialog extends DialogFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.dialog_guide, null);
 
-        pager = (ViewPager) v.findViewById(R.id.pager1);
+        pager = v.findViewById(R.id.pager1);
         pagerAdapter = new MyGuideFragmentPagerAdapter(getChildFragmentManager());
         pager.setAdapter(pagerAdapter);
 
-        TabLayout tabLayout = (TabLayout) v.findViewById(R.id.tabDots_second);
+        TabLayout tabLayout = v.findViewById(R.id.tabDots_second);
         tabLayout.setupWithViewPager(pager, true);
 
         v.findViewById(R.id.btnBackSecond).setOnClickListener(new View.OnClickListener() {

@@ -1,14 +1,10 @@
-package com.projectcenterfvt.historicalpenza;
+package com.projectcenterfvt.historicalpenza.DataBases;
 
-import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.widget.Filter;
 
-import com.arlib.floatingsearchview.FloatingSearchView;
+import com.projectcenterfvt.historicalpenza.PlaceSuggestion;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -17,39 +13,12 @@ import java.util.List;
  * Created by Dmitry on 22.12.2017.
  */
 
-class DataHelper {
+public class DataHelper {
 
     private static List<PlaceSuggestion> sPlaceSuggestions;
-//            new ArrayList<>(Arrays.asList(
-//                    new PlaceSuggestion("green"),
-//                    new PlaceSuggestion("blue"),
-//                    new PlaceSuggestion("pink"),
-//                    new PlaceSuggestion("purple"),
-//                    new PlaceSuggestion("brown"),
-//                    new PlaceSuggestion("gray"),
-//                    new PlaceSuggestion("Granny Smith Apple"),
-//                    new PlaceSuggestion("Indigo"),
-//                    new PlaceSuggestion("Periwinkle"),
-//                    new PlaceSuggestion("Mahogany"),
-//                    new PlaceSuggestion("Maize"),
-//                    new PlaceSuggestion("Mahogany"),
-//                    new PlaceSuggestion("Outer Space"),
-//                    new PlaceSuggestion("Melon"),
-//                    new PlaceSuggestion("Yellow"),
-//                    new PlaceSuggestion("Orange"),
-//                    new PlaceSuggestion("Red"),
-//                    new PlaceSuggestion("Orchid")));
 
     public static void setsPlaceSuggestions(List<PlaceSuggestion> sPlaceSuggestions) {
         DataHelper.sPlaceSuggestions = sPlaceSuggestions;
-    }
-
-    public interface OnFindPlacesListener {
-        void onResults(List<PlaceSuggestion> results);
-    }
-
-    public interface OnFindSuggestionsListener {
-        void onResults(List<PlaceSuggestion> results);
     }
 
     public static List<PlaceSuggestion> getHistory(int count) {
@@ -125,5 +94,13 @@ class DataHelper {
             }
         }.filter(query);
 
+    }
+
+    public interface OnFindPlacesListener {
+        void onResults(List<PlaceSuggestion> results);
+    }
+
+    public interface OnFindSuggestionsListener {
+        void onResults(List<PlaceSuggestion> results);
     }
 }

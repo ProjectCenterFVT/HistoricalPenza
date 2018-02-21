@@ -1,15 +1,16 @@
-package com.projectcenterfvt.historicalpenza;
+package com.projectcenterfvt.historicalpenza.Adapters;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.PagerAdapter;
+
+import com.projectcenterfvt.historicalpenza.Fragments.PageFragment;
 
 /**
  * Created by Dmitry on 13.12.2017.
  */
 
-class MyFragmentPagerAdapter extends FragmentPagerAdapter {
+public class MyFragmentPagerAdapter extends FragmentPagerAdapter {
 
     private static final int PAGE_COUNT = 3;
 

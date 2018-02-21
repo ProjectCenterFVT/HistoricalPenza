@@ -8,13 +8,15 @@
 
     <application
         android:allowBackup="true"
+        android:hardwareAccelerated="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:largeHeap="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
         <activity
-            android:name=".SplashActivity"
+            android:name=".Activity.SplashActivity"
             android:theme="@style/AppFullScreenTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -28,15 +30,14 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".MapActivity"
+            android:name=".Activity.MapActivity"
             android:label="@string/title_activity_map" />
         <activity
-            android:name=".GreetingActivity"
-            android:theme="@style/AppFullScreenTheme"
-            android:noHistory="true">
+            android:name=".Activity.GreetingActivity"
+            android:noHistory="true"
+            android:theme="@style/AppFullScreenTheme">
         </activity>
-        <activity
-            android:name=".InfoActivity">
+        <activity android:name=".Activity.InfoActivity">
         </activity>
 
         <meta-data android:name="net.hockeyapp.android.appIdentifier" android:value="${HOCKEYAPP_APP_ID}" />

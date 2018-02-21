@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
@@ -9,83 +10,80 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="com.projectcenterfvt.historicalpenza.InfoActivity">
+        tools:context="com.projectcenterfvt.historicalpenza.Activity.InfoActivity">
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <LinearLayout
+            <android.support.constraint.ConstraintLayout
+                android:id="@+id/linearLayout3"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:divider="@drawable/divider"
                 android:dividerPadding="3dp"
                 android:gravity="top"
-                android:orientation="vertical"
                 android:showDividers="middle"
                 tools:ignore="MissingConstraints"
                 tools:layout_editor_absoluteX="0dp"
                 tools:layout_editor_absoluteY="0dp">
 
-                <TextView
+                <com.projectcenterfvt.historicalpenza.CustomTextView.TextViewEx
                     android:id="@+id/tvTitle"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"
                     android:paddingLeft="15dp"
                     android:paddingRight="15dp"
                     android:paddingTop="8dp"
                     android:text="Памятник Ленин и Сталин в Горках"
-                    android:textAlignment="center"
-                    android:textSize="25sp" />
+                    android:textSize="22sp"
+                    app:layout_constraintBottom_toTopOf="@+id/ivPhoto"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <ImageView
                     android:id="@+id/ivPhoto"
-                    android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:layout_margin="15dp" />
-
-                <ScrollView
-                    android:id="@+id/horizontalScrollView1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentTop="true"
-                    android:fillViewport="true"
-                    android:scrollbars="none" >
-
-                    <com.projectcenterfvt.historicalpenza.TextViewEx
-                        android:id="@+id/tvDescription"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:maxLines="200"
-                        android:paddingBottom="100dp"
-                        android:paddingLeft="15dp"
-                        android:paddingRight="15dp"
-                        android:scrollbars="vertical"
-                        android:text="@string/description" />
-
-                </ScrollView>
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintBottom_toTopOf="@+id/tvDescription"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
 
 
-            </LinearLayout>
+                <com.projectcenterfvt.historicalpenza.CustomTextView.TextViewEx
+                    android:id="@+id/tvDescription"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginEnd="11dp"
+                    android:layout_marginStart="11dp"
+                    android:layout_marginTop="8dp"
+                    android:scrollbars="vertical"
+                    android:text="@string/description"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/ivPhoto" />
+
+
+            </android.support.constraint.ConstraintLayout>
 
             <Button
                 android:id="@+id/btnPhoto"
                 android:layout_width="48dp"
-                android:layout_height="38dp"
+                android:layout_height="48dp"
                 android:layout_gravity="left|bottom"
                 android:layout_margin="12dip"
-                android:onClick="onCameraClick"
-                android:background="@drawable/icon_camera" />
+                android:background="@drawable/icon_camera"
+                android:onClick="onCameraClick" />
 
-            <Button
-                android:id="@+id/btnBack"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_gravity="right|bottom"
-                android:layout_margin="10dip"
-                android:background="@drawable/icon_back"
-                android:onClick="onBackClick" />
         </FrameLayout>
 
     </android.support.constraint.ConstraintLayout>

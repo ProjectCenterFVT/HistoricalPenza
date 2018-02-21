@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.projectcenterfvt.historicalpenza.MapActivity">
+    tools:context="com.projectcenterfvt.historicalpenza.Activity.MapActivity">
 
     <include
         android:id="@+id/include"
@@ -22,11 +22,11 @@
         app:floatingSearch_dimBackground="false"
         app:floatingSearch_dismissOnOutsideTouch="true"
         app:floatingSearch_leftActionMode="showHamburger"
+        app:floatingSearch_menu="@menu/search_menu"
         app:floatingSearch_searchBarMarginLeft="8dp"
         app:floatingSearch_searchBarMarginRight="8dp"
         app:floatingSearch_searchBarMarginTop="8dp"
         app:floatingSearch_searchHint="Поиск по городу"
-        app:floatingSearch_menu="@menu/search_menu"
         app:floatingSearch_showSearchKey="true"
         app:floatingSearch_suggestionsListAnimDuration="250" />
 

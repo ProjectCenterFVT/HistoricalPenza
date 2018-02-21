@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.projectcenterfvt.historicalpenza.MapActivity"
+    tools:context="com.projectcenterfvt.historicalpenza.Activity.MapActivity"
     tools:showIn="@layout/app_bar_activity_map">
 
     <RelativeLayout
@@ -22,8 +22,8 @@
             android:layout_centerHorizontal="true"
             android:layout_gravity="center|bottom"
             android:layout_marginBottom="12dp"
-            android:onClick="close_target"
-            android:background="@drawable/btn_close_target" />
+            android:background="@drawable/btn_close_target"
+            android:onClick="close_target" />
 
         <fragment
             android:id="@+id/map"
@@ -32,7 +32,7 @@
             android:layout_height="match_parent"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            tools:context="com.projectcenterfvt.historicalpenza.MapActivity" />
+            tools:context="com.projectcenterfvt.historicalpenza.Activity.MapActivity" />
 
         <Button
             android:id="@+id/btn_plus"

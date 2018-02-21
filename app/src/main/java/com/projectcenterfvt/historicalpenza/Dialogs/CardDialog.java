@@ -1,4 +1,4 @@
-package com.projectcenterfvt.historicalpenza;
+package com.projectcenterfvt.historicalpenza.Dialogs;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -14,6 +14,9 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.projectcenterfvt.historicalpenza.Adapters.PointAdapter;
+import com.projectcenterfvt.historicalpenza.DataBases.Sight;
+import com.projectcenterfvt.historicalpenza.R;
 
 import java.util.ArrayList;
 
@@ -23,6 +26,7 @@ import java.util.ArrayList;
 
 public class CardDialog extends android.support.v4.app.DialogFragment {
 
+    onEventListener listener;
     private ArrayList<Sight> sights;
     private ArrayList<String> listString = new ArrayList<>();
 
@@ -33,12 +37,6 @@ public class CardDialog extends android.support.v4.app.DialogFragment {
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
         return dialog;
     }
-
-    public interface onEventListener {
-        public void setPosition(LatLng loc);
-    }
-
-    onEventListener listener;
 
     @Override
     public void onAttach(Context context) {
@@ -61,15 +59,15 @@ public class CardDialog extends android.support.v4.app.DialogFragment {
                 dismiss();
             }
         });
-        ListView listView = (ListView) v.findViewById(R.id.info_list);
-        Log.d("adapter", "кол-во в списке "+sights.size());
+        ListView listView = v.findViewById(R.id.info_list);
+        Log.d("adapter", "кол-во в списке " + sights.size());
         PointAdapter adapter = new PointAdapter(getContext(), sights, R.layout.list_item);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Sight sight = (Sight) adapterView.getAdapter().getItem(i);
-                Log.d("clicked", "id = "+sight.getId()+" name = "+sight.getTitle()+" loc = "+sight.getLocation().toString());
+                Log.d("clicked", "id = " + sight.getId() + " name = " + sight.getTitle() + " loc = " + sight.getLocation().toString());
                 LatLng loc = sight.getLocation();
                 listener.setPosition(loc);
                 dismiss();
@@ -78,7 +76,11 @@ public class CardDialog extends android.support.v4.app.DialogFragment {
         return v;
     }
 
-    public void setList(ArrayList<Sight> list){
+    public void setList(ArrayList<Sight> list) {
         sights = list;
+    }
+
+    public interface onEventListener {
+        void setPosition(LatLng loc);
     }
 }
