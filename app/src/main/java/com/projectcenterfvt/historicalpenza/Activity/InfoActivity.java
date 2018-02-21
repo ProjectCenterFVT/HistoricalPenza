@@ -1,4 +1,4 @@
-package com.projectcenterfvt.historicalpenza;
+package com.projectcenterfvt.historicalpenza.Activity;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -12,10 +12,14 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.projectcenterfvt.historicalpenza.CustomTextView.TextViewEx;
+import com.projectcenterfvt.historicalpenza.R;
+
 import java.io.InputStream;
 
-/** Класс отрисовывает
- *
+/**
+ * Класс отрисовывает
  */
 
 public class InfoActivity extends AppCompatActivity {
@@ -25,10 +29,10 @@ public class InfoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info);
 
-        TextViewEx tvDescription = (TextViewEx) findViewById(R.id.tvDescription);
+        TextViewEx tvDescription = findViewById(R.id.tvDescription);
         tvDescription.setMovementMethod(new ScrollingMovementMethod());
 
-        TextView tvTitle = (TextView) findViewById(R.id.tvTitle);
+        TextView tvTitle = findViewById(R.id.tvTitle);
 
         Intent intent = getIntent();
         String title = intent.getStringExtra("title");
@@ -36,7 +40,7 @@ public class InfoActivity extends AppCompatActivity {
         String uml = intent.getStringExtra("uml");
         tvTitle.setText(title);
 
-        new DownloadImage((ImageView) findViewById(R.id.ivPhoto)).execute("http://"+uml);
+        new DownloadImage((ImageView) findViewById(R.id.ivPhoto)).execute("http://" + uml);
         tvDescription.setText(description, true);
     }
 
@@ -53,7 +57,7 @@ public class InfoActivity extends AppCompatActivity {
     }
 
 
-    class DownloadImage extends AsyncTask<String, Void, Bitmap>{
+    class DownloadImage extends AsyncTask<String, Void, Bitmap> {
 
         ImageView bmImage;
 

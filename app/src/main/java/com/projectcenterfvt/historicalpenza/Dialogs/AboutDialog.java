@@ -1,4 +1,4 @@
-package com.projectcenterfvt.historicalpenza;
+package com.projectcenterfvt.historicalpenza.Dialogs;
 
 import android.app.Dialog;
 import android.graphics.drawable.ColorDrawable;
@@ -10,8 +10,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 
+import com.projectcenterfvt.historicalpenza.R;
+
 /**
- * Created by Roman on 16.12.2017.
+ * @author roman
+ * @version 1.0
+ * @since 1.0
  */
 
 public class AboutDialog extends android.support.v4.app.DialogFragment {

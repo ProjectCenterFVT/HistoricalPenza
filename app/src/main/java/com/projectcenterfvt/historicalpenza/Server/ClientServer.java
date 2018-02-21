@@ -1,10 +1,10 @@
-package com.projectcenterfvt.historicalpenza;
+package com.projectcenterfvt.historicalpenza.Server;
 
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.util.Log;
+
+import com.projectcenterfvt.historicalpenza.DataBases.Sight;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -15,23 +15,30 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 
 /**
  * Created by Roman on 15.12.2017.
  */
 
 
-public class ClientServer extends AsyncTask<String, Void, Sight[]>{
+public class ClientServer extends AsyncTask<String, Void, Sight[]> {
 
+    OnResponseListener<Sight> listener;
+    byte[] data = null;
+    InputStream is = null;
     private int id;
     private Exception mException;
-    OnResponseListener<Sight> listener;
+    private Context context;
+    private String server = "http://d95344yu.beget.tech/api/api.request.php";
+    private String command;
+
+    public ClientServer(Context context) {
+        this.context = context;
+    }
 
     public void getInfo(int id) {
-        this.execute("{\"getInfo\":\""+id+"\"}");
+        this.execute("{\"getInfo\":\"" + id + "\"}");
         this.id = id;
     }
 
@@ -41,20 +48,6 @@ public class ClientServer extends AsyncTask<String, Void, Sight[]>{
 
     public void getCoordinates() {
         this.execute("{\"getCoordinates\":\"0.0.0\"}");
-    }
-
-    public interface OnResponseListener<T> {
-        public void onSuccess(T[] result);
-        public void onFailure(Exception e);
-    }
-
-    private Context context;
-    private String server = "http://d95344yu.beget.tech/api/api.request.php";
-    private String command;
-    byte[] data = null;
-    InputStream is = null;
-    ClientServer(Context context){
-        this.context = context;
     }
 
     @Override
@@ -72,7 +65,7 @@ public class ClientServer extends AsyncTask<String, Void, Sight[]>{
                 return parseGetCoordinatesResponse(jsonArr);
             }
 
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             mException = e;
         }
@@ -103,14 +96,14 @@ public class ClientServer extends AsyncTask<String, Void, Sight[]>{
 
         OutputStream os = conn.getOutputStream();
         data = command.getBytes("UTF-8");
-        Log.d("server","отпралвяю "+ command);
+        Log.d("server", "отпралвяю " + command);
         os.write(data);
         data = null;
 
         conn.connect();
 
         int code = conn.getResponseCode();
-        Log.d("server", "код = "+code);
+        Log.d("server", "код = " + code);
 
         is = conn.getInputStream();
 
@@ -123,7 +116,7 @@ public class ClientServer extends AsyncTask<String, Void, Sight[]>{
         }
         data = baos.toByteArray();
         String resultString = new String(data, "UTF-8");
-        Log.d("server", "result = "+resultString);
+        Log.d("server", "result = " + resultString);
 
         JSONObject jsonResult = new JSONObject(resultString);
 
@@ -138,15 +131,14 @@ public class ClientServer extends AsyncTask<String, Void, Sight[]>{
         String description = item.getString("description");
         String img = item.getString("img");
 
-        return new Sight[] {new Sight(this.id, title, description, img)};
+        return new Sight[]{new Sight(this.id, title, description, img)};
     }
 
     private Sight[] parseGetAllInfoResponse(JSONArray jsonArr) throws JSONException {
         int size = jsonArr.length();
         Sight[] resultArr = new Sight[size];
 
-        for(int i = 0; i < size; i++)
-        {
+        for (int i = 0; i < size; i++) {
             JSONObject item = jsonArr.getJSONObject(i);
 
             int id = Integer.parseInt(item.getString("_id"));
@@ -164,8 +156,7 @@ public class ClientServer extends AsyncTask<String, Void, Sight[]>{
         int size = jsonArr.length();
         Sight[] resultArr = new Sight[size];
 
-        for(int i = 0; i < size; i++)
-        {
+        for (int i = 0; i < size; i++) {
             JSONObject item = jsonArr.getJSONObject(i);
 
             int id = Integer.parseInt(item.getString("_id"));
@@ -174,7 +165,7 @@ public class ClientServer extends AsyncTask<String, Void, Sight[]>{
 
             resultArr[i] = new Sight(id);
             resultArr[i].setCoordinates(coordRaw);
-            resultArr[i].setFlag(flag==1);
+            resultArr[i].setFlag(flag == 1);
         }
 
         return resultArr;
@@ -182,6 +173,12 @@ public class ClientServer extends AsyncTask<String, Void, Sight[]>{
 
     public void setOnResponseListener(OnResponseListener<Sight> listener) {
         this.listener = listener;
+    }
+
+    public interface OnResponseListener<T> {
+        void onSuccess(T[] result);
+
+        void onFailure(Exception e);
     }
 
 }

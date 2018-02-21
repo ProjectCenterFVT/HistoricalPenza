@@ -1,4 +1,4 @@
-package com.projectcenterfvt.historicalpenza;
+package com.projectcenterfvt.historicalpenza.Fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -7,24 +7,24 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.projectcenterfvt.historicalpenza.R;
+
 /**
  * Created by Dmitry on 13.12.2017.
  */
 
-public class GuidePageFragment extends Fragment {
-
-    int mNum;
-
-    int[] pages = {
-            R.drawable.help_location,
-            R.drawable.help_unlock,
-            R.drawable.help_lock,
-    };
+public class PageFragment extends Fragment {
 
     static final String ARGUMENT_PAGE_NUMBER = "arg_page_number";
+    int mNum;
+    int[] pages = {
+            R.drawable.first_pager,
+            R.drawable.second_pager,
+            R.drawable.third_pager,
+    };
 
-    public static GuidePageFragment newInstance(int page) {
-        GuidePageFragment pageFragment = new GuidePageFragment();
+    public static PageFragment newInstance(int page) {
+        PageFragment pageFragment = new PageFragment();
 
         Bundle arguments = new Bundle();
         arguments.putInt(ARGUMENT_PAGE_NUMBER, page);
@@ -44,7 +44,7 @@ public class GuidePageFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment, null);
 
-        ImageView ivPage = (ImageView) view.findViewById(R.id.ivPage);
+        ImageView ivPage = view.findViewById(R.id.ivPage);
         ivPage.setImageResource(pages[mNum]);
 
         return view;
