@@ -14,7 +14,11 @@ import com.google.android.gms.location.LocationServices;
 import com.projectcenterfvt.historicalpenza.R;
 
 /**
- * Created by roman on 20.02.2018.
+ * Работа с местоположением пользователя
+ * @author Roman
+ * @version 1.0.0
+ * @since 1.0.0
+ * @see com.projectcenterfvt.historicalpenza.Activity.MapActivity
  */
 
 public class LocationManager {
@@ -32,8 +36,12 @@ public class LocationManager {
         this.mGoogleApiClient = mGoogleApiClient;
     }
 
+    /**
+     * Получение местоположения пользователя
+     *
+     * @return Местоположение пользователя
+     */
     public Location getDeviceLocation() {
-        Log.d("pos", "" + mLastKnownLocation);
         if (mLocationPermissionGranted) {
             if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 // TODO: Consider calling
@@ -46,14 +54,20 @@ public class LocationManager {
             }
             mLastKnownLocation = LocationServices.FusedLocationApi
                     .getLastLocation(mGoogleApiClient);
+            Log.d("pos", "" + mLastKnownLocation);
         }
         return mLastKnownLocation;
     }
 
+    /**
+     * Обновление UI
+     * @param flag Доступность GPS or NETWORK
+     * @param btn_pos Кнопка местоположения
+     */
     public void updateLocationUI(boolean flag, Button btn_pos) {
         Log.d("pos", "upadeLoc");
         try {
-            if (mLocationPermissionGranted && flag) {
+            if (flag) {
                 btn_pos.setBackgroundResource(R.drawable.get_location);
                 Log.d("position", "visible");
             } else {
@@ -68,6 +82,9 @@ public class LocationManager {
         }
     }
 
+    /**
+     * Проверка разрешения пользователя
+     */
     public void getLocationPermission() {
         if (ContextCompat.checkSelfPermission(context.getApplicationContext(),
                 android.Manifest.permission.ACCESS_FINE_LOCATION)

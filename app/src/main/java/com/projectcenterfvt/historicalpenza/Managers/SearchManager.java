@@ -17,7 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by roman on 21.02.2018.
+ * Работа со списком
+ * @author Dmitry
+ * @version 1.0.0
+ * @since 1.0.0
+ * @see com.projectcenterfvt.historicalpenza.Activity.MapActivity
  */
 
 public class SearchManager {

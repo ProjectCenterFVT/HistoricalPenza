@@ -18,7 +18,10 @@ import com.projectcenterfvt.historicalpenza.Adapters.MyGuideFragmentPagerAdapter
 import com.projectcenterfvt.historicalpenza.R;
 
 /**
- * Created by Roman on 16.12.2017.
+ * Отрисовка справки
+ * @author Roman, Dmitry
+ * @version 1.0.0
+ * @since 1.0.0
  */
 
 public class PageDialog extends DialogFragment {

@@ -14,7 +14,11 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.projectcenterfvt.historicalpenza.DataBases.Sight;
 
 /**
- * Created by roman on 21.02.2018.
+ * Работа с маркерами
+ * @author Roman
+ * @version 1.0.0
+ * @since 1.0.0
+ * @see com.projectcenterfvt.historicalpenza.Activity.MapActivity
  */
 
 public class MarkerManager {
@@ -28,14 +32,31 @@ public class MarkerManager {
         this.myContext = myContext;
     }
 
-    public void addSightMarker(Boolean flag, LatLng position, Sight sight) {
+    /**
+     * Добавление маркера на карту(Маркер достоприм)
+     *
+     * @param flag     Открыт/неоткрыт
+     * @param position Позиция достопримечательности
+     * @param sight    Достопримечательность
+     */
+    public void addSightMarker(Boolean flag, int type, LatLng position, Sight sight) {
         MarkerOptions options = new MarkerOptions();
         options.position(position);
         if (flag) {
-            Bitmap bitmap = BitmapFactory.decodeResource(myContext.getResources(), myContext.getResources().
-                    getIdentifier("unlock", "drawable", myContext.getPackageName()));
-            bitmap = Bitmap.createScaledBitmap(bitmap, 74, 100, false);
-            options.icon(BitmapDescriptorFactory.fromBitmap(bitmap));
+            switch (type) {
+                case 0:
+                    Bitmap bitmap = BitmapFactory.decodeResource(myContext.getResources(), myContext.getResources().
+                            getIdentifier("unlock", "drawable", myContext.getPackageName()));
+                    bitmap = Bitmap.createScaledBitmap(bitmap, 74, 100, false);
+                    options.icon(BitmapDescriptorFactory.fromBitmap(bitmap));
+                    break;
+                case 1:
+                    Bitmap bitmapHomestead = BitmapFactory.decodeResource(myContext.getResources(), myContext.getResources().
+                            getIdentifier("homestead", "drawable", myContext.getPackageName()));
+                    bitmap = Bitmap.createScaledBitmap(bitmapHomestead, 74, 100, false);
+                    options.icon(BitmapDescriptorFactory.fromBitmap(bitmap));
+                    break;
+            }
         } else {
             Bitmap bitmap = BitmapFactory.decodeResource(myContext.getResources(), myContext.getResources().
                     getIdentifier("lock", "drawable", myContext.getPackageName()));
@@ -43,10 +64,15 @@ public class MarkerManager {
             options.icon(BitmapDescriptorFactory.fromBitmap(bitmap));
         }
         Marker marker = mMap.addMarker(options);
+        sight.setType(type);
         marker.setTag(sight);
         Log.d("marker", "нарисовал маркер с координатами " + position);
     }
 
+    /**
+     * Добавленеи маркера местоположения
+     * @param location Позиция пользователя
+     */
     public void addMyMarker(Location location) {
         if (location != null) {
             if (myMarker != null) {

@@ -3,28 +3,43 @@ package com.projectcenterfvt.historicalpenza.DataBases;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
- *
+ *Класс - объект достопримечательности
+ * @author Roman
+ * @version 1.0.0
+ * @since 1.0.0
  */
 
 public class Sight {
+    /**
+     * id из бд
+     */
     private int id;
+    /** Название дост*/
     private String title;
+    /** Описание дост*/
     private String description;
+    /** Ссылка на изображение*/
     private String img;
+    /** Широта*/
     private double latitude;
+    /** Долгота*/
     private double longitude;
+    /** Открыт или нет*/
     private boolean flag;
+    /** Дистанция от объекта до пользователя*/
     private int distance;
+    private int type;
 
     public Sight(int id) {
         this.id = id;
     }
 
-    public Sight(int id, double latitude, double longitude, boolean flag) {
+    public Sight(int id, double latitude, double longitude, boolean flag, int type) {
         this.id = id;
         this.latitude = latitude;
         this.longitude = longitude;
         this.flag = flag;
+        this.type = type;
     }
 
     public Sight() {
@@ -108,6 +123,14 @@ public class Sight {
 
     public LatLng getLocation() {
         return new LatLng(latitude, longitude);
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 
     public void setCoordinates(String coordRaw) {

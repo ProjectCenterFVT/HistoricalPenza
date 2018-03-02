@@ -10,7 +10,10 @@ import android.widget.ImageView;
 import com.projectcenterfvt.historicalpenza.R;
 
 /**
- * Created by Dmitry on 13.12.2017.
+ * Фрагмент для справки в меню
+ * @author Dmitry
+ * @version 1.0.0
+ * @since 1.0.0
  */
 
 public class GuidePageFragment extends Fragment {
