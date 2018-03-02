@@ -13,9 +13,10 @@ import android.view.Window;
 import com.projectcenterfvt.historicalpenza.R;
 
 /**
- * @author roman
- * @version 1.0
- * @since 1.0
+ * Диалоговое окно о приложении
+ * @author Roman
+ * @version 1.0.0
+ * @since 1.0.0
  */
 
 public class AboutDialog extends android.support.v4.app.DialogFragment {

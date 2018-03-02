@@ -21,7 +21,10 @@ import com.projectcenterfvt.historicalpenza.R;
 import java.util.ArrayList;
 
 /**
- * Created by Roman on 15.12.2017.
+ * Отрисовка списка достопримечательностей
+ * @author Roman
+ * @version 1.0.0
+ * @since 1.0.0
  */
 
 public class CardDialog extends android.support.v4.app.DialogFragment {

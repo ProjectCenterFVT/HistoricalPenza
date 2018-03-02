@@ -8,7 +8,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
@@ -42,6 +41,7 @@ import com.projectcenterfvt.historicalpenza.DataBases.DB_Position;
 import com.projectcenterfvt.historicalpenza.DataBases.Sight;
 import com.projectcenterfvt.historicalpenza.Dialogs.AboutDialog;
 import com.projectcenterfvt.historicalpenza.Dialogs.CardDialog;
+import com.projectcenterfvt.historicalpenza.Dialogs.HomestadeDialog;
 import com.projectcenterfvt.historicalpenza.Dialogs.PageDialog;
 import com.projectcenterfvt.historicalpenza.Managers.CameraManager;
 import com.projectcenterfvt.historicalpenza.Managers.ListManager;
@@ -53,34 +53,70 @@ import com.projectcenterfvt.historicalpenza.Server.ClientServer;
 import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.UpdateManager;
 
+/**
+ * Вся основная работа происходит в этом классе. Однако основные задачи распределены по классам менеджерам.
+ * Класс отрисовывает карту и все её элементы, включая меню
+ *
+ * @author Roman, Dmitry
+ * @version 1.0.0
+ * @see CameraManager
+ * @see ListManager
+ * @see com.projectcenterfvt.historicalpenza.Managers.LocationManager
+ * @see MarkerManager
+ * @see SearchManager
+ * @since 1.0.0
+ */
+
 public class MapActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, GoogleMap.OnMarkerClickListener, CardDialog.onEventListener {
 
+    /** Сохранение предыдушей позиции камеры после разворота приложения*/
     private static final String KEY_CAMERA_POSITION = "camera_position";
+    /**Сохранение предыдушей позиции после разворота приложения */
     private static final String KEY_LOCATION = "location";
+    /** Карта*/
     private GoogleMap mMap;
+    /** API*/
     private GoogleApiClient mGoogleApiClient;
+    /** Позиция пользователя*/
     private Location mLastKnownLocation;
+    /** Кнопка - мое местоположение*/
     private Button btn_pos;
+    /** Контекст*/
     private Context context = this;
+    /** Меню*/
     private DrawerLayout mDrawerLayout;
+    /** БД*/
     private DB_Position database;
+    /** Менеджер маркеров*/
     private MarkerManager markerManager;
+    /** Менеджер поиска*/
     private SearchManager searchManager;
+    /** Менеджер камеры*/
     private CameraManager cameraManager;
+    /** Менеджер достопримечательностей*/
     private ListManager listManager;
+    /** Менеджер геопозиции*/
     private com.projectcenterfvt.historicalpenza.Managers.LocationManager locationManager;
+    /**
+     * !!!! Не трогать и не прикосаться. Это тестирующий вариант обработки местоположения. ТРЕБУЕТСЯ В ДОРАБОТКЕ И ТЕСТИРОВАНИИ
+     */
+    private boolean check;
+    private int CAMERA_KEY = 1;
+
     private LocationListener locationListener = new LocationListener() {
 
         @Override
         public void onLocationChanged(Location location) {
-            Log.d("pos", "Смена позиции");
-            if (markerManager.getMyMarker() != null && mLastKnownLocation != null) {
-                markerManager.getMyMarker().setPosition(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
+            if (markerManager != null) {
+                Log.d("pos", "Смена позиции");
+                if (markerManager.getMyMarker() != null && mLastKnownLocation != null) {
+                    markerManager.getMyMarker().setPosition(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
+                }
+                mLastKnownLocation = locationManager.getDeviceLocation();
+                markerManager.addMyMarker(mLastKnownLocation);
+                listManager.setDistance(mLastKnownLocation);
             }
-            mLastKnownLocation = locationManager.getDeviceLocation();
-            markerManager.addMyMarker(mLastKnownLocation);
-            listManager.setDistance(mLastKnownLocation);
         }
 
         @Override
@@ -91,6 +127,7 @@ public class MapActivity extends AppCompatActivity
         @Override
         public void onProviderEnabled(String s) {
             locationManager.updateLocationUI(true, btn_pos);
+            Log.d("pos", "status : "+s);
         }
 
         @Override
@@ -104,6 +141,10 @@ public class MapActivity extends AppCompatActivity
         cameraManager.setCameraPosition(loc);
     }
 
+    /**
+     * Отрисовка элементов и объявление нужных объектов
+     * @param savedInstanceState Сохраненное состояние
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -111,7 +152,6 @@ public class MapActivity extends AppCompatActivity
         database = new DB_Position(this);
         listManager = new ListManager();
         btn_pos = findViewById(R.id.btn_position);
-
         final LocationManager lM = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
@@ -148,6 +188,8 @@ public class MapActivity extends AppCompatActivity
         searchManager.setSearchView((FloatingSearchView) findViewById(R.id.floating_search_view));
         searchManager.setupSearch();
         checkForUpdates();
+
+        check = savedInstanceState != null;
     }
 
     private void checkForUpdates() {
@@ -183,6 +225,11 @@ public class MapActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Слушатель нажатия на элементы в меню
+     * @param item Элемент в меню
+     * @return
+     */
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -257,6 +304,11 @@ public class MapActivity extends AppCompatActivity
             FragmentManager fragmentManager = getSupportFragmentManager();
             AboutDialog dialog = new AboutDialog();
             dialog.show(fragmentManager, "dialog");
+        } else if (id == R.id.name_homestade) {
+            Log.d("click ", "нажал на кнопку усадеб");
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            HomestadeDialog dialog = new HomestadeDialog();
+            dialog.show(fragmentManager, "dialog");
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -264,10 +316,13 @@ public class MapActivity extends AppCompatActivity
         return true;
     }
 
+    /**
+     * Отрисовка карты, объявление менеджеров
+     * @param googleMap Карта
+     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        Log.d("saved", "первый запуск");
         mMap.setMinZoomPreference(12.0f);
         mMap.setMaxZoomPreference(17.0f);
         mMap.setOnMarkerClickListener(this);
@@ -278,28 +333,24 @@ public class MapActivity extends AppCompatActivity
         markerManager.addMyMarker(mLastKnownLocation);
         cameraManager = new CameraManager(this, mMap);
         searchManager.setCameraManager(cameraManager);
-        cameraManager.setCameraPosition(mLastKnownLocation);
+        if (!check)
+            cameraManager.setCameraPosition(mLastKnownLocation);
         listManager.setList(database.fillArray(mMap, mLastKnownLocation));
         listManager.setDistance(mLastKnownLocation);
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-        super.onSaveInstanceState(outState, outPersistentState);
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
-    }
-
-    @Override
     protected void onSaveInstanceState(Bundle outState) {
-        if (mMap != null) {
-            outState.putParcelable(KEY_CAMERA_POSITION, mMap.getCameraPosition());
-            outState.putParcelable(KEY_LOCATION, mLastKnownLocation);
-            super.onSaveInstanceState(outState);
-        }
+        outState.putBoolean("check", true);
+
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        check = savedInstanceState.getBoolean("check");
     }
 
     @Override
@@ -322,6 +373,19 @@ public class MapActivity extends AppCompatActivity
         mMap.animateCamera(CameraUpdateFactory.zoomBy(-1.0f));
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == CAMERA_KEY) {
+            check = true;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    /**
+     * Обработка нажатие на маркер
+     * @param marker Маркер
+     * @return
+     */
     @Override
     public boolean onMarkerClick(final Marker marker) {
         Log.d("marker", "Нажал на маркер " + marker.getId() + " " + marker.getTitle() + " " + marker.getPosition().toString());
@@ -365,7 +429,10 @@ public class MapActivity extends AppCompatActivity
                                 intent.putExtra("title", result[0].getTitle());
                                 intent.putExtra("description", result[0].getDescription());
                                 intent.putExtra("uml", result[0].getImg());
-                                startActivity(intent);
+                                if (sight.getType() == 1) {
+                                    intent.putExtra("button", true);
+                                }
+                                startActivityForResult(intent,CAMERA_KEY);
                                 alert.hide();
                             }
                         });
@@ -413,14 +480,13 @@ public class MapActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        listManager.clearList();
-
         checkForCrashes();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        listManager.clearList();
         unregisterManagers();
     }
 
@@ -439,13 +505,21 @@ public class MapActivity extends AppCompatActivity
     }
 
     public void close_target(View view) {
-        if (mLastKnownLocation != null) {
-            synchronized (cameraManager) {
-                cameraManager.setCameraPosition(listManager.getList().get(0).getLocation());
+        try {
+            if (mLastKnownLocation != null && cameraManager != null && listManager != null) {
+                synchronized (listManager) {
+                    cameraManager.setCameraPosition(listManager.getList().get(0).getLocation());
+                }
             }
+        } catch (Exception ex) {
+            Log.d("ex", ex.getMessage());
         }
     }
 
 
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
 }
 

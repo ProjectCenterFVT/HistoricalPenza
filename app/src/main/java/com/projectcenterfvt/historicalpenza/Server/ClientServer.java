@@ -18,7 +18,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 /**
- * Created by Roman on 15.12.2017.
+ * Клиент-серверная часть. Нужно вспоминать, что делают запросы. Возможна переработка сервера. Пока не трогать!
+ * @author Roman, Dmitry
+ * @version 1.0.0
+ * @since 1.0.0
  */
 
 
@@ -31,7 +34,6 @@ public class ClientServer extends AsyncTask<String, Void, Sight[]> {
     private Exception mException;
     private Context context;
     private String server = "http://d95344yu.beget.tech/api/api.request.php";
-    private String command;
 
     public ClientServer(Context context) {
         this.context = context;
@@ -162,10 +164,12 @@ public class ClientServer extends AsyncTask<String, Void, Sight[]> {
             int id = Integer.parseInt(item.getString("_id"));
             int flag = Integer.parseInt(item.getString("flag"));
             String coordRaw = item.getString("coordinates");
+            int type = item.getInt("type");
 
             resultArr[i] = new Sight(id);
             resultArr[i].setCoordinates(coordRaw);
             resultArr[i].setFlag(flag == 1);
+            resultArr[i].setType(type);
         }
 
         return resultArr;

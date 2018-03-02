@@ -10,7 +10,11 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
- * Created by roman on 21.02.2018.
+ * Работа с камерой на карте
+ * @author Roman
+ * @version 1.0.0
+ * @since 1.0.0
+ * @see com.projectcenterfvt.historicalpenza.Activity.MapActivity
  */
 
 public class CameraManager {
@@ -26,6 +30,11 @@ public class CameraManager {
         this.mMap = mMap;
     }
 
+    /**
+     * Установка позиции камеры на карте
+     *
+     * @param location Позиция пользователя
+     */
     public void setCameraPosition(Location location) {
         if (mCameraPosition != null) {
             mMap.moveCamera(CameraUpdateFactory.newCameraPosition(mCameraPosition));
@@ -39,6 +48,10 @@ public class CameraManager {
         }
     }
 
+    /**
+     * Установка позиции камеры на карте
+     * @param location Позиция пользователя
+     */
     public void setCameraPosition(LatLng location) {
         synchronized (location) {
             if (mCameraPosition != null) {

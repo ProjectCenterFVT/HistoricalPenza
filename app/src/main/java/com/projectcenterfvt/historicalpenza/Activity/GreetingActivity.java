@@ -11,11 +11,25 @@ import android.view.View;
 import com.projectcenterfvt.historicalpenza.Adapters.MyFragmentPagerAdapter;
 import com.projectcenterfvt.historicalpenza.R;
 
+/**
+ * Активити
+ * Класс служит для отрисовки экрана при первом запуске
+ *
+ * @author Dmitry
+ * @version 1.0.0
+ * @since 1.0.0
+ */
 public class GreetingActivity extends AppCompatActivity {
-
+    /** Экзмепляр класса ViewPager*/
     ViewPager pager;
+    /** Экземпляр класса PagerAdapter */
     PagerAdapter pagerAdapter;
 
+    /**
+     * Метод вызывается при создании или перезапуска активности <br>
+     * Отрисовка экрана при первом запуске
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,6 +45,10 @@ public class GreetingActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Обработчик нажатия на кнопку "Продолжить"
+     * @param view Кнопка
+     */
     public void continueClick(View view) {
         startActivity(new Intent(this, MapActivity.class));
     }

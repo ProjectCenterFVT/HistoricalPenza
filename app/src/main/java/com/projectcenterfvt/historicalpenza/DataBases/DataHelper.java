@@ -10,7 +10,11 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * Created by Dmitry on 22.12.2017.
+ * Класс для работы с поиском
+ * Нужно, чтобы Дима пояснил еще раз
+ * @author Dmitry
+ * @version 1.0.0
+ * @since 1.0.0
  */
 
 public class DataHelper {

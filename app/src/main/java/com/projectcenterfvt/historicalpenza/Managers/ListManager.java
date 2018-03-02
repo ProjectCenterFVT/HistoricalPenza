@@ -11,13 +11,24 @@ import java.util.Collections;
 import java.util.Comparator;
 
 /**
- * Created by roman on 21.02.2018.
+ * Работа со списком достопримечательностей
+ * @author Roman
+ * @version 1.0.0
+ * @since 1.0.0
+ * @see com.projectcenterfvt.historicalpenza.Activity.MapActivity
  */
 
 public class ListManager {
 
     private ArrayList<Sight> list = new ArrayList<>();
 
+    /**
+     * Расчет дистанции(Можно нагрузить на сервер, а можно оставить на клиенте)
+     *
+     * @param l1 Позиция пользователя
+     * @param l2 Позиция объекта
+     * @return Расстояние
+     */
     public int calculateDistance(Location l1, LatLng l2) {
         Log.d("marker ", "Мое местоположение = " + l1.toString());
         final int R = 6372795;
@@ -30,6 +41,9 @@ public class ListManager {
         return (int) res;
     }
 
+    /**
+     * Сортировка списка по возрастанию (Дистанция от объекта до пользователя)
+     */
     public void sortList() {
         Log.d("list", "start sort");
         Collections.sort(list, new Comparator<Sight>() {
