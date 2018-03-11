@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "829688686374",
+    "project_id": "historicalpenza-1512670643563"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:829688686374:android:529d6c00d4c4934a",
+        "android_client_info": {
+          "package_name": "com.projectcenterfvt.historicalpenza"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "829688686374-vk0n2e09v1pe95r45pufk8sbdqlkbbuo.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.projectcenterfvt.historicalpenza",
+            "certificate_hash": "6aa6c260d9f1adc859ea0f9e49b3327520ab9a5f"
+          }
+        },
+        {
+          "client_id": "829688686374-c1m8h2q7gfhg0nafnlrmdgnvipock49b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDRsvur2mv5utkQpQzBBfVWG5t4yZxzDOM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
