@@ -4,11 +4,12 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
+
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,6 +40,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
 
     /** ID, по которому выводятся логи в Logcat*/
     static final String TAG = "server";
+
     /** Ключ, по которому проверяется первый запуск приложения*/
     static final String KEY_IS_FIRST_TIME = "first_time";
     /** Экземпляр класс базы данных*/
@@ -46,6 +48,10 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
     private SignInButton sign_in_button;
     private GoogleApiClient googleApiClient;
     private static final int REQ_CODE = 9001;
+    private TextView textViewHistoric;
+    private TextView textViewPenza;
+
+
 
     /**
      * Метод вызывается при создании или перезапуска активности <br>
@@ -60,19 +66,17 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-        final TextView textViewHistoric;
-        final TextView textViewPenza;
+
         textViewHistoric = findViewById(R.id.textViewHistorical);
         textViewPenza = findViewById(R.id.textView8);
-        sign_in_button = (SignInButton) findViewById(R.id.sign_in_button);
+        sign_in_button =  findViewById(R.id.sign_in_button);
+        sign_in_button.setEnabled(false);
         sign_in_button.setOnClickListener(this);
         GoogleSignInOptions signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail().build();
         googleApiClient = new GoogleApiClient.Builder(this).enableAutoManage(this,this).addApi(Auth.GOOGLE_SIGN_IN_API,signInOptions)
                 .build();
         db = new DB_Position(this);
-
-
         ClientServer call = new ClientServer(this);
         call.setOnResponseListener(new ClientServer.OnResponseListener<Sight>() {
             /**
@@ -107,6 +111,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
                 db.close();
 
             }
+
             /**
              * Метод вызывается при неудачном подключении
              */
@@ -119,16 +124,17 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
                     getPreferences(Context.MODE_PRIVATE).edit().putBoolean(KEY_IS_FIRST_TIME, false).apply();
 
                     intent = new Intent(SplashActivity.this, GreetingActivity.class);
-                } else
+                } else{
                     intent = new Intent(SplashActivity.this, MapActivity.class);
 
                 SplashActivity.this.startActivity(intent);
-                SplashActivity.this.finish();
+                SplashActivity.this.finish();}
             }
         });
         call.getCoordinates();
-    }
+        nextPage();
 
+    }
     /**
      * Метод отвечает за проверку первого запуска приложения
      * @return булевое значение
@@ -137,6 +143,34 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         //return getPreferences(Context.MODE_PRIVATE).getBoolean(KEY_IS_FIRST_TIME, true);
         return true;
     }
+    /**
+    *Метод проверяющий первый ли раз запущ. приложение
+     * Если не 1-ый. то 3 сек. ждем и переход на MapActivity
+     * Иначе проресовываем кнопку google sign  и удаляем текст "Историческая Пенза"
+     * */
+    public void nextPage() {
+        Intent intent;
+        if (!isFirstTime()){
+
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    startActivity(new Intent(getApplicationContext(), MapActivity.class));
+                }
+            }, 3000);
+        }
+        else {
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    textViewHistoric.setVisibility(View.INVISIBLE);
+                    textViewPenza.setVisibility(View.INVISIBLE);
+                    sign_in_button.setEnabled(true);
+                    sign_in_button.setVisibility(View.VISIBLE);
+                }
+            }, 2000);
+                 }
+        }
 
     @Override
     public void onClick(View view) {
@@ -145,19 +179,22 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
             signIn(); break;
         }
     }
+
 private void signIn(){
 Intent intent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient);
 startActivityForResult(intent,REQ_CODE);
 }
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
     }
+
     private void handleResult(GoogleSignInResult result){
         if (result.isSuccess()){
             GoogleSignInAccount account = result.getSignInAccount();
             String name = account.getDisplayName();
             String email = account.getEmail();
-
+            String Id = account.getId();
         }
     }
 
@@ -166,7 +203,7 @@ startActivityForResult(intent,REQ_CODE);
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQ_CODE) {
             GoogleSignInResult  result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-
+            handleResult(result);
         }
     }
 }
