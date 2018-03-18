@@ -27,6 +27,8 @@ import com.projectcenterfvt.historicalpenza.DataBases.Sight;
 import com.projectcenterfvt.historicalpenza.R;
 import com.projectcenterfvt.historicalpenza.Server.ClientServer;
 
+import java.util.jar.Attributes;
+
 
 /**
  * Активити
@@ -79,10 +81,10 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
                 .requestIdToken(getString(R.string.client_server_id))
                 .requestEmail()
                 .build();
-       // googleApiClient = new GoogleApiClient.Builder(this)
-         //       .enableAutoManage(this,this)
-           //     .addApi(Auth.GOOGLE_SIGN_IN_API,signInOptions)
-             //   .build();
+        // googleApiClient = new GoogleApiClient.Builder(this)
+        //       .enableAutoManage(this,this)
+        //     .addApi(Auth.GOOGLE_SIGN_IN_API,signInOptions)
+        //   .build();
         mGoogleSignInClient = GoogleSignIn.getClient(this, signInOptions);
 
         db = new DB_Position(this);
@@ -136,8 +138,8 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
                 } else{
                     intent = new Intent(SplashActivity.this, MapActivity.class);
 
-                SplashActivity.this.startActivity(intent);
-                SplashActivity.this.finish();}
+                    SplashActivity.this.startActivity(intent);
+                    SplashActivity.this.finish();}
             }
         });
         call.getCoordinates();
@@ -166,16 +168,20 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
      * @return булевое значение
      */
     public boolean isFirstTime() {
-        //return getPreferences(Context.MODE_PRIVATE).getBoolean(KEY_IS_FIRST_TIME, true);
-        return true;
+        return getPreferences(Context.MODE_PRIVATE).getBoolean(KEY_IS_FIRST_TIME, true);
+       // return true;
     }
     private void handleSignInResult(@NonNull Task<GoogleSignInAccount> completedTask) {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
             String idToken = account.getIdToken();
+
             String NAme = account.getDisplayName();
             String Email = account.getEmail();
-            // TODO(developer): send ID Token to server and validate
+
+            TextView textView7 =  findViewById(R.id.textView7);
+            textView7.setText(NAme);
+
 
 
         } catch (ApiException e) {
@@ -185,12 +191,12 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     /**
-    *Метод проверяющий первый ли раз запущ. приложение
+     *Метод проверяющий первый ли раз запущ. приложение
      * Если не 1-ый. то 3 сек. ждем и переход на MapActivity
      * Иначе проресовываем кнопку google sign  и удаляем текст "Историческая Пенза"
      * */
     public void nextPage() {
-               if (!isFirstTime()){
+        if (!isFirstTime()){
 
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
@@ -209,8 +215,8 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
                     sign_in_button.setVisibility(View.VISIBLE);
                 }
             }, 2000);
-                 }
         }
+    }
 
 
 
@@ -222,7 +228,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
 
 
 
-        @Override
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQ_CODE) {
@@ -240,7 +246,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
-    }
+}
 
 
 
