@@ -51,7 +51,6 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
     private GoogleSignInOptions signInOptions;
     private static DB_Position db;
     private SignInButton sign_in_button;
-    private GoogleApiClient googleApiClient;
     private static final int REQ_CODE = 9002;
     private TextView textViewHistoric;
     private TextView textViewPenza;
