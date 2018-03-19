@@ -1,33 +1,41 @@
 {
   "project_info": {
-    "project_number": "829688686374",
-    "project_id": "historicalpenza-1512670643563"
+    "project_number": "732937176154",
+    "project_id": "history-penza-193109"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:829688686374:android:529d6c00d4c4934a",
+        "mobilesdk_app_id": "1:732937176154:android:529d6c00d4c4934a",
         "android_client_info": {
           "package_name": "com.projectcenterfvt.historicalpenza"
         }
       },
       "oauth_client": [
         {
-          "client_id": "829688686374-vk0n2e09v1pe95r45pufk8sbdqlkbbuo.apps.googleusercontent.com",
+          "client_id": "732937176154-shj0athm5rsplqor87f1bj71ssh2e2fa.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "732937176154-gp9qclp21i0gf5bp2cnbdok902cdpgrm.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.projectcenterfvt.historicalpenza",
-            "certificate_hash": "6aa6c260d9f1adc859ea0f9e49b3327520ab9a5f"
+            "certificate_hash": "5fbb6e07a77086cffe91853213930653a32bab02"
           }
         },
         {
-          "client_id": "829688686374-c1m8h2q7gfhg0nafnlrmdgnvipock49b.apps.googleusercontent.com",
-          "client_type": 3
+          "client_id": "732937176154-rfjg81f62po38a7javgp6kra31ed1kdq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.projectcenterfvt.historicalpenza",
+            "certificate_hash": "d9495604edbc6dcb7e40388fcaf3fc0e09ab4352"
+          }
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDRsvur2mv5utkQpQzBBfVWG5t4yZxzDOM"
+          "current_key": "AIzaSyCD7ScYkNJnVjpVCS2qb4wAL_tI1wWmtfM"
         }
       ],
       "services": {

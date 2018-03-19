@@ -27,7 +27,21 @@ import com.projectcenterfvt.historicalpenza.DataBases.Sight;
 import com.projectcenterfvt.historicalpenza.R;
 import com.projectcenterfvt.historicalpenza.Server.ClientServer;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.jar.Attributes;
+
+import static android.app.PendingIntent.getActivity;
 
 
 /**
@@ -55,6 +69,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
     private TextView textViewHistoric;
     private TextView textViewPenza;
     private GoogleSignInClient mGoogleSignInClient;
+   private static String utl = "http://d95344yu.beget.tech/api/api.request.php";
     /**
      * Метод вызывается при создании или перезапуска активности <br>
      * (Временное решение) Удаляется старая бд и от сервера получаем новую <br>
@@ -80,10 +95,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
                 .requestIdToken(getString(R.string.client_server_id))
                 .requestEmail()
                 .build();
-        // googleApiClient = new GoogleApiClient.Builder(this)
-        //       .enableAutoManage(this,this)
-        //     .addApi(Auth.GOOGLE_SIGN_IN_API,signInOptions)
-        //   .build();
+
         mGoogleSignInClient = GoogleSignIn.getClient(this, signInOptions);
 
         db = new DB_Position(this);
@@ -167,25 +179,45 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
      * @return булевое значение
      */
     public boolean isFirstTime() {
-        return getPreferences(Context.MODE_PRIVATE).getBoolean(KEY_IS_FIRST_TIME, true);
-       // return true;
+       return getPreferences(Context.MODE_PRIVATE).getBoolean(KEY_IS_FIRST_TIME, true);
+        //return true;
     }
     private void handleSignInResult(@NonNull Task<GoogleSignInAccount> completedTask) {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-            String idToken = account.getIdToken();
-
-            String NAme = account.getDisplayName();
+            //String idToken = account.getIdToken();
+            String displayName = account.getDisplayName();
             String Email = account.getEmail();
-
+           // sendToBackEnd(idToken,displayName,Email);
             TextView textView7 =  findViewById(R.id.textView7);
-            textView7.setText(NAme);
+            textView7.setText(displayName);
 
 
 
         } catch (ApiException e) {
             Log.w(TAG, "handleSignInResult:error", e);
 
+        }
+    }
+
+    private void sendToBackEnd(String idToken, String displayName, String email) {
+        HttpClient httpClient = new DefaultHttpClient();
+        HttpPost httpPost = new HttpPost("http://d95344yu.beget.tech/api/api.request.php");
+
+        try {
+            List nameValuePairs = new ArrayList(1);
+            nameValuePairs.add(new BasicNameValuePair("idToken", idToken));
+            nameValuePairs.add(new BasicNameValuePair("Name",displayName));
+            nameValuePairs.add(new BasicNameValuePair("email",email));
+            httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+            HttpResponse response = httpClient.execute(httpPost);
+            int statusCode = response.getStatusLine().getStatusCode();
+            final String responseBody = EntityUtils.toString(response.getEntity());
+            Log.i(TAG, "Signed in as: " + responseBody);
+        } catch (ClientProtocolException e) {
+            Log.e(TAG, "Error sending ID token to backend.", e);
+        } catch (IOException e) {
+            Log.e(TAG, "Error s");
         }
     }
 
