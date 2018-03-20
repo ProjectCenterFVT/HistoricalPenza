@@ -3,6 +3,7 @@ package com.projectcenterfvt.historicalpenza.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -12,7 +13,6 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -39,9 +39,6 @@ import org.apache.http.util.EntityUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.jar.Attributes;
-
-import static android.app.PendingIntent.getActivity;
 
 
 /**
@@ -54,14 +51,25 @@ import static android.app.PendingIntent.getActivity;
  * @since 1.0.0
  */
 
-public class SplashActivity extends AppCompatActivity implements View.OnClickListener,GoogleApiClient.OnConnectionFailedListener{
+public class SplashActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
 
-    /** ID, по которому выводятся логи в Logcat*/
+    /**
+     * ID, по которому выводятся логи в Logcat
+     */
     static final String TAG = "server";
     static final String TAG_API = "API:";
-    /** Ключ, по которому проверяется первый запуск приложения*/
+
+    static final String mName = "name";
+    static final String mEmail = "email";
+    static final String mIdTokrn = "idToken";
+    public static final String APP_PREFERENCES = "account";
+    /**
+     * Ключ, по которому проверяется первый запуск приложения
+     */
     static final String KEY_IS_FIRST_TIME = "first_time";
-    /** Экземпляр класс базы данных*/
+    /**
+     * Экземпляр класс базы данных
+     */
     private GoogleSignInOptions signInOptions;
     private static DB_Position db;
     private SignInButton sign_in_button;
@@ -69,15 +77,18 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
     private TextView textViewHistoric;
     private TextView textViewPenza;
     private GoogleSignInClient mGoogleSignInClient;
-   private static String utl = "http://d95344yu.beget.tech/api/api.request.php";
+    private SharedPreferences mAccount;
+    private static String utl = "http://d95344yu.beget.tech/api/api.request.php";
+
     /**
      * Метод вызывается при создании или перезапуска активности <br>
      * (Временное решение) Удаляется старая бд и от сервера получаем новую <br>
      * Если {@link #KEY_IS_FIRST_TIME} = true, то переходим на <b>GreetingActivity</b> <br>
      * Иначе переходим на <b>MapActivity</b> <br>
+     *
+     * @param savedInstanceState сохраненное состояние <br>
      * @see GreetingActivity
      * @see MapActivity
-     * @param savedInstanceState сохраненное состояние <br>
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,7 +97,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
 
         textViewHistoric = findViewById(R.id.textViewHistorical);
         textViewPenza = findViewById(R.id.textView8);
-        sign_in_button =  findViewById(R.id.sign_in_button);
+        sign_in_button = findViewById(R.id.sign_in_button);
         sign_in_button.setEnabled(false);
         sign_in_button.setOnClickListener(this);
         validateServerClientID();
@@ -146,11 +157,12 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
                     getPreferences(Context.MODE_PRIVATE).edit().putBoolean(KEY_IS_FIRST_TIME, false).apply();
 
                     intent = new Intent(SplashActivity.this, GreetingActivity.class);
-                } else{
+                } else {
                     intent = new Intent(SplashActivity.this, MapActivity.class);
 
                     SplashActivity.this.startActivity(intent);
-                    SplashActivity.this.finish();}
+                    SplashActivity.this.finish();
+                }
             }
         });
         call.getCoordinates();
@@ -158,12 +170,13 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         nextPage();
 
     }
-
-    private void signIn(){
+/**
+ * вызывается при нажатии на кнопку войти*/
+    private void signIn() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, REQ_CODE);
-
     }
+
     private void validateServerClientID() {
         String serverClientId = getString(R.string.client_server_id);
         String suffix = ".apps.googleusercontent.com";
@@ -174,45 +187,52 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
             Toast.makeText(this, message, Toast.LENGTH_LONG).show();
         }
     }
+
     /**
      * Метод отвечает за проверку первого запуска приложения
+     *
      * @return булевое значение
      */
     public boolean isFirstTime() {
-       return getPreferences(Context.MODE_PRIVATE).getBoolean(KEY_IS_FIRST_TIME, true);
+        return getPreferences(Context.MODE_PRIVATE).getBoolean(KEY_IS_FIRST_TIME, true);
         //return true;
     }
+
     private void handleSignInResult(@NonNull Task<GoogleSignInAccount> completedTask) {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-            //String idToken = account.getIdToken();
+            String idToken = account.getIdToken();
+            String token = account.getId();
             String displayName = account.getDisplayName();
             String Email = account.getEmail();
-           // sendToBackEnd(idToken,displayName,Email);
-            TextView textView7 =  findViewById(R.id.textView7);
-            textView7.setText(displayName);
-
-
+            sendToBackEnd(idToken, displayName, Email);
+            mAccount = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = mAccount.edit();
+            editor.putString(mName, displayName);
+            editor.putString(mEmail, Email);
+            editor.putString(mIdTokrn, idToken);
+            editor.apply();
+            getPreferences(Context.MODE_PRIVATE).getBoolean(KEY_IS_FIRST_TIME, true);
+            Intent intent = new Intent(getApplicationContext(), GreetingActivity.class);
 
         } catch (ApiException e) {
             Log.w(TAG, "handleSignInResult:error", e);
 
         }
     }
-
+/**
+ * метод отправляет данные на сервер*/
     private void sendToBackEnd(String idToken, String displayName, String email) {
         HttpClient httpClient = new DefaultHttpClient();
         HttpPost httpPost = new HttpPost("http://d95344yu.beget.tech/api/api.request.php");
 
         try {
             List nameValuePairs = new ArrayList(1);
-            nameValuePairs.add(new BasicNameValuePair("idToken", idToken));
-            nameValuePairs.add(new BasicNameValuePair("Name",displayName));
-            nameValuePairs.add(new BasicNameValuePair("email",email));
+            nameValuePairs.add(new BasicNameValuePair(mIdTokrn, idToken));
             httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
             HttpResponse response = httpClient.execute(httpPost);
             int statusCode = response.getStatusLine().getStatusCode();
-            final String responseBody = EntityUtils.toString(response.getEntity());
+            String responseBody = EntityUtils.toString(response.getEntity());
             Log.i(TAG, "Signed in as: " + responseBody);
         } catch (ClientProtocolException e) {
             Log.e(TAG, "Error sending ID token to backend.", e);
@@ -222,12 +242,12 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     /**
-     *Метод проверяющий первый ли раз запущ. приложение
+     * Метод проверяющий первый ли раз запущ. приложение
      * Если не 1-ый. то 3 сек. ждем и переход на MapActivity
      * Иначе проресовываем кнопку google sign  и удаляем текст "Историческая Пенза"
-     * */
+     */
     public void nextPage() {
-        if (!isFirstTime()){
+        if (!isFirstTime()) {
 
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
@@ -235,8 +255,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
                     startActivity(new Intent(getApplicationContext(), MapActivity.class));
                 }
             }, 3000);
-        }
-        else {
+        } else {
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 public void run() {
@@ -250,13 +269,10 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
     }
 
 
-
-
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
-
 
 
     @Override
@@ -271,9 +287,10 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.sign_in_button:
-                signIn(); break;
+                signIn();
+                break;
         }
     }
 
