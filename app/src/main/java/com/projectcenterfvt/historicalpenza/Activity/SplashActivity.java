@@ -10,6 +10,8 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -79,7 +81,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
     private GoogleSignInClient mGoogleSignInClient;
     private SharedPreferences mAccount;
     private static String utl = "http://d95344yu.beget.tech/api/api.request.php";
-
+    private Animation mAnimationFadeOut;
     /**
      * Метод вызывается при создании или перезапуска активности <br>
      * (Временное решение) Удаляется старая бд и от сервера получаем новую <br>
@@ -101,6 +103,8 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         sign_in_button.setEnabled(false);
         sign_in_button.setOnClickListener(this);
         validateServerClientID();
+
+        mAnimationFadeOut = AnimationUtils.loadAnimation(this, android.R.anim.fade_out);
 
         signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.client_server_id))
@@ -205,7 +209,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
             String token = account.getId();
             String displayName = account.getDisplayName();
             String Email = account.getEmail();
-            sendToBackEnd(idToken, displayName, Email);
+            sendToBackEnd(idToken);
             mAccount = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = mAccount.edit();
             editor.putString(mName, displayName);
@@ -222,7 +226,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
     }
 /**
  * метод отправляет данные на сервер*/
-    private void sendToBackEnd(String idToken, String displayName, String email) {
+    private void sendToBackEnd(String idToken) {
         HttpClient httpClient = new DefaultHttpClient();
         HttpPost httpPost = new HttpPost("http://d95344yu.beget.tech/api/api.request.php");
 
@@ -259,6 +263,8 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 public void run() {
+                    textViewHistoric.startAnimation(mAnimationFadeOut);
+                    textViewPenza.startAnimation(mAnimationFadeOut);
                     textViewHistoric.setVisibility(View.INVISIBLE);
                     textViewPenza.setVisibility(View.INVISIBLE);
                     sign_in_button.setEnabled(true);
