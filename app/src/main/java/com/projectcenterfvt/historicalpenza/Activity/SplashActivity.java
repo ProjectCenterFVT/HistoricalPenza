@@ -103,7 +103,6 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         sign_in_button.setEnabled(false);
         sign_in_button.setOnClickListener(this);
         validateServerClientID();
-
         mAnimationFadeOut = AnimationUtils.loadAnimation(this, android.R.anim.fade_out);
 
         signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
