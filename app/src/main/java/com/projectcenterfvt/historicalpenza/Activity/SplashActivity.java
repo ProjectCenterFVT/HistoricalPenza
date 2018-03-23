@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -28,17 +29,28 @@ import com.projectcenterfvt.historicalpenza.DataBases.DB_Position;
 import com.projectcenterfvt.historicalpenza.DataBases.Sight;
 import com.projectcenterfvt.historicalpenza.R;
 import com.projectcenterfvt.historicalpenza.Server.ClientServer;
+import com.projectcenterfvt.historicalpenza.Server.LoginServer;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,7 +92,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
     private TextView textViewPenza;
     private GoogleSignInClient mGoogleSignInClient;
     private SharedPreferences mAccount;
-    private static String utl = "http://d95344yu.beget.tech/api/api.request.php";
+    private static String url = "http://d95344yu.beget.tech/api/api.request.php";
     private Animation mAnimationFadeOut;
     /**
      * Метод вызывается при создании или перезапуска активности <br>
@@ -100,7 +112,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         textViewHistoric = findViewById(R.id.textViewHistorical);
         textViewPenza = findViewById(R.id.textView8);
         sign_in_button = findViewById(R.id.sign_in_button);
-        sign_in_button.setEnabled(false);
+        sign_in_button.setEnabled(false);ClientServer call = new ClientServer(this);
         sign_in_button.setOnClickListener(this);
         validateServerClientID();
         mAnimationFadeOut = AnimationUtils.loadAnimation(this, android.R.anim.fade_out);
@@ -113,62 +125,63 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         mGoogleSignInClient = GoogleSignIn.getClient(this, signInOptions);
 
         db = new DB_Position(this);
-        ClientServer call = new ClientServer(this);
-        call.setOnResponseListener(new ClientServer.OnResponseListener<Sight>() {
-            /**
-             * Метод вызывается при успешном ответе от сервера
-             */
-            @Override
-            public void onSuccess(Sight[] result) {
-                db.connectToWrite();
-                db.getDB().delete(DB_Position.DB_TABLE, null, null);
-
-                for (Sight aResult : result) {
-                    ContentValues contentValues = new ContentValues();
-
-                    contentValues.put(DB_Position.COLUMN_ID, aResult.getId());
-                    Log.d(TAG, "вствавил  id = " + aResult.getId());
-
-                    contentValues.put(DB_Position.COLUMN_X1, aResult.getLatitude());
-                    Log.d(TAG, "вствавил  x1 = " + aResult.getLatitude());
-
-                    contentValues.put(DB_Position.COLUMN_X2, aResult.getLongitude());
-                    Log.d(TAG, "вствавил  x2 = " + aResult.getLongitude());
-
-                    contentValues.put(DB_Position.COLUMN_flag, aResult.getFlag());
-                    Log.d(TAG, "вствавил  flag = " + aResult.getFlag());
-
-                    contentValues.put(DB_Position.COLUMN_type, aResult.getType());
-                    Log.d(TAG, "вствавил  type = " + aResult.getType());
-
-                    db.getDB().insert(DB_Position.DB_TABLE, null, contentValues);
-                }
-
-                db.close();
-
-            }
-
-            /**
-             * Метод вызывается при неудачном подключении
-             */
-            @Override
-            public void onFailure(Exception e) {
-                Toast.makeText(SplashActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                e.printStackTrace();
-                Intent intent;
-                if (isFirstTime()) {
-                    getPreferences(Context.MODE_PRIVATE).edit().putBoolean(KEY_IS_FIRST_TIME, false).apply();
-
-                    intent = new Intent(SplashActivity.this, GreetingActivity.class);
-                } else {
-                    intent = new Intent(SplashActivity.this, MapActivity.class);
-
-                    SplashActivity.this.startActivity(intent);
-                    SplashActivity.this.finish();
-                }
-            }
-        });
-        call.getCoordinates();
+//        ClientServer call = new ClientServer(this);
+//        call.setOnResponseListener(new ClientServer.OnResponseListener<Sight>() {
+//            /**
+//             * Метод вызывается при успешном ответе от сервера
+//             */
+//            @Override
+//            public void onSuccess(Sight[] result) {
+//                db.connectToWrite();
+//                db.getDB().delete(DB_Position.DB_TABLE, null, null);
+//
+//                for (Sight aResult : result) {
+//                    ContentValues contentValues = new ContentValues();
+//
+//                    contentValues.put(DB_Position.COLUMN_ID, aResult.getId());
+//                    Log.d(TAG, "вствавил  id = " + aResult.getId());
+//
+//                    contentValues.put(DB_Position.COLUMN_X1, aResult.getLatitude());
+//                    Log.d(TAG, "вствавил  x1 = " + aResult.getLatitude());
+//
+//                    contentValues.put(DB_Position.COLUMN_X2, aResult.getLongitude());
+//                    Log.d(TAG, "вствавил  x2 = " + aResult.getLongitude());
+//
+//                    contentValues.put(DB_Position.COLUMN_flag, aResult.getFlag());
+//                    Log.d(TAG, "вствавил  flag = " + aResult.getFlag());
+//
+//                    contentValues.put(DB_Position.COLUMN_type, aResult.getType());
+//                    Log.d(TAG, "вствавил  type = " + aResult.getType());
+//
+//                    db.getDB().insert(DB_Position.DB_TABLE, null, contentValues);
+//                }
+//
+//                db.close();
+//
+//            }
+//
+//            /**
+//             * Метод вызывается при неудачном подключении
+//             */
+//            @Override
+//            public void onFailure(Exception e) {
+//                Toast.makeText(SplashActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+//                e.printStackTrace();
+//                Intent intent;
+//                if (isFirstTime()) {
+//                    getPreferences(Context.MODE_PRIVATE).edit().putBoolean(KEY_IS_FIRST_TIME, false).apply();
+//
+//                    intent = new Intent(SplashActivity.this, GreetingActivity.class);
+//                } else {
+//                    intent = new Intent(SplashActivity.this, MapActivity.class);
+//
+//                    SplashActivity.this.startActivity(intent);
+//                    SplashActivity.this.finish();
+//                }
+//            }
+//        });
+//        call.getCoordinates();
+//        call.login()
 
         nextPage();
 
@@ -197,22 +210,19 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
      * @return булевое значение
      */
     public boolean isFirstTime() {
-        return getPreferences(Context.MODE_PRIVATE).getBoolean(KEY_IS_FIRST_TIME, true);
-        //return true;
+       // return getPreferences(Context.MODE_PRIVATE).getBoolean(KEY_IS_FIRST_TIME, true);
+        return true;
     }
 
     private void handleSignInResult(@NonNull Task<GoogleSignInAccount> completedTask) {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
             String idToken = account.getIdToken();
-            String token = account.getId();
-            String displayName = account.getDisplayName();
-            String Email = account.getEmail();
+
             sendToBackEnd(idToken);
             mAccount = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = mAccount.edit();
-            editor.putString(mName, displayName);
-            editor.putString(mEmail, Email);
+
             editor.putString(mIdTokrn, idToken);
             editor.apply();
             getPreferences(Context.MODE_PRIVATE).getBoolean(KEY_IS_FIRST_TIME, true);
@@ -226,22 +236,20 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
 /**
  * метод отправляет данные на сервер*/
     private void sendToBackEnd(String idToken) {
-        HttpClient httpClient = new DefaultHttpClient();
-        HttpPost httpPost = new HttpPost("http://d95344yu.beget.tech/api/api.request.php");
+        LoginServer ls = new LoginServer();
+        ls.setOnResponseListener(new LoginServer.OnResponseListener() {
+            @Override
+            public void onSuccess(String result) {
+                Log.d("mToken", result);
+            }
 
-        try {
-            List nameValuePairs = new ArrayList(1);
-            nameValuePairs.add(new BasicNameValuePair(mIdTokrn, idToken));
-            httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-            HttpResponse response = httpClient.execute(httpPost);
-            int statusCode = response.getStatusLine().getStatusCode();
-            String responseBody = EntityUtils.toString(response.getEntity());
-            Log.i(TAG, "Signed in as: " + responseBody);
-        } catch (ClientProtocolException e) {
-            Log.e(TAG, "Error sending ID token to backend.", e);
-        } catch (IOException e) {
-            Log.e(TAG, "Error s");
-        }
+            @Override
+            public void onFailure(Exception e) {
+
+            }
+        });
+        ls.getLogin(idToken);
+
     }
 
     /**

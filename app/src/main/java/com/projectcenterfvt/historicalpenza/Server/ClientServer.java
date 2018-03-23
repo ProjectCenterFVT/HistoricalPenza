@@ -31,6 +31,7 @@ public class ClientServer extends AsyncTask<String, Void, Sight[]> {
     byte[] data = null;
     InputStream is = null;
     private int id;
+    private int IdAccaunt;
     private Exception mException;
     private Context context;
     private String server = "http://d95344yu.beget.tech/api/api.request.php";
@@ -51,6 +52,9 @@ public class ClientServer extends AsyncTask<String, Void, Sight[]> {
     public void getCoordinates() {
         this.execute("{\"getCoordinates\":\"0.0.0\"}");
     }
+    public void login() {
+        this.execute("{\"login\":\"0.0.0\"}");
+    }
 
     @Override
     protected Sight[] doInBackground(String... from) {
@@ -66,6 +70,10 @@ public class ClientServer extends AsyncTask<String, Void, Sight[]> {
             } else if (myJson.has("getCoordinates")) {
                 return parseGetCoordinatesResponse(jsonArr);
             }
+            else   if (myJson.has("login")) {
+                return parselogin(jsonArr);
+            }
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -73,6 +81,15 @@ public class ClientServer extends AsyncTask<String, Void, Sight[]> {
         }
 
         return null;
+    }
+
+    private Sight[] parselogin(JSONArray jsonArr) throws JSONException {
+        JSONObject item = jsonArr.getJSONObject(0);
+
+       int code = 0;
+
+        return new Sight[]{new Sight(code)};
+
     }
 
     @Override
