@@ -210,8 +210,8 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
      * @return булевое значение
      */
     public boolean isFirstTime() {
-       // return getPreferences(Context.MODE_PRIVATE).getBoolean(KEY_IS_FIRST_TIME, true);
-        return true;
+        return getPreferences(Context.MODE_PRIVATE).getBoolean(KEY_IS_FIRST_TIME, true);
+
     }
 
     private void handleSignInResult(@NonNull Task<GoogleSignInAccount> completedTask) {
@@ -220,13 +220,9 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
             String idToken = account.getIdToken();
 
             sendToBackEnd(idToken);
-            mAccount = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = mAccount.edit();
 
-            editor.putString(mIdTokrn, idToken);
-            editor.apply();
-            getPreferences(Context.MODE_PRIVATE).getBoolean(KEY_IS_FIRST_TIME, true);
-            Intent intent = new Intent(getApplicationContext(), GreetingActivity.class);
+
+
 
         } catch (ApiException e) {
             Log.w(TAG, "handleSignInResult:error", e);
@@ -241,6 +237,15 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
             @Override
             public void onSuccess(String result) {
                 Log.d("mToken", result);
+
+                getPreferences(Context.MODE_PRIVATE).getBoolean(KEY_IS_FIRST_TIME, true);
+
+                Intent intent = new Intent(getApplicationContext(), GreetingActivity.class);
+
+                SplashActivity.this.startActivity(intent);
+                SplashActivity.this.finish();
+
+
             }
 
             @Override
