@@ -125,7 +125,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         mGoogleSignInClient = GoogleSignIn.getClient(this, signInOptions);
 
         db = new DB_Position(this);
-//        ClientServer call = new ClientServer(this);
+//      ClientServer call = new ClientServer(this);
 //        call.setOnResponseListener(new ClientServer.OnResponseListener<Sight>() {
 //            /**
 //             * Метод вызывается при успешном ответе от сервера
@@ -237,15 +237,14 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
             @Override
             public void onSuccess(String result) {
                 Log.d("mToken", result);
-
-                getPreferences(Context.MODE_PRIVATE).getBoolean(KEY_IS_FIRST_TIME, true);
-
+                mAccount =getPreferences(MODE_PRIVATE);
+                SharedPreferences.Editor editor = mAccount.edit();
+                editor.putString(APP_PREFERENCES,result);
+                editor.apply();
+                getPreferences(Context.MODE_PRIVATE).edit().putBoolean(KEY_IS_FIRST_TIME, false).apply();
                 Intent intent = new Intent(getApplicationContext(), GreetingActivity.class);
-
                 SplashActivity.this.startActivity(intent);
                 SplashActivity.this.finish();
-
-
             }
 
             @Override
