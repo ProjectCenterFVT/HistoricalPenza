@@ -25,7 +25,8 @@ public class MarkerManager {
 
     private GoogleMap mMap;
     private Context myContext;
-    private Marker myMarker = null;
+    private Marker myMarker;
+    private String TAG = "Marker";
 
     public MarkerManager(GoogleMap mMap, Context myContext) {
         this.mMap = mMap;
@@ -39,6 +40,7 @@ public class MarkerManager {
      * @param position Позиция достопримечательности
      * @param sight    Достопримечательность
      */
+
     public void addSightMarker(Boolean flag, int type, LatLng position, Sight sight) {
         MarkerOptions options = new MarkerOptions();
         options.position(position);
@@ -66,7 +68,7 @@ public class MarkerManager {
         Marker marker = mMap.addMarker(options);
         sight.setType(type);
         marker.setTag(sight);
-        Log.d("marker", "нарисовал маркер с координатами " + position);
+        Log.d(TAG, "нарисовал маркер с координатами " + position);
     }
 
     /**
@@ -75,21 +77,44 @@ public class MarkerManager {
      */
     public void addMyMarker(Location location) {
         if (location != null) {
-            if (myMarker != null) {
-                Log.d("pos", "Моя позиция есть, изменяю её");
-                myMarker.setPosition(new LatLng(location.getLatitude(), location.getLongitude()));
-            } else {
-                Bitmap bitmap = BitmapFactory.decodeResource(myContext.getResources(), myContext.getResources().
-                        getIdentifier("my_marker", "drawable", myContext.getPackageName()));
-                bitmap = Bitmap.createScaledBitmap(bitmap, 57, 100, false);
-                Log.d("pos", "Моей позиции нет, делаю позицию");
-                myMarker = mMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromBitmap(bitmap)).position(new LatLng(location.getLatitude(), location.getLongitude())));
-            }
-            Log.d("pos", "Моя позиция - " + location.toString());
+            Log.d(TAG, "Моя позиция есть, изменяю её");
+            myMarker.setPosition(new LatLng(location.getLatitude(), location.getLongitude()));
+            showMyMarker();
+        }
+    }
+
+    public void removeMyMarker() {
+        if (myMarker != null) {
+            myMarker.remove();
+            Log.d(TAG, "Удалил маркер");
+        }
+    }
+
+    public void inviseMyMarker() {
+        if (myMarker != null) {
+            myMarker.setVisible(false);
+            Log.d(TAG, "Спрятал маркер");
+        }
+    }
+
+    public void showMyMarker() {
+        if (myMarker != null) {
+            myMarker.setVisible(true);
+            Log.d(TAG, "Показал маркер");
         }
     }
 
     public Marker getMyMarker() {
         return myMarker;
     }
+
+    public void addStartMarker() {
+        Bitmap bitmap = BitmapFactory.decodeResource(myContext.getResources(), myContext.getResources().
+                getIdentifier("my_marker", "drawable", myContext.getPackageName()));
+        bitmap = Bitmap.createScaledBitmap(bitmap, 57, 100, false);
+        myMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(53.196854, 45.017561)).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
+        inviseMyMarker();
+        Log.d(TAG, "Создал стартовый маркер");
+    }
 }
+
