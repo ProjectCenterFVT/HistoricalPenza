@@ -1,5 +1,9 @@
 package com.projectcenterfvt.historicalpenza.DataBases;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.util.Log;
+
 import com.google.android.gms.maps.model.LatLng;
 
 /**
@@ -9,7 +13,20 @@ import com.google.android.gms.maps.model.LatLng;
  * @since 1.0.0
  */
 
-public class Sight {
+public class Sight implements Parcelable {
+    final static String LOG_TAG = "SightLog";
+    public static final Creator<Sight> CREATOR = new Creator<Sight>() {
+        @Override
+        public Sight createFromParcel(Parcel in) {
+            Log.d(LOG_TAG, "createFromParcel");
+            return new Sight(in);
+        }
+
+        @Override
+        public Sight[] newArray(int size) {
+            return new Sight[size];
+        }
+    };
     /**
      * id из бд
      */
@@ -43,7 +60,6 @@ public class Sight {
     }
 
     public Sight() {
-
     }
 
     public Sight(int id, String title, String description, String img) {
@@ -51,6 +67,19 @@ public class Sight {
         this.title = title;
         this.description = description;
         this.img = img;
+    }
+
+    private Sight(Parcel in) {
+        Log.d(LOG_TAG, "Конструктир читает данные");
+        id = in.readInt();
+        title = in.readString();
+        description = in.readString();
+        img = in.readString();
+        latitude = in.readDouble();
+        longitude = in.readDouble();
+        flag = in.readByte() != 0;
+        distance = in.readInt();
+        type = in.readInt();
     }
 
     public int getId() {
@@ -136,5 +165,24 @@ public class Sight {
     public void setCoordinates(String coordRaw) {
         this.latitude = Double.parseDouble(coordRaw.substring(0, coordRaw.indexOf(",")));
         this.longitude = Double.parseDouble(coordRaw.substring(coordRaw.indexOf(" ") + 1, coordRaw.length() - 1));
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        Log.d(LOG_TAG, "writeToParcel");
+        parcel.writeInt(id);
+        parcel.writeString(title);
+        parcel.writeString(description);
+        parcel.writeString(img);
+        parcel.writeDouble(latitude);
+        parcel.writeDouble(longitude);
+        parcel.writeByte((byte) (flag ? 1 : 0));
+        parcel.writeInt(distance);
+        parcel.writeInt(type);
     }
 }

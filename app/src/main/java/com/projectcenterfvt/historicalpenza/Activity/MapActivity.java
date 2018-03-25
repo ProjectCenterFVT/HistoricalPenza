@@ -52,6 +52,7 @@ import com.projectcenterfvt.historicalpenza.Managers.MarkerManager;
 import com.projectcenterfvt.historicalpenza.Managers.SearchManager;
 import com.projectcenterfvt.historicalpenza.R;
 import com.projectcenterfvt.historicalpenza.Server.ClientServer;
+import com.projectcenterfvt.historicalpenza.Service.LocationService;
 
 import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.UpdateManager;
@@ -107,6 +108,7 @@ public class MapActivity extends AppCompatActivity
     private boolean check;
     private int CAMERA_KEY = 1;
     private String TAG_GEO = "Geoinformation";
+    private Intent serviceIntent;
 
     private LocationListener locationListener = new LocationListener() {
 
@@ -149,6 +151,7 @@ public class MapActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        serviceIntent = new Intent(MapActivity.this, LocationService.class);
         setContentView(R.layout.activity_map);
         database = new DB_Position(this);
         listManager = new ListManager();
@@ -356,7 +359,8 @@ public class MapActivity extends AppCompatActivity
             cameraManager.setCameraPosition(mLastKnownLocation);
         listManager.setList(database.fillArray(mMap, mLastKnownLocation));
         listManager.setDistance(mLastKnownLocation);
-
+        serviceIntent.putParcelableArrayListExtra("list", listManager.getList());
+        startService(serviceIntent);
     }
 
     @Override
