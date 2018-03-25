@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -31,29 +30,6 @@ import com.projectcenterfvt.historicalpenza.R;
 import com.projectcenterfvt.historicalpenza.Server.ClientServer;
 import com.projectcenterfvt.historicalpenza.Server.LoginServer;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.protocol.HTTP;
-import org.apache.http.util.EntityUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-
 
 /**
  * Активити
@@ -67,33 +43,33 @@ import java.util.List;
 
 public class SplashActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
 
+    public static final String APP_PREFERENCES = "account";
     /**
      * ID, по которому выводятся логи в Logcat
      */
     static final String TAG = "server";
     static final String TAG_API = "API:";
-
     static final String mName = "name";
     static final String mEmail = "email";
     static final String mIdTokrn = "idToken";
-    public static final String APP_PREFERENCES = "account";
     /**
      * Ключ, по которому проверяется первый запуск приложения
      */
     static final String KEY_IS_FIRST_TIME = "first_time";
+    private static final int REQ_CODE = 9002;
+    private static DB_Position db;
+    private static String url = "http://d95344yu.beget.tech/api/api.request.php";
     /**
      * Экземпляр класс базы данных
      */
     private GoogleSignInOptions signInOptions;
-    private static DB_Position db;
     private SignInButton sign_in_button;
-    private static final int REQ_CODE = 9002;
     private TextView textViewHistoric;
     private TextView textViewPenza;
     private GoogleSignInClient mGoogleSignInClient;
     private SharedPreferences mAccount;
-    private static String url = "http://d95344yu.beget.tech/api/api.request.php";
     private Animation mAnimationFadeOut;
+    private Context context;
     /**
      * Метод вызывается при создании или перезапуска активности <br>
      * (Временное решение) Удаляется старая бд и от сервера получаем новую <br>
@@ -108,7 +84,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-
+        context = this;
         textViewHistoric = findViewById(R.id.textViewHistorical);
         textViewPenza = findViewById(R.id.textView8);
         sign_in_button = findViewById(R.id.sign_in_button);
@@ -125,64 +101,6 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         mGoogleSignInClient = GoogleSignIn.getClient(this, signInOptions);
 
         db = new DB_Position(this);
-//      ClientServer call = new ClientServer(this);
-//        call.setOnResponseListener(new ClientServer.OnResponseListener<Sight>() {
-//            /**
-//             * Метод вызывается при успешном ответе от сервера
-//             */
-//            @Override
-//            public void onSuccess(Sight[] result) {
-//                db.connectToWrite();
-//                db.getDB().delete(DB_Position.DB_TABLE, null, null);
-//
-//                for (Sight aResult : result) {
-//                    ContentValues contentValues = new ContentValues();
-//
-//                    contentValues.put(DB_Position.COLUMN_ID, aResult.getId());
-//                    Log.d(TAG, "вствавил  id = " + aResult.getId());
-//
-//                    contentValues.put(DB_Position.COLUMN_X1, aResult.getLatitude());
-//                    Log.d(TAG, "вствавил  x1 = " + aResult.getLatitude());
-//
-//                    contentValues.put(DB_Position.COLUMN_X2, aResult.getLongitude());
-//                    Log.d(TAG, "вствавил  x2 = " + aResult.getLongitude());
-//
-//                    contentValues.put(DB_Position.COLUMN_flag, aResult.getFlag());
-//                    Log.d(TAG, "вствавил  flag = " + aResult.getFlag());
-//
-//                    contentValues.put(DB_Position.COLUMN_type, aResult.getType());
-//                    Log.d(TAG, "вствавил  type = " + aResult.getType());
-//
-//                    db.getDB().insert(DB_Position.DB_TABLE, null, contentValues);
-//                }
-//
-//                db.close();
-//
-//            }
-//
-//            /**
-//             * Метод вызывается при неудачном подключении
-//             */
-//            @Override
-//            public void onFailure(Exception e) {
-//                Toast.makeText(SplashActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-//                e.printStackTrace();
-//                Intent intent;
-//                if (isFirstTime()) {
-//                    getPreferences(Context.MODE_PRIVATE).edit().putBoolean(KEY_IS_FIRST_TIME, false).apply();
-//
-//                    intent = new Intent(SplashActivity.this, GreetingActivity.class);
-//                } else {
-//                    intent = new Intent(SplashActivity.this, MapActivity.class);
-//
-//                    SplashActivity.this.startActivity(intent);
-//                    SplashActivity.this.finish();
-//                }
-//            }
-//        });
-//        call.getCoordinates();
-//        call.login()
-
         nextPage();
 
     }
@@ -242,6 +160,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
                 editor.putString(APP_PREFERENCES,result);
                 editor.apply();
                 getPreferences(Context.MODE_PRIVATE).edit().putBoolean(KEY_IS_FIRST_TIME, false).apply();
+                idToServer(result);
                 Intent intent = new Intent(getApplicationContext(), GreetingActivity.class);
                 SplashActivity.this.startActivity(intent);
                 SplashActivity.this.finish();
@@ -263,7 +182,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
      */
     public void nextPage() {
         if (!isFirstTime()) {
-
+            idToServer(getPreferences(Context.MODE_PRIVATE).getString(APP_PREFERENCES, ""));
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 public void run() {
@@ -309,6 +228,65 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
                 signIn();
                 break;
         }
+    }
+
+    private void idToServer(String mIdTokrn) {
+        ClientServer call = new ClientServer(context);
+        call.setOnResponseListener(new ClientServer.OnResponseListener<Sight>() {
+            /**
+             * Метод вызывается при успешном ответе от сервера
+             */
+            @Override
+            public void onSuccess(Sight[] result) {
+                db.connectToWrite();
+                db.getDB().delete(DB_Position.DB_TABLE, null, null);
+
+                for (Sight aResult : result) {
+                    ContentValues contentValues = new ContentValues();
+
+                    contentValues.put(DB_Position.COLUMN_ID, aResult.getId());
+                    Log.d(TAG, "вствавил  id = " + aResult.getId());
+
+                    contentValues.put(DB_Position.COLUMN_X1, aResult.getLatitude());
+                    Log.d(TAG, "вствавил  x1 = " + aResult.getLatitude());
+
+                    contentValues.put(DB_Position.COLUMN_X2, aResult.getLongitude());
+                    Log.d(TAG, "вствавил  x2 = " + aResult.getLongitude());
+
+                    contentValues.put(DB_Position.COLUMN_flag, aResult.getFlag());
+                    Log.d(TAG, "вствавил  flag = " + aResult.getFlag());
+
+                    contentValues.put(DB_Position.COLUMN_type, aResult.getType());
+                    Log.d(TAG, "вствавил  type = " + aResult.getType());
+
+                    db.getDB().insert(DB_Position.DB_TABLE, null, contentValues);
+                }
+
+                db.close();
+
+            }
+
+            /**
+             * Метод вызывается при неудачном подключении
+             */
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(SplashActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
+                Intent intent;
+                if (isFirstTime()) {
+                    getPreferences(Context.MODE_PRIVATE).edit().putBoolean(KEY_IS_FIRST_TIME, false).apply();
+
+                    intent = new Intent(SplashActivity.this, GreetingActivity.class);
+                } else {
+                    intent = new Intent(SplashActivity.this, MapActivity.class);
+
+                    SplashActivity.this.startActivity(intent);
+                    SplashActivity.this.finish();
+                }
+            }
+        });
+        call.getCoordinates(mIdTokrn);
     }
 
 }
