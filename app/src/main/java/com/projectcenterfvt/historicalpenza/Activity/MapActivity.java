@@ -7,7 +7,9 @@ import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
@@ -37,6 +39,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.projectcenterfvt.historicalpenza.BuildConfig;
 import com.projectcenterfvt.historicalpenza.DataBases.DB_Position;
 import com.projectcenterfvt.historicalpenza.DataBases.Sight;
 import com.projectcenterfvt.historicalpenza.Dialogs.AboutDialog;
@@ -103,36 +106,33 @@ public class MapActivity extends AppCompatActivity
      */
     private boolean check;
     private int CAMERA_KEY = 1;
+    private String TAG_GEO = "Geoinformation";
 
     private LocationListener locationListener = new LocationListener() {
 
         @Override
         public void onLocationChanged(Location location) {
-            if (markerManager != null) {
-                Log.d("pos", "Смена позиции");
-                if (markerManager.getMyMarker() != null && mLastKnownLocation != null) {
-                    markerManager.getMyMarker().setPosition(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
-                }
-                mLastKnownLocation = locationManager.getDeviceLocation();
-                markerManager.addMyMarker(mLastKnownLocation);
-                listManager.setDistance(mLastKnownLocation);
-            }
         }
 
         @Override
         public void onStatusChanged(String s, int i, Bundle bundle) {
-            Log.d("pos", "status - " + s + " i = " + i);
+            Log.d(TAG_GEO, "status - " + s + " i = " + i);
         }
 
         @Override
         public void onProviderEnabled(String s) {
             locationManager.updateLocationUI(true, btn_pos);
-            Log.d("pos", "status : "+s);
+            markerManager.showMyMarker();
+            Log.d(TAG_GEO, "status : " + s);
         }
 
         @Override
         public void onProviderDisabled(String s) {
+            if (markerManager != null) {
+                markerManager.inviseMyMarker();
+            }
             locationManager.updateLocationUI(false, btn_pos);
+            Log.d(TAG_GEO, "status : " + s);
         }
     };
 
@@ -164,6 +164,15 @@ public class MapActivity extends AppCompatActivity
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
+
+        locationManager = new com.projectcenterfvt.historicalpenza.Managers.LocationManager(this, MapActivity.this);
+        if (!locationManager.checkPermissions()) {
+            locationManager.startLocationPermissionRequest();
+        } else {
+            Log.d("Location", "Настройки полученны");
+        }
+        locationManager.setListManager(listManager);
+
         lM.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 4, locationListener);
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -175,8 +184,6 @@ public class MapActivity extends AppCompatActivity
                 .addApi(Places.PLACE_DETECTION_API)
                 .build();
         mGoogleApiClient.connect();
-
-        locationManager = new com.projectcenterfvt.historicalpenza.Managers.LocationManager(this, this.getParent(), mGoogleApiClient);
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -224,6 +231,14 @@ public class MapActivity extends AppCompatActivity
 
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (markerManager != null) {
+            markerManager.removeMyMarker();
+        }
     }
 
     /**
@@ -323,21 +338,25 @@ public class MapActivity extends AppCompatActivity
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
+
         mMap = googleMap;
         mMap.setMinZoomPreference(12.0f);
         mMap.setMaxZoomPreference(17.0f);
         mMap.setOnMarkerClickListener(this);
         mMap.getUiSettings().setMapToolbarEnabled(false);
         markerManager = new MarkerManager(mMap, this);
-        locationManager.getLocationPermission();
+        locationManager.setMarkerManager(markerManager);
         mLastKnownLocation = locationManager.getDeviceLocation();
+        markerManager.addStartMarker();
         markerManager.addMyMarker(mLastKnownLocation);
         cameraManager = new CameraManager(this, mMap);
+        cameraManager.setCameraPosition(mLastKnownLocation);
         searchManager.setCameraManager(cameraManager);
         if (!check)
             cameraManager.setCameraPosition(mLastKnownLocation);
         listManager.setList(database.fillArray(mMap, mLastKnownLocation));
         listManager.setDistance(mLastKnownLocation);
+
     }
 
     @Override
@@ -521,6 +540,28 @@ public class MapActivity extends AppCompatActivity
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == 34) {
+            if (grantResults.length <= 0) {
+                // If user interaction was interrupted, the permission request is cancelled and you
+                // receive empty arrays.
+            } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted.
+                //getLastLocation();
+            } else {
+                Intent intent = new Intent();
+                intent.setAction(
+                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                Uri uri = Uri.fromParts("package",
+                        BuildConfig.APPLICATION_ID, null);
+                intent.setData(uri);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
+        }
     }
 }
 
