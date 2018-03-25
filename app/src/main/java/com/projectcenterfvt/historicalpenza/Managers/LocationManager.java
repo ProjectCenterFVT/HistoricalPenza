@@ -69,11 +69,6 @@ public class LocationManager {
         getLocation();
     }
 
-    public LocationManager() {
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(Context.;
-        createLocationRequest();
-    }
-
     public void startLocationUpdate() {
         mLocationCallback = new LocationCallback() {
             @Override
