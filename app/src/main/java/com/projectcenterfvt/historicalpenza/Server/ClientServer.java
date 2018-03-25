@@ -117,6 +117,7 @@ public class ClientServer extends AsyncTask<String, Void, Sight[]> {
         while ((bytesRead = is.read(buffer)) != -1) {
             baos.write(buffer, 0, bytesRead);
         }
+
         data = baos.toByteArray();
         String resultString = new String(data, "UTF-8");
         Log.d("server", "result = " + resultString);

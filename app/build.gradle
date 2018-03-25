@@ -1,12 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
+
     signingConfigs {
         config {
             keyAlias 'HistoricalPenza'
-            keyPassword 'fd5df2e122ff4e88e02b46375759df5d'
-            storeFile file('keystore')
-            storePassword '0e72ae7177d74be65adeb5b875719e96'
+            keyPassword 'RedmiNote3Pro'
+            storeFile file('E:/development/ANDROID PROJECTS/HistoricalPenza/keystore.jks')
+            storePassword 'RedmiNote3Pro'
         }
     }
     compileSdkVersion 26
@@ -22,8 +23,6 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.config
         }
     }

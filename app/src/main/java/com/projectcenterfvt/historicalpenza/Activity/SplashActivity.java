@@ -12,6 +12,7 @@ import com.projectcenterfvt.historicalpenza.DataBases.DB_Position;
 import com.projectcenterfvt.historicalpenza.DataBases.Sight;
 import com.projectcenterfvt.historicalpenza.R;
 import com.projectcenterfvt.historicalpenza.Server.ClientServer;
+import com.projectcenterfvt.historicalpenza.Services.PositionService;
 
 /**
  * Активити
@@ -46,7 +47,8 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
         db = new DB_Position(this);
-
+        startService(
+                new Intent(SplashActivity.this, PositionService.class));
         ClientServer call = new ClientServer(this);
         call.setOnResponseListener(new ClientServer.OnResponseListener<Sight>() {
             /**

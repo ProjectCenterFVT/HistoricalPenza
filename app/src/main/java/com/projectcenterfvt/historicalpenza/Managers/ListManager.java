@@ -30,14 +30,12 @@ public class ListManager {
      * @return Расстояние
      */
     public int calculateDistance(Location l1, LatLng l2) {
-        Log.d("marker ", "Мое местоположение = " + l1.toString());
         final int R = 6372795;
         double x1 = l1.getLatitude() * Math.PI / 180;
         double x2 = l1.getLongitude() * Math.PI / 180;
         double x3 = l2.latitude * Math.PI / 180;
         double x4 = l2.longitude * Math.PI / 180;
         double res = Math.acos(Math.sin(x1) * Math.sin(x3) + Math.cos(x1) * Math.cos(x3) * Math.cos(x2 - x4)) * R;
-        Log.d("marker", "res = " + res);
         return (int) res;
     }
 

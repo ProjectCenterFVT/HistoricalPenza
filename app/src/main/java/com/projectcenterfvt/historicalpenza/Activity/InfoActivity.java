@@ -20,6 +20,8 @@ import com.projectcenterfvt.historicalpenza.Dialogs.HomestadeDialog;
 import com.projectcenterfvt.historicalpenza.R;
 
 import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 /**
  * Активити
@@ -99,11 +101,27 @@ public class InfoActivity extends AppCompatActivity {
 
         @Override
         protected Bitmap doInBackground(String... urls) {
+
             String urldisplay = urls[0];
+            //String server = "http://d95344yu.beget.tech/api/api.request.php";
             Bitmap mIcon11 = null;
             try {
-                InputStream in = new java.net.URL(urldisplay).openStream();
+
+                URL url = new URL(urldisplay);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36");
+                conn.setRequestMethod("GET");
+                conn.setDoOutput(true);
+                conn.connect();
+
+                int code = conn.getResponseCode();
+                String info = conn.getRequestMethod();
+                info = conn.getContentType();
+                info = conn.getRequestMethod();
+                InputStream in = conn.getInputStream();
+
                 mIcon11 = BitmapFactory.decodeStream(in);
+
             } catch (Exception e) {
                 Log.e("Error", e.getMessage());
                 e.printStackTrace();
