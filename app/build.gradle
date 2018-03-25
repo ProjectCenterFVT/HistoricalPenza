@@ -4,8 +4,14 @@ android {
     signingConfigs {
         config {
             keyAlias 'HistoricalPenza'
+            keyPassword 'RedmiNote3Pro'
+            storeFile file('E:/development/ANDROID PROJECTS/HistoricalPenza/keystore.jks')
+            storePassword 'RedmiNote3Pro'
+        }
+        my_key_store {
+            keyAlias 'Creativity Project Center'
             keyPassword 'fd5df2e122ff4e88e02b46375759df5d'
-            storeFile file('keystore')
+            storeFile file('E:/development/ANDROID PROJECTS/HistoricalPenza/my_key_store.jks')
             storePassword '0e72ae7177d74be65adeb5b875719e96'
         }
     }
@@ -24,7 +30,10 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.config
+            signingConfig signingConfigs.my_key_store
+        }
+        debug {
+            signingConfig signingConfigs.my_key_store
         }
     }
 }
@@ -46,4 +55,10 @@ dependencies {
     implementation 'com.google.android.gms:play-services-maps:11.6.2'
     compile 'com.github.arimorty:floatingsearchview:2.1.1'
     compile 'net.hockeyapp.android:HockeySDK:5.0.4'
+    compile 'com.google.android.gms:play-services-auth:11.6.2'
+    compile 'com.google.api-client:google-api-client:1.22.0'
+    compile 'com.google.api-client:google-api-client-android:1.22.0'
+    compile 'com.google.apis:google-api-services-people:v1-rev139-1.22.0'
 }
+
+

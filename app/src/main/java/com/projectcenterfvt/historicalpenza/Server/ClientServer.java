@@ -31,25 +31,52 @@ public class ClientServer extends AsyncTask<String, Void, Sight[]> {
     byte[] data = null;
     InputStream is = null;
     private int id;
+    private int IdAccaunt;
     private Exception mException;
     private Context context;
     private String server = "http://d95344yu.beget.tech/api/api.request.php";
+    private String mToken;
+    private String ver = "0.0.0";
+    private String TAG_JSON = "JSON_SERVER";
 
     public ClientServer(Context context) {
         this.context = context;
     }
 
     public void getInfo(int id) {
-        this.execute("{\"getInfo\":\"" + id + "\"}");
-        this.id = id;
+        JSONObject JSONToServer = new JSONObject();
+        try {
+            JSONToServer.put("type", "getInfo");
+            JSONToServer.put("id", id);
+            this.execute(JSONToServer.toString());
+            this.id = id;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     public void getAllInfo() {
-        this.execute("{\"getAllInfo\":\"1\"}");
+        JSONObject JSONToServer = new JSONObject();
+        try {
+            JSONToServer.put("type", "getAllInfo");
+            JSONToServer.put("id", 1);
+            this.execute(JSONToServer.toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void getCoordinates() {
-        this.execute("{\"getCoordinates\":\"0.0.0\"}");
+    public void getCoordinates(String mToken) {
+        this.mToken = mToken;
+        JSONObject JSONToServer = new JSONObject();
+        try {
+            JSONToServer.put("type", "getCoordinates");
+            JSONToServer.put("ver", ver);
+            JSONToServer.put("enc_id", mToken);
+            this.execute(JSONToServer.toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -59,11 +86,13 @@ public class ClientServer extends AsyncTask<String, Void, Sight[]> {
             JSONObject myJson = new JSONObject(from[0]);
             JSONArray jsonArr = getJsonArray(from[0]);
 
-            if (myJson.has("getInfo")) {
+            String type = myJson.getString("type");
+            Log.d(TAG_JSON, "type = " + type);
+            if (type.equals("getInfo")) {
                 return parseGetInfoResponse(jsonArr);
-            } else if (myJson.has("getAllInfo")) {
+            } else if (type.equals("getAllInfo")) {
                 return parseGetAllInfoResponse(jsonArr);
-            } else if (myJson.has("getCoordinates")) {
+            } else if (type.equals("getCoordinates")) {
                 return parseGetCoordinatesResponse(jsonArr);
             }
 
@@ -99,7 +128,7 @@ public class ClientServer extends AsyncTask<String, Void, Sight[]> {
 
         OutputStream os = conn.getOutputStream();
         data = command.getBytes("UTF-8");
-        Log.d("server", "отпралвяю " + command);
+        Log.d(TAG_JSON, "отпралвяю " + command);
         os.write(data);
         data = null;
 
