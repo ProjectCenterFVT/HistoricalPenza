@@ -136,6 +136,7 @@ public class MapActivity extends AppCompatActivity
         }
     };
 
+    //comment
     @Override
     public void setPosition(LatLng loc) {
         cameraManager.setCameraPosition(loc);
