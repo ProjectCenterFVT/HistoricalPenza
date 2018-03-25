@@ -1,16 +1,23 @@
 package com.projectcenterfvt.historicalpenza.Managers;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Button;
 
-import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.projectcenterfvt.historicalpenza.R;
 
 /**
@@ -23,17 +30,73 @@ import com.projectcenterfvt.historicalpenza.R;
 
 public class LocationManager {
 
-    private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private Context context;
     private Location mLastKnownLocation;
-    private Boolean mLocationPermissionGranted;
     private Activity activity;
-    private GoogleApiClient mGoogleApiClient;
+    private FusedLocationProviderClient mFusedLocationClient;
+    private LocationRequest mLocationRequest;
+    private LocationCallback mLocationCallback;
+    private String TAG = "Location";
+    private String TAG_SERVICE = "TagService";
+    private MarkerManager markerManager;
 
-    public LocationManager(Context context, Activity activity, GoogleApiClient mGoogleApiClient) {
+    private ListManager listManager;
+
+    public LocationManager(Context context, Activity activity) {
         this.context = context;
         this.activity = activity;
-        this.mGoogleApiClient = mGoogleApiClient;
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
+        createLocationRequest();
+        mLocationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) {
+                    Log.d(TAG, "нет позиции");
+                }
+                for (Location location : locationResult.getLocations()) {
+                    mLastKnownLocation = location;
+                    if (markerManager != null) {
+                        markerManager.addMyMarker(location);
+                    }
+                    if (listManager != null) {
+                        listManager.setDistance(mLastKnownLocation);
+                    }
+                    Log.d(TAG, "Смена позиции");
+                }
+            }
+        };
+        startLocationUpdates();
+        getLocation();
+    }
+
+    public void startLocationUpdate() {
+        mLocationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) {
+                    Log.d(TAG_SERVICE, "нет позиции");
+                }
+                for (Location location : locationResult.getLocations()) {
+                    mLastKnownLocation = location;
+                    Log.d(TAG_SERVICE, "Служба обновляет данные : " + location.toString());
+                }
+            }
+        };
+        startLocationUpdates();
+    }
+
+    private void createLocationRequest() {
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(2000);
+        mLocationRequest.setFastestInterval(1000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
+
+    @SuppressLint("MissingPermission")
+    private void startLocationUpdates() {
+        mFusedLocationClient.requestLocationUpdates(mLocationRequest,
+                mLocationCallback,
+                null /* Looper */);
     }
 
     /**
@@ -42,21 +105,33 @@ public class LocationManager {
      * @return Местоположение пользователя
      */
     public Location getDeviceLocation() {
-        if (mLocationPermissionGranted) {
-            if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-            }
-            mLastKnownLocation = LocationServices.FusedLocationApi
-                    .getLastLocation(mGoogleApiClient);
-            Log.d("pos", "" + mLastKnownLocation);
-        }
+        getLocation();
         return mLastKnownLocation;
+    }
+
+    public void setMarkerManager(MarkerManager markerManager) {
+        this.markerManager = markerManager;
+    }
+
+    public void setListManager(ListManager listManager) {
+        this.listManager = listManager;
+    }
+
+    @SuppressLint("MissingPermission")
+    public void getLocation() {
+        mFusedLocationClient.getLastLocation()
+                .addOnCompleteListener(activity, new OnCompleteListener<Location>() {
+                    @SuppressLint("SetTextI18n")
+                    @Override
+                    public void onComplete(@NonNull Task<Location> task) {
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            mLastKnownLocation = task.getResult();
+                            Log.d(TAG, "Моя позиция = " + mLastKnownLocation.toString());
+                        } else {
+                            Log.d(TAG, "Ошибка");
+                        }
+                    }
+                });
     }
 
     /**
@@ -68,13 +143,14 @@ public class LocationManager {
         Log.d("pos", "upadeLoc");
         try {
             if (flag) {
+                btn_pos.setEnabled(true);
                 btn_pos.setBackgroundResource(R.drawable.get_location);
                 Log.d("position", "visible");
             } else {
+                btn_pos.setEnabled(false);
                 btn_pos.setBackgroundResource(R.drawable.my_pos_un);
                 Log.d("position", "invisible");
                 mLastKnownLocation = null;
-                getLocationPermission();
             }
         } catch (SecurityException e) {
             Log.d("pos", e.getMessage());
@@ -85,21 +161,16 @@ public class LocationManager {
     /**
      * Проверка разрешения пользователя
      */
-    public void getLocationPermission() {
-        if (ContextCompat.checkSelfPermission(context.getApplicationContext(),
-                android.Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            Log.d("pos", "пользователь дал согласие");
-            mLocationPermissionGranted = true;
-        } else {
-            ActivityCompat.requestPermissions(activity,
-                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-            Log.d("pos", "пользователь не дал согласие");
-        }
+
+    public boolean checkPermissions() {
+        int permissionState = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION);
+        return permissionState == PackageManager.PERMISSION_GRANTED;
     }
 
-    public Boolean getmLocationPermissionGranted() {
-        return mLocationPermissionGranted;
+    public void startLocationPermissionRequest() {
+        ActivityCompat.requestPermissions(activity,
+                new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                34);
     }
+
 }
