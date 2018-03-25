@@ -5,13 +5,13 @@ android {
         config {
             keyAlias 'HistoricalPenza'
             keyPassword 'RedmiNote3Pro'
-            storeFile file('E:/work/HistoricalPenza/app/keystore.jks')
+            storeFile file('E:/development/ANDROID PROJECTS/HistoricalPenza/keystore.jks')
             storePassword 'RedmiNote3Pro'
         }
         my_key_store {
             keyAlias 'Creativity Project Center'
             keyPassword 'fd5df2e122ff4e88e02b46375759df5d'
-            storeFile file('E:/work/HistoricalPenza/app/my_key_store.jks')
+            storeFile file('E:/development/ANDROID PROJECTS/HistoricalPenza/my_key_store.jks')
             storePassword '0e72ae7177d74be65adeb5b875719e96'
         }
     }
