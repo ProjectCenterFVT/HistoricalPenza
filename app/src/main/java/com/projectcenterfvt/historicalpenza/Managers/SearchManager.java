@@ -126,7 +126,7 @@ public class SearchManager {
         searchView.setOnFocusChangeListener(new FloatingSearchView.OnFocusChangeListener() {
             @Override
             public void onFocus() {
-                ClientServer call = new ClientServer(myContext.getApplicationContext());
+                ClientServer call = new ClientServer();
                 call.setOnResponseListener(new ClientServer.OnResponseListener<Sight>() {
                     @Override
                     public void onSuccess(Sight[] result) {

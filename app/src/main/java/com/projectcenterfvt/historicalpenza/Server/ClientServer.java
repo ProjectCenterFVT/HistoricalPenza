@@ -1,6 +1,5 @@
 package com.projectcenterfvt.historicalpenza.Server;
 
-import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -31,16 +30,12 @@ public class ClientServer extends AsyncTask<String, Void, Sight[]> {
     byte[] data = null;
     InputStream is = null;
     private int id;
-    private int IdAccaunt;
     private Exception mException;
-    private Context context;
-    private String server = "http://d95344yu.beget.tech/api/api.request.php";
-    private String mToken;
+    private String server = "http://hpenza.creativityprojectcenter.ru/api.request.php";
     private String ver = "0.0.0";
     private String TAG_JSON = "JSON_SERVER";
 
-    public ClientServer(Context context) {
-        this.context = context;
+    public ClientServer() {
     }
 
     public void getInfo(int id) {
@@ -67,12 +62,24 @@ public class ClientServer extends AsyncTask<String, Void, Sight[]> {
     }
 
     public void getCoordinates(String mToken) {
-        this.mToken = mToken;
         JSONObject JSONToServer = new JSONObject();
         try {
             JSONToServer.put("type", "getCoordinates");
             JSONToServer.put("ver", ver);
             JSONToServer.put("enc_id", mToken);
+            this.execute(JSONToServer.toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setPlaces(int id, String mToken) {
+        this.id = id;
+        JSONObject JSONToServer = new JSONObject();
+        try {
+            JSONToServer.put("type", "setPlaces");
+            JSONToServer.put("enc_id", mToken);
+            JSONToServer.put("id", "" + id);
             this.execute(JSONToServer.toString());
         } catch (JSONException e) {
             e.printStackTrace();
@@ -94,6 +101,8 @@ public class ClientServer extends AsyncTask<String, Void, Sight[]> {
                 return parseGetAllInfoResponse(jsonArr);
             } else if (type.equals("getCoordinates")) {
                 return parseGetCoordinatesResponse(jsonArr);
+            } else if (type.equals("setPlaces")) {
+                return setPlacesResponce(jsonArr);
             }
 
         } catch (Exception e) {
@@ -101,6 +110,11 @@ public class ClientServer extends AsyncTask<String, Void, Sight[]> {
             mException = e;
         }
 
+        return null;
+    }
+
+    private Sight[] setPlacesResponce(JSONArray jsonArr) {
+        Log.d(TAG_JSON, "отправили данные на сервер : " + jsonArr.toString());
         return null;
     }
 

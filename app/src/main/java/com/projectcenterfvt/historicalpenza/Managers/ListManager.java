@@ -85,4 +85,10 @@ public class ListManager {
         Log.d("distance", "дистанция от сервиса =  " + distance);
         return distance <= range;
     }
+
+    public void refreshSight(Sight sight) {
+        list.remove(sight);
+        sight.setFlag(true);
+        list.add(sight);
+    }
 }

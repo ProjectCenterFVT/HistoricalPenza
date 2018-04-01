@@ -23,12 +23,12 @@ public class LoginServer extends AsyncTask<String,Void,String>{
 
     byte[] data = null;
     InputStream is = null;
+    OnResponseListener listener;
     private String token;
     private int IdAccaunt;
-    OnResponseListener listener;
     private Exception mException;
     private Context context;
-    private String server = "http://d95344yu.beget.tech/api/api.request.php";
+    private String server = "http://hpenza.creativityprojectcenter.ru/api.request.php";
 
     public void getLogin(String token){
 

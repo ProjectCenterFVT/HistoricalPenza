@@ -1,5 +1,6 @@
 package com.projectcenterfvt.historicalpenza.DataBases;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -112,6 +113,8 @@ public class DB_Position extends SQLiteOpenHelper {
         cursor.move(id);
         final int id_x1 = cursor.getColumnIndex(COLUMN_X1);
         final int id_x2 = cursor.getColumnIndex(COLUMN_X2);
+        final int id_flag = cursor.getColumnIndex(COLUMN_type);
+        int fg = cursor.getInt(id_flag);
         double latitude = cursor.getDouble(id_x1);
         double longtitude = cursor.getDouble(id_x2);
         sight.setLatitude(latitude);
@@ -128,9 +131,8 @@ public class DB_Position extends SQLiteOpenHelper {
      * @return Лист достоприм
      * @see com.projectcenterfvt.historicalpenza.Activity.MapActivity
      */
-    public ArrayList<Sight> fillArray(GoogleMap map, Location mLastKnownLocation) {
+    public ArrayList<Sight> fillArray(GoogleMap map, Location mLastKnownLocation, MarkerManager markerManager) {
         ArrayList<Sight> list = new ArrayList<>();
-        MarkerManager markerManager = new MarkerManager(map, myContext);
         this.connectToRead();
         Cursor cursor = this.db.query(DB_TABLE, new String[]{COLUMN_ID, COLUMN_X1, COLUMN_X2, COLUMN_flag, COLUMN_type}, null, null, null, null, null);
         if (cursor.moveToFirst()) {
@@ -180,5 +182,15 @@ public class DB_Position extends SQLiteOpenHelper {
         double res = Math.acos(Math.sin(x1) * Math.sin(x3) + Math.cos(x1) * Math.cos(x3) * Math.cos(x2 - x4)) * R;
         Log.d("marker", "res = " + res);
         return (int) res;
+    }
+
+    public void updateColumn(Sight sight) {
+        ContentValues values = new ContentValues();
+        connectToWrite();
+        values.put(COLUMN_flag, true);
+        String selection = "_id = ?";
+        String args[] = {"" + sight.getId()};
+        db.update(DB_TABLE, values, selection, args);
+        this.close();
     }
 }

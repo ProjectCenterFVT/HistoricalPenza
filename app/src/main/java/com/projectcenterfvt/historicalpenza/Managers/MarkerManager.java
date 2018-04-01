@@ -1,5 +1,6 @@
 package com.projectcenterfvt.historicalpenza.Managers;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,6 +13,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.projectcenterfvt.historicalpenza.DataBases.Sight;
+
+import java.util.HashMap;
 
 /**
  * Работа с маркерами
@@ -27,6 +30,7 @@ public class MarkerManager {
     private Context myContext;
     private Marker myMarker;
     private String TAG = "Marker";
+    private HashMap<Integer, Marker> stackMarkers = new HashMap<>();
 
     public MarkerManager(GoogleMap mMap, Context myContext) {
         this.mMap = mMap;
@@ -68,7 +72,23 @@ public class MarkerManager {
         Marker marker = mMap.addMarker(options);
         sight.setType(type);
         marker.setTag(sight);
+        stackMarkers.put(sight.getId(), marker);
         Log.d(TAG, "нарисовал маркер с координатами " + position);
+    }
+
+    @SuppressLint("NewApi")
+    public void addSightMarker(Sight sight, Marker marker) {
+        marker.remove();
+        MarkerOptions options = new MarkerOptions();
+        Bitmap bitmap = BitmapFactory.decodeResource(myContext.getResources(), myContext.getResources().
+                getIdentifier("unlock", "drawable", myContext.getPackageName()));
+        bitmap = Bitmap.createScaledBitmap(bitmap, 74, 100, false);
+        options.icon(BitmapDescriptorFactory.fromBitmap(bitmap));
+        options.position(new LatLng(sight.getLatitude(), sight.getLongitude()));
+        marker = mMap.addMarker(options);
+        marker.setTag(sight);
+        stackMarkers.remove(sight.getId());
+        stackMarkers.put(sight.getId(), marker);
     }
 
     /**
@@ -115,6 +135,10 @@ public class MarkerManager {
         myMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(53.196854, 45.017561)).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
         inviseMyMarker();
         Log.d(TAG, "Создал стартовый маркер");
+    }
+
+    public void refreshMarker(Sight sight) {
+        addSightMarker(sight, stackMarkers.get(sight.getId()));
     }
 }
 
