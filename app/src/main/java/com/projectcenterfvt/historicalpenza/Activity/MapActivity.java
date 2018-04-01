@@ -55,6 +55,7 @@ import com.projectcenterfvt.historicalpenza.Managers.ListManager;
 import com.projectcenterfvt.historicalpenza.Managers.MarkerManager;
 import com.projectcenterfvt.historicalpenza.Managers.SearchManager;
 import com.projectcenterfvt.historicalpenza.R;
+import com.projectcenterfvt.historicalpenza.Server.BaseAsyncTask;
 import com.projectcenterfvt.historicalpenza.Server.ClientServer;
 import com.projectcenterfvt.historicalpenza.Service.LocationService;
 
@@ -289,7 +290,7 @@ public class MapActivity extends AppCompatActivity
 
         if (id == R.id.name_sight) {
             ClientServer call = new ClientServer();
-            call.setOnResponseListener(new ClientServer.OnResponseListener<Sight>() {
+            call.setOnResponseListener(new BaseAsyncTask.OnResponseListener<Sight[]>() {
                 @Override
                 public void onSuccess(Sight[] result) {
                     FragmentManager fragmentManager = getSupportFragmentManager();
@@ -471,7 +472,7 @@ public class MapActivity extends AppCompatActivity
             final AlertDialog alert = builder.create();
 
             ClientServer call = new ClientServer();
-            call.setOnResponseListener(new ClientServer.OnResponseListener<Sight>() {
+            call.setOnResponseListener(new BaseAsyncTask.OnResponseListener<Sight[]>() {
                 @Override
                 public void onSuccess(final Sight[] result) {
                     info.setText(result[0].getTitle());

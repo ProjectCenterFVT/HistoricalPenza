@@ -21,7 +21,7 @@ import java.util.Comparator;
 public class ListManager {
 
     private ArrayList<Sight> list = new ArrayList<>();
-    private int range = 30;
+    private int range = 300;
 
     /**
      * Расчет дистанции(Можно нагрузить на сервер, а можно оставить на клиенте)

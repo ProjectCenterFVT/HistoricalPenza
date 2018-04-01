@@ -11,6 +11,7 @@ import com.projectcenterfvt.historicalpenza.DataBases.DB_Position;
 import com.projectcenterfvt.historicalpenza.DataBases.DataHelper;
 import com.projectcenterfvt.historicalpenza.DataBases.Sight;
 import com.projectcenterfvt.historicalpenza.PlaceSuggestion;
+import com.projectcenterfvt.historicalpenza.Server.BaseAsyncTask;
 import com.projectcenterfvt.historicalpenza.Server.ClientServer;
 
 import java.util.ArrayList;
@@ -127,7 +128,7 @@ public class SearchManager {
             @Override
             public void onFocus() {
                 ClientServer call = new ClientServer();
-                call.setOnResponseListener(new ClientServer.OnResponseListener<Sight>() {
+                call.setOnResponseListener(new BaseAsyncTask.OnResponseListener<Sight[]>() {
                     @Override
                     public void onSuccess(Sight[] result) {
                         ArrayList<PlaceSuggestion> placeSuggestionArrayList = new ArrayList<>();

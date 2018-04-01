@@ -1,6 +1,5 @@
 package com.projectcenterfvt.historicalpenza.Server;
 
-import android.os.AsyncTask;
 import android.util.Log;
 
 import com.projectcenterfvt.historicalpenza.DataBases.Sight;
@@ -24,14 +23,9 @@ import java.net.URL;
  */
 
 
-public class ClientServer extends AsyncTask<String, Void, Sight[]> {
+public class ClientServer extends BaseAsyncTask<String, Sight[]> {
 
-    OnResponseListener<Sight> listener;
-    byte[] data = null;
-    InputStream is = null;
     private int id;
-    private Exception mException;
-    private String server = "http://hpenza.creativityprojectcenter.ru/api.request.php";
     private String ver = "0.0.0";
     private String TAG_JSON = "JSON_SERVER";
 
@@ -73,19 +67,6 @@ public class ClientServer extends AsyncTask<String, Void, Sight[]> {
         }
     }
 
-    public void setPlaces(int id, String mToken) {
-        this.id = id;
-        JSONObject JSONToServer = new JSONObject();
-        try {
-            JSONToServer.put("type", "setPlaces");
-            JSONToServer.put("enc_id", mToken);
-            JSONToServer.put("id", "" + id);
-            this.execute(JSONToServer.toString());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
     @Override
     protected Sight[] doInBackground(String... from) {
         try {
@@ -101,8 +82,6 @@ public class ClientServer extends AsyncTask<String, Void, Sight[]> {
                 return parseGetAllInfoResponse(jsonArr);
             } else if (type.equals("getCoordinates")) {
                 return parseGetCoordinatesResponse(jsonArr);
-            } else if (type.equals("setPlaces")) {
-                return setPlacesResponce(jsonArr);
             }
 
         } catch (Exception e) {
@@ -113,26 +92,12 @@ public class ClientServer extends AsyncTask<String, Void, Sight[]> {
         return null;
     }
 
-    private Sight[] setPlacesResponce(JSONArray jsonArr) {
-        Log.d(TAG_JSON, "отправили данные на сервер : " + jsonArr.toString());
-        return null;
-    }
-
-    @Override
-    protected void onPostExecute(Sight[] result) {
-        if (listener != null) {
-            if (mException == null) {
-                listener.onSuccess(result);
-            } else {
-                listener.onFailure(mException);
-            }
-        }
-    }
-
     private JSONArray getJsonArray(String command) throws JSONException, IOException {
         Log.d("server", command);
 
-        URL url = new URL(server);
+        byte[] data;
+
+        URL url = new URL(SERVER_ADDR);
 
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36");
@@ -144,14 +109,13 @@ public class ClientServer extends AsyncTask<String, Void, Sight[]> {
         data = command.getBytes("UTF-8");
         Log.d(TAG_JSON, "отпралвяю " + command);
         os.write(data);
-        data = null;
 
         conn.connect();
 
         int code = conn.getResponseCode();
         Log.d("server", "код = " + code);
 
-        is = conn.getInputStream();
+        InputStream is = conn.getInputStream();
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -218,15 +182,4 @@ public class ClientServer extends AsyncTask<String, Void, Sight[]> {
 
         return resultArr;
     }
-
-    public void setOnResponseListener(OnResponseListener<Sight> listener) {
-        this.listener = listener;
-    }
-
-    public interface OnResponseListener<T> {
-        void onSuccess(T[] result);
-
-        void onFailure(Exception e);
-    }
-
 }

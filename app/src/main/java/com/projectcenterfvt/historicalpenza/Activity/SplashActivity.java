@@ -27,6 +27,7 @@ import com.google.android.gms.tasks.Task;
 import com.projectcenterfvt.historicalpenza.DataBases.DB_Position;
 import com.projectcenterfvt.historicalpenza.DataBases.Sight;
 import com.projectcenterfvt.historicalpenza.R;
+import com.projectcenterfvt.historicalpenza.Server.BaseAsyncTask;
 import com.projectcenterfvt.historicalpenza.Server.ClientServer;
 import com.projectcenterfvt.historicalpenza.Server.LoginServer;
 
@@ -145,7 +146,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
  * метод отправляет данные на сервер*/
     private void sendToBackEnd(String idToken) {
         LoginServer ls = new LoginServer();
-        ls.setOnResponseListener(new LoginServer.OnResponseListener() {
+        ls.setOnResponseListener(new BaseAsyncTask.OnResponseListener<String>() {
             @Override
             public void onSuccess(String result) {
 
@@ -231,7 +232,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
 
     private void idToServer(final String mIdTokrn) {
         ClientServer call = new ClientServer();
-        call.setOnResponseListener(new ClientServer.OnResponseListener<Sight>() {
+        call.setOnResponseListener(new BaseAsyncTask.OnResponseListener<Sight[]>() {
             /**
              * Метод вызывается при успешном ответе от сервера
              */
