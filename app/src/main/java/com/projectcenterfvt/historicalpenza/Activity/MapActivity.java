@@ -557,6 +557,7 @@ public class MapActivity extends AppCompatActivity
     protected void onDestroy() {
         super.onDestroy();
         unregisterManagers();
+        unbindService(sConn);
     }
 
     private void unregisterManagers() {
