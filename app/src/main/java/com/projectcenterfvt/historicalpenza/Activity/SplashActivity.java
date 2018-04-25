@@ -164,7 +164,8 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
 
             @Override
             public void onFailure(Exception e) {
-
+                Toast.makeText(SplashActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
             }
         });
         ls.getLogin(idToken);
