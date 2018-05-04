@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -23,6 +24,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.projectcenterfvt.historicalpenza.DataBases.DB_Position;
 import com.projectcenterfvt.historicalpenza.DataBases.Sight;
@@ -155,9 +157,10 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
                 editor.putString(APP_PREFERENCES_TOKEN, result);
                 editor.putBoolean(KEY_IS_FIRST_TIME, false);
                 editor.apply();
+
                 idToServer(result);
                 Intent intent = new Intent(getApplicationContext(), GreetingActivity.class);
-                SplashActivity.this.startActivity(intent);
+                 SplashActivity.this.startActivity(intent);
                 SplashActivity.this.finish();
 
             }
@@ -178,6 +181,24 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
      * Иначе проресовываем кнопку google sign  и удаляем текст "Историческая Пенза"
      */
 
+    private void signOut() {
+        mGoogleSignInClient.signOut()
+                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        // ...
+                    }
+                });
+    }
+    private void revokeAccess() {
+        mGoogleSignInClient.revokeAccess()
+                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        // ...
+                    }
+                });
+    }
     public void nextPage() {
 
         if (!isFirstTime()) {
@@ -192,6 +213,8 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 public void run() {
+                    signOut();
+
                     textViewHistoric.startAnimation(mAnimationFadeOut);
                     textViewPenza.startAnimation(mAnimationFadeOut);
                     textViewHistoric.setVisibility(View.INVISIBLE);

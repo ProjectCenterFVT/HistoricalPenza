@@ -49,6 +49,7 @@ import com.projectcenterfvt.historicalpenza.DataBases.Sight;
 import com.projectcenterfvt.historicalpenza.Dialogs.AboutDialog;
 import com.projectcenterfvt.historicalpenza.Dialogs.CardDialog;
 import com.projectcenterfvt.historicalpenza.Dialogs.HomestadeDialog;
+import com.projectcenterfvt.historicalpenza.Dialogs.LogoutDialog;
 import com.projectcenterfvt.historicalpenza.Dialogs.PageDialog;
 import com.projectcenterfvt.historicalpenza.Managers.CameraManager;
 import com.projectcenterfvt.historicalpenza.Managers.ListManager;
@@ -361,6 +362,11 @@ public class MapActivity extends AppCompatActivity
             FragmentManager fragmentManager = getSupportFragmentManager();
             HomestadeDialog dialog = new HomestadeDialog();
             dialog.show(fragmentManager, "dialog");
+        } else if (id == R.id.name_logout) {
+            Log.d("click","Нажал на выйти из аккаунта");
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            LogoutDialog logoutDialog = new LogoutDialog();
+            logoutDialog.show(fragmentManager, "dialog");
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);

@@ -10,6 +10,11 @@
         <item
             android:id="@+id/name_help"
             android:title="@string/name_help" />
+        <item
+            android:id="@+id/name_logout"
+            android:title="@string/name_logout"
+            />
+
     </group>
     <group android:id="@+id/grp2" android:checkableBehavior="single">
         <item
