@@ -114,7 +114,6 @@ public class DB_Position extends SQLiteOpenHelper {
         final int id_x1 = cursor.getColumnIndex(COLUMN_X1);
         final int id_x2 = cursor.getColumnIndex(COLUMN_X2);
         final int id_flag = cursor.getColumnIndex(COLUMN_type);
-        int fg = cursor.getInt(id_flag);
         double latitude = cursor.getDouble(id_x1);
         double longtitude = cursor.getDouble(id_x2);
         sight.setLatitude(latitude);

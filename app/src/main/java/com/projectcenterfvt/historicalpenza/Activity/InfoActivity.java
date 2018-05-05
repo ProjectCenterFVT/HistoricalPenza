@@ -9,7 +9,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -68,14 +67,6 @@ public class InfoActivity extends AppCompatActivity {
     }
 
     /**Обработчик нажатия кнопки камеры */
-
-    public void onCameraClick(View view) {
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_CAMERA_BUTTON);
-        intent.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_DOWN,
-                KeyEvent.KEYCODE_CAMERA));
-        sendOrderedBroadcast(intent, null);
-    }
 
     public void homestadeClick(View view) {
         FragmentManager fragmentManager = getSupportFragmentManager();

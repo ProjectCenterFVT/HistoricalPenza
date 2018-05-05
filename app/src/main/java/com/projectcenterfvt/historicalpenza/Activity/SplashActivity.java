@@ -1,13 +1,17 @@
 package com.projectcenterfvt.historicalpenza.Activity;
 
+import android.Manifest;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Parcelable;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -26,6 +30,7 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.projectcenterfvt.historicalpenza.BuildConfig;
 import com.projectcenterfvt.historicalpenza.DataBases.DB_Position;
 import com.projectcenterfvt.historicalpenza.DataBases.Sight;
 import com.projectcenterfvt.historicalpenza.R;
@@ -100,6 +105,15 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, signInOptions);
 
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                    34);
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    35);
+        }
+
         db = new DB_Position(this);
         nextPage();
 
@@ -122,11 +136,28 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
-    /**
-     * Метод отвечает за проверку первого запуска приложения
-     *
-     * @return булевое значение
-     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == 34 | requestCode == 35) {
+            if (grantResults.length <= 0) {
+                // If user interaction was interrupted, the permission request is cancelled and you
+                // receive empty arrays.
+            } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted.
+                //getLastLocation();
+            } else {
+                Intent intent = new Intent();
+                intent.setAction(
+                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                Uri uri = Uri.fromParts("package",
+                        BuildConfig.APPLICATION_ID, null);
+                intent.setData(uri);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
+        }
+    }
+
     public boolean isFirstTime() {
         return mAccount.getBoolean(KEY_IS_FIRST_TIME, true);
 
