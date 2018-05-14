@@ -1,7 +1,5 @@
 package com.projectcenterfvt.historicalpenza.Server;
 
-import android.content.Context;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -16,33 +14,32 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 /**
- * Created by MaksimS on 23.03.2018.
+ * Created by Dmitry on 01.04.2018.
  */
 
-public class LoginServer extends BaseAsyncTask<String,String>{
+public class SetPlacesServer extends BaseAsyncTask<String, Void> {
 
-    InputStream is = null;
-    private int IdAccount;
-    private Context context;
+    private int id;
+    private static final String TAG_JSON = "JSON_SERVER";
 
-    public LoginServer() {
-    }
-
-    public void getLogin(String token){
-
-        this.execute("{\"type\":\"login\",\n" +
-                "\"token\":\""+token+"\"}");
-
+    public void setPlaces(int id, String mToken) {
+        this.id = id;
+        JSONObject JSONToServer = new JSONObject();
+        try {
+            JSONToServer.put("type", "setPlaces");
+            JSONToServer.put("enc_id", mToken);
+            JSONToServer.put("id", "" + id);
+            this.execute(JSONToServer.toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
-    protected String doInBackground(String... from) {
+    protected Void doInBackground(String... from) {
         try {
-            JSONArray jsonArr = getJsonArray(from[0]);
-
-            return parseGetLogin(jsonArr);
-
-
+            boolean isSuccess = setPlace(from[0]);
+            if (!isSuccess) { throw new Exception("Сервер не обработал запрос правильно"); }
         } catch (Exception e) {
             e.printStackTrace();
             mException = e;
@@ -51,7 +48,7 @@ public class LoginServer extends BaseAsyncTask<String,String>{
         return null;
     }
 
-    private JSONArray getJsonArray(String command) throws JSONException, IOException {
+    private boolean setPlace(String command) throws JSONException, IOException {
         Log.d("server", command);
 
         byte[] data;
@@ -66,15 +63,16 @@ public class LoginServer extends BaseAsyncTask<String,String>{
 
         OutputStream os = conn.getOutputStream();
         data = command.getBytes("UTF-8");
-        Log.d("server", "отпралвяю " + command);
+        Log.d(TAG_JSON, "отпралвяю " + command);
         os.write(data);
+        data = null;
 
         conn.connect();
 
         int code = conn.getResponseCode();
         Log.d("server", "код = " + code);
 
-        is = conn.getInputStream();
+        InputStream is = conn.getInputStream();
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -87,18 +85,6 @@ public class LoginServer extends BaseAsyncTask<String,String>{
         String resultString = new String(data, "UTF-8");
         Log.d("server", "result = " + resultString);
 
-        JSONObject jsonResult = new JSONObject(resultString);
-
-        return jsonResult.getJSONArray("result");
-    }
-
-    private String parseGetLogin(JSONArray jsonArr) throws JSONException {
-
-        JSONObject item = jsonArr.getJSONObject(0);
-
-        String id = item.getString("enc_id");
-
-        return id;
+        return Boolean.parseBoolean(resultString);
     }
 }
-

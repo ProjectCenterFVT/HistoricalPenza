@@ -1,7 +1,5 @@
 package com.projectcenterfvt.historicalpenza.Server;
 
-import android.content.Context;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import com.projectcenterfvt.historicalpenza.DataBases.Sight;
@@ -25,22 +23,13 @@ import java.net.URL;
  */
 
 
-public class ClientServer extends AsyncTask<String, Void, Sight[]> {
+public class ClientServer extends BaseAsyncTask<String, Sight[]> {
 
-    OnResponseListener<Sight> listener;
-    byte[] data = null;
-    InputStream is = null;
     private int id;
-    private int IdAccaunt;
-    private Exception mException;
-    private Context context;
-    private String server = "http://d95344yu.beget.tech/api/api.request.php";
-    private String mToken;
     private String ver = "0.0.0";
     private String TAG_JSON = "JSON_SERVER";
 
-    public ClientServer(Context context) {
-        this.context = context;
+    public ClientServer() {
     }
 
     public void getInfo(int id) {
@@ -67,7 +56,6 @@ public class ClientServer extends AsyncTask<String, Void, Sight[]> {
     }
 
     public void getCoordinates(String mToken) {
-        this.mToken = mToken;
         JSONObject JSONToServer = new JSONObject();
         try {
             JSONToServer.put("type", "getCoordinates");
@@ -104,21 +92,12 @@ public class ClientServer extends AsyncTask<String, Void, Sight[]> {
         return null;
     }
 
-    @Override
-    protected void onPostExecute(Sight[] result) {
-        if (listener != null) {
-            if (mException == null) {
-                listener.onSuccess(result);
-            } else {
-                listener.onFailure(mException);
-            }
-        }
-    }
-
     private JSONArray getJsonArray(String command) throws JSONException, IOException {
         Log.d("server", command);
 
-        URL url = new URL(server);
+        byte[] data;
+
+        URL url = new URL(SERVER_ADDR);
 
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36");
@@ -130,14 +109,13 @@ public class ClientServer extends AsyncTask<String, Void, Sight[]> {
         data = command.getBytes("UTF-8");
         Log.d(TAG_JSON, "отпралвяю " + command);
         os.write(data);
-        data = null;
 
         conn.connect();
 
         int code = conn.getResponseCode();
         Log.d("server", "код = " + code);
 
-        is = conn.getInputStream();
+        InputStream is = conn.getInputStream();
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -204,15 +182,4 @@ public class ClientServer extends AsyncTask<String, Void, Sight[]> {
 
         return resultArr;
     }
-
-    public void setOnResponseListener(OnResponseListener<Sight> listener) {
-        this.listener = listener;
-    }
-
-    public interface OnResponseListener<T> {
-        void onSuccess(T[] result);
-
-        void onFailure(Exception e);
-    }
-
 }

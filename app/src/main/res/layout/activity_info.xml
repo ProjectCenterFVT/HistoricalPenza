@@ -77,15 +77,6 @@
             </android.support.constraint.ConstraintLayout>
 
             <Button
-                android:id="@+id/btnPhoto"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_gravity="left|bottom"
-                android:layout_margin="12dip"
-                android:background="@drawable/icon_camera"
-                android:onClick="onCameraClick" />
-
-            <Button
                 android:id="@+id/homestadeButton"
                 android:layout_width="48dp"
                 android:layout_height="48dp"

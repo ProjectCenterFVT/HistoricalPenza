@@ -38,13 +38,19 @@
         <activity
             android:name=".Activity.GreetingActivity"
             android:noHistory="true"
-            android:theme="@style/AppFullScreenTheme">
-        </activity>
-        <activity android:name=".Activity.InfoActivity">
-        </activity>
+            android:theme="@style/AppFullScreenTheme" />
+        <activity
+            android:name=".Activity.InfoActivity"
+            android:parentActivityName=".Activity.MapActivity" />
 
-        <meta-data android:name="net.hockeyapp.android.appIdentifier" android:value="${HOCKEYAPP_APP_ID}" />
+        <meta-data
+            android:name="net.hockeyapp.android.appIdentifier"
+            android:value="${HOCKEYAPP_APP_ID}" />
 
+        <service
+            android:name=".Service.LocationService"
+            android:enabled="true"
+            android:exported="true" />
     </application>
 
 </manifest>

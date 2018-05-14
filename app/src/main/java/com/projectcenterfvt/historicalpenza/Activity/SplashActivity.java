@@ -1,12 +1,17 @@
 package com.projectcenterfvt.historicalpenza.Activity;
 
+import android.Manifest;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -23,10 +28,13 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.projectcenterfvt.historicalpenza.BuildConfig;
 import com.projectcenterfvt.historicalpenza.DataBases.DB_Position;
 import com.projectcenterfvt.historicalpenza.DataBases.Sight;
 import com.projectcenterfvt.historicalpenza.R;
+import com.projectcenterfvt.historicalpenza.Server.BaseAsyncTask;
 import com.projectcenterfvt.historicalpenza.Server.ClientServer;
 import com.projectcenterfvt.historicalpenza.Server.LoginServer;
 
@@ -44,21 +52,18 @@ import com.projectcenterfvt.historicalpenza.Server.LoginServer;
 public class SplashActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
 
     public static final String APP_PREFERENCES = "account";
+    public static final String APP_PREFERENCES_TOKEN = "token";
     /**
      * ID, по которому выводятся логи в Logcat
      */
     static final String TAG = "server";
-    static final String TAG_API = "API:";
-    static final String mName = "name";
-    static final String mEmail = "email";
-    static final String mIdTokrn = "idToken";
     /**
      * Ключ, по которому проверяется первый запуск приложения
      */
     static final String KEY_IS_FIRST_TIME = "first_time";
     private static final int REQ_CODE = 9002;
     private static DB_Position db;
-    private static String url = "http://d95344yu.beget.tech/api/api.request.php";
+    private static String url = "http://hpenza.creativityprojectcenter.ru/api.request.php";
     /**
      * Экземпляр класс базы данных
      */
@@ -69,7 +74,6 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
     private GoogleSignInClient mGoogleSignInClient;
     private SharedPreferences mAccount;
     private Animation mAnimationFadeOut;
-    private Context context;
     /**
      * Метод вызывается при создании или перезапуска активности <br>
      * (Временное решение) Удаляется старая бд и от сервера получаем новую <br>
@@ -82,13 +86,14 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
+        mAccount = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
         setContentView(R.layout.activity_splash);
-        context = this;
         textViewHistoric = findViewById(R.id.textViewHistorical);
         textViewPenza = findViewById(R.id.textView8);
         sign_in_button = findViewById(R.id.sign_in_button);
-        sign_in_button.setEnabled(false);ClientServer call = new ClientServer(this);
+        sign_in_button.setEnabled(false);
         sign_in_button.setOnClickListener(this);
         validateServerClientID();
         mAnimationFadeOut = AnimationUtils.loadAnimation(this, android.R.anim.fade_out);
@@ -99,6 +104,15 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
                 .build();
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, signInOptions);
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                    34);
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    35);
+        }
 
         db = new DB_Position(this);
         nextPage();
@@ -122,25 +136,39 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
-    /**
-     * Метод отвечает за проверку первого запуска приложения
-     *
-     * @return булевое значение
-     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == 34 | requestCode == 35) {
+            if (grantResults.length <= 0) {
+                // If user interaction was interrupted, the permission request is cancelled and you
+                // receive empty arrays.
+            } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted.
+                //getLastLocation();
+            } else {
+                Intent intent = new Intent();
+                intent.setAction(
+                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                Uri uri = Uri.fromParts("package",
+                        BuildConfig.APPLICATION_ID, null);
+                intent.setData(uri);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
+        }
+    }
+
     public boolean isFirstTime() {
-        return getPreferences(Context.MODE_PRIVATE).getBoolean(KEY_IS_FIRST_TIME, true);
+        return mAccount.getBoolean(KEY_IS_FIRST_TIME, true);
 
     }
 
     private void handleSignInResult(@NonNull Task<GoogleSignInAccount> completedTask) {
         try {
+
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
             String idToken = account.getIdToken();
-
             sendToBackEnd(idToken);
-
-
-
 
         } catch (ApiException e) {
             Log.w(TAG, "handleSignInResult:error", e);
@@ -151,24 +179,27 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
  * метод отправляет данные на сервер*/
     private void sendToBackEnd(String idToken) {
         LoginServer ls = new LoginServer();
-        ls.setOnResponseListener(new LoginServer.OnResponseListener() {
+        ls.setOnResponseListener(new BaseAsyncTask.OnResponseListener<String>() {
             @Override
             public void onSuccess(String result) {
+
                 Log.d("mToken", result);
-                mAccount =getPreferences(MODE_PRIVATE);
                 SharedPreferences.Editor editor = mAccount.edit();
-                editor.putString(APP_PREFERENCES,result);
+                editor.putString(APP_PREFERENCES_TOKEN, result);
+                editor.putBoolean(KEY_IS_FIRST_TIME, false);
                 editor.apply();
-                getPreferences(Context.MODE_PRIVATE).edit().putBoolean(KEY_IS_FIRST_TIME, false).apply();
+
                 idToServer(result);
                 Intent intent = new Intent(getApplicationContext(), GreetingActivity.class);
-                SplashActivity.this.startActivity(intent);
+                 SplashActivity.this.startActivity(intent);
                 SplashActivity.this.finish();
+
             }
 
             @Override
             public void onFailure(Exception e) {
-
+                Toast.makeText(SplashActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
             }
         });
         ls.getLogin(idToken);
@@ -180,9 +211,29 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
      * Если не 1-ый. то 3 сек. ждем и переход на MapActivity
      * Иначе проресовываем кнопку google sign  и удаляем текст "Историческая Пенза"
      */
+
+    private void signOut() {
+        mGoogleSignInClient.signOut()
+                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        // ...
+                    }
+                });
+    }
+    private void revokeAccess() {
+        mGoogleSignInClient.revokeAccess()
+                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        // ...
+                    }
+                });
+    }
     public void nextPage() {
+
         if (!isFirstTime()) {
-            idToServer(getPreferences(Context.MODE_PRIVATE).getString(APP_PREFERENCES, ""));
+            idToServer(mAccount.getString(APP_PREFERENCES_TOKEN, ""));
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 public void run() {
@@ -193,6 +244,8 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 public void run() {
+                    signOut();
+
                     textViewHistoric.startAnimation(mAnimationFadeOut);
                     textViewPenza.startAnimation(mAnimationFadeOut);
                     textViewHistoric.setVisibility(View.INVISIBLE);
@@ -202,6 +255,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
                 }
             }, 2000);
         }
+
     }
 
 
@@ -213,6 +267,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQ_CODE) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
@@ -230,9 +285,9 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
-    private void idToServer(String mIdTokrn) {
-        ClientServer call = new ClientServer(context);
-        call.setOnResponseListener(new ClientServer.OnResponseListener<Sight>() {
+    private void idToServer(final String mIdTokrn) {
+        ClientServer call = new ClientServer();
+        call.setOnResponseListener(new BaseAsyncTask.OnResponseListener<Sight[]>() {
             /**
              * Метод вызывается при успешном ответе от сервера
              */
@@ -271,20 +326,26 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
              */
             @Override
             public void onFailure(Exception e) {
+
                 Toast.makeText(SplashActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                 e.printStackTrace();
                 Intent intent;
-                if (isFirstTime()) {
-                    getPreferences(Context.MODE_PRIVATE).edit().putBoolean(KEY_IS_FIRST_TIME, false).apply();
 
+                if (isFirstTime()) {
+
+                    mAccount.edit().putBoolean(KEY_IS_FIRST_TIME, false).apply();
                     intent = new Intent(SplashActivity.this, GreetingActivity.class);
+
                 } else {
+
                     intent = new Intent(SplashActivity.this, MapActivity.class);
 
                     SplashActivity.this.startActivity(intent);
                     SplashActivity.this.finish();
+
                 }
             }
+
         });
         call.getCoordinates(mIdTokrn);
     }

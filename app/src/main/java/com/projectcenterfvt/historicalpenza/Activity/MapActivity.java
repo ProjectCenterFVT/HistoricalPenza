@@ -1,19 +1,24 @@
 package com.projectcenterfvt.historicalpenza.Activity;
 
+import android.annotation.SuppressLint;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -45,13 +50,16 @@ import com.projectcenterfvt.historicalpenza.DataBases.Sight;
 import com.projectcenterfvt.historicalpenza.Dialogs.AboutDialog;
 import com.projectcenterfvt.historicalpenza.Dialogs.CardDialog;
 import com.projectcenterfvt.historicalpenza.Dialogs.HomestadeDialog;
+import com.projectcenterfvt.historicalpenza.Dialogs.LogoutDialog;
 import com.projectcenterfvt.historicalpenza.Dialogs.PageDialog;
 import com.projectcenterfvt.historicalpenza.Managers.CameraManager;
 import com.projectcenterfvt.historicalpenza.Managers.ListManager;
 import com.projectcenterfvt.historicalpenza.Managers.MarkerManager;
 import com.projectcenterfvt.historicalpenza.Managers.SearchManager;
 import com.projectcenterfvt.historicalpenza.R;
+import com.projectcenterfvt.historicalpenza.Server.BaseAsyncTask;
 import com.projectcenterfvt.historicalpenza.Server.ClientServer;
+import com.projectcenterfvt.historicalpenza.Service.LocationService;
 
 import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.UpdateManager;
@@ -73,10 +81,13 @@ import net.hockeyapp.android.UpdateManager;
 public class MapActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, GoogleMap.OnMarkerClickListener, CardDialog.onEventListener {
 
+    public static final String APP_PREFERENCES = "account";
+    public static final String APP_PREFERENCES_TOKEN = "token";
     /** Сохранение предыдушей позиции камеры после разворота приложения*/
     private static final String KEY_CAMERA_POSITION = "camera_position";
     /**Сохранение предыдушей позиции после разворота приложения */
     private static final String KEY_LOCATION = "location";
+    LocationService locationService;
     /** Карта*/
     private GoogleMap mMap;
     /** API*/
@@ -107,6 +118,8 @@ public class MapActivity extends AppCompatActivity
     private boolean check;
     private int CAMERA_KEY = 1;
     private String TAG_GEO = "Geoinformation";
+    private Intent serviceIntent;
+    private ServiceConnection sConn;
 
     private LocationListener locationListener = new LocationListener() {
 
@@ -121,18 +134,22 @@ public class MapActivity extends AppCompatActivity
 
         @Override
         public void onProviderEnabled(String s) {
-            locationManager.updateLocationUI(true, btn_pos);
-            markerManager.showMyMarker();
-            Log.d(TAG_GEO, "status : " + s);
+            if (Build.VERSION.SDK_INT < 23) {
+                locationManager.updateLocationUI(true, btn_pos);
+                markerManager.showMyMarker();
+                Log.d(TAG_GEO, "status : " + s);
+            }
         }
 
         @Override
         public void onProviderDisabled(String s) {
-            if (markerManager != null) {
-                markerManager.inviseMyMarker();
+            if (Build.VERSION.SDK_INT < 23) {
+                if (markerManager != null) {
+                    markerManager.inviseMyMarker();
+                }
+                locationManager.updateLocationUI(false, btn_pos);
+                Log.d(TAG_GEO, "status : " + s);
             }
-            locationManager.updateLocationUI(false, btn_pos);
-            Log.d(TAG_GEO, "status : " + s);
         }
     };
 
@@ -146,34 +163,23 @@ public class MapActivity extends AppCompatActivity
      * Отрисовка элементов и объявление нужных объектов
      * @param savedInstanceState Сохраненное состояние
      */
+    @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        serviceIntent = new Intent(MapActivity.this, LocationService.class);
         setContentView(R.layout.activity_map);
         database = new DB_Position(this);
         listManager = new ListManager();
         btn_pos = findViewById(R.id.btn_position);
         final LocationManager lM = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
 
         locationManager = new com.projectcenterfvt.historicalpenza.Managers.LocationManager(this, MapActivity.this);
-        if (!locationManager.checkPermissions()) {
-            locationManager.startLocationPermissionRequest();
-        } else {
-            Log.d("Location", "Настройки полученны");
-        }
         locationManager.setListManager(listManager);
+        locationManager.updateLocationUI(true, btn_pos);
 
         lM.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 4, locationListener);
+        lM.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 2000, 4, locationListener);
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this /* FragmentActivity */,
@@ -198,6 +204,29 @@ public class MapActivity extends AppCompatActivity
         checkForUpdates();
 
         check = savedInstanceState != null;
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        sConn = new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+                LocationService.LocalBinder binder = (LocationService.LocalBinder) iBinder;
+                locationService = binder.getService();
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName componentName) {
+
+            }
+        };
+        try {
+            bindService(serviceIntent, sConn, Context.BIND_AUTO_CREATE);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     private void checkForUpdates() {
@@ -253,8 +282,8 @@ public class MapActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.name_sight) {
-            ClientServer call = new ClientServer(this);
-            call.setOnResponseListener(new ClientServer.OnResponseListener<Sight>() {
+            ClientServer call = new ClientServer();
+            call.setOnResponseListener(new BaseAsyncTask.OnResponseListener<Sight[]>() {
                 @Override
                 public void onSuccess(Sight[] result) {
                     FragmentManager fragmentManager = getSupportFragmentManager();
@@ -325,6 +354,11 @@ public class MapActivity extends AppCompatActivity
             FragmentManager fragmentManager = getSupportFragmentManager();
             HomestadeDialog dialog = new HomestadeDialog();
             dialog.show(fragmentManager, "dialog");
+        } else if (id == R.id.name_logout) {
+            Log.d("click","Нажал на выйти из аккаунта");
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            LogoutDialog logoutDialog = new LogoutDialog();
+            logoutDialog.show(fragmentManager, "dialog");
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -354,9 +388,16 @@ public class MapActivity extends AppCompatActivity
         searchManager.setCameraManager(cameraManager);
         if (!check)
             cameraManager.setCameraPosition(mLastKnownLocation);
-        listManager.setList(database.fillArray(mMap, mLastKnownLocation));
+        listManager.setList(database.fillArray(mMap, mLastKnownLocation, markerManager));
         listManager.setDistance(mLastKnownLocation);
-
+        //serviceIntent.putParcelableArrayListExtra("list", listManager.getList());
+        SharedPreferences mAccount = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
+        String token = mAccount.getString(APP_PREFERENCES_TOKEN, " ");
+        serviceIntent.putExtra("token", token);
+        locationService.setContext(this);
+        locationService.setMarkerManager(markerManager);
+        locationService.setListManager(listManager);
+        startService(serviceIntent);
     }
 
     @Override
@@ -428,8 +469,8 @@ public class MapActivity extends AppCompatActivity
             builder.setView(view);
             final AlertDialog alert = builder.create();
 
-            ClientServer call = new ClientServer(this);
-            call.setOnResponseListener(new ClientServer.OnResponseListener<Sight>() {
+            ClientServer call = new ClientServer();
+            call.setOnResponseListener(new BaseAsyncTask.OnResponseListener<Sight[]>() {
                 @Override
                 public void onSuccess(final Sight[] result) {
                     info.setText(result[0].getTitle());
@@ -514,6 +555,7 @@ public class MapActivity extends AppCompatActivity
     protected void onDestroy() {
         super.onDestroy();
         unregisterManagers();
+        unbindService(sConn);
     }
 
     private void unregisterManagers() {
@@ -544,7 +586,7 @@ public class MapActivity extends AppCompatActivity
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == 34) {
+        if (requestCode == 34 | requestCode == 35) {
             if (grantResults.length <= 0) {
                 // If user interaction was interrupted, the permission request is cancelled and you
                 // receive empty arrays.
@@ -563,5 +605,6 @@ public class MapActivity extends AppCompatActivity
             }
         }
     }
+
 }
 

@@ -1,13 +1,10 @@
 package com.projectcenterfvt.historicalpenza.Managers;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.widget.Button;
 
@@ -85,6 +82,7 @@ public class LocationManager {
         startLocationUpdates();
     }
 
+    @SuppressLint("RestrictedApi")
     private void createLocationRequest() {
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(2000);
@@ -156,21 +154,6 @@ public class LocationManager {
             Log.d("pos", e.getMessage());
             Log.e("Exception: %s", e.getMessage());
         }
-    }
-
-    /**
-     * Проверка разрешения пользователя
-     */
-
-    public boolean checkPermissions() {
-        int permissionState = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION);
-        return permissionState == PackageManager.PERMISSION_GRANTED;
-    }
-
-    public void startLocationPermissionRequest() {
-        ActivityCompat.requestPermissions(activity,
-                new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
-                34);
     }
 
 }
