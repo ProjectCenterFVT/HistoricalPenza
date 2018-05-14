@@ -120,7 +120,7 @@ public class SearchManager {
 //
 //                        });
                 Log.d(LOG_SEARCH, "onSearchAction()");
-                Toast.makeText(myContext, "onSearchAction()", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(myContext, "onSearchAction()", Toast.LENGTH_SHORT).show();
             }
         });
 

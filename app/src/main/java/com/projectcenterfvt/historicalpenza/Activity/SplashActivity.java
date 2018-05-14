@@ -238,6 +238,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
             handler.postDelayed(new Runnable() {
                 public void run() {
                     startActivity(new Intent(getApplicationContext(), MapActivity.class));
+                    finish();
                 }
             }, 3000);
         } else {
@@ -339,7 +340,6 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
                 } else {
 
                     intent = new Intent(SplashActivity.this, MapActivity.class);
-
                     SplashActivity.this.startActivity(intent);
                     SplashActivity.this.finish();
 
