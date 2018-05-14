@@ -8,14 +8,13 @@ import android.app.Service;
 import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Binder;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -31,6 +30,7 @@ import com.projectcenterfvt.historicalpenza.Server.SetPlacesServer;
 
 public class LocationService extends Service implements LocationListener {
 
+    public static final String APP_PREFERENCES = "account";
     LocalBinder binder = new LocalBinder();
     private LocationManager locationManager;
     private ListManager listManager;
@@ -133,46 +133,50 @@ public class LocationService extends Service implements LocationListener {
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
         final TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
 
+        SharedPreferences preferences = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
+        final boolean checked = preferences.getBoolean("Pref", true);
         ClientServer call = new ClientServer();
         call.setOnResponseListener(new BaseAsyncTask.OnResponseListener<Sight[]>() {
             @Override
             public void onSuccess(final Sight[] result) {
-                Sight sight = result[0];
+                if (checked) {
+                    Sight sight = result[0];
 
-                resultIntent.putExtra("title", sight.getTitle());
-                resultIntent.putExtra("description", sight.getDescription());
-                resultIntent.putExtra("uml", sight.getImg());
-                if (sight.getType() == 1) {
-                    resultIntent.putExtra("button", true);
+                    resultIntent.putExtra("title", sight.getTitle());
+                    resultIntent.putExtra("description", sight.getDescription());
+                    resultIntent.putExtra("uml", sight.getImg());
+                    if (sight.getType() == 1) {
+                        resultIntent.putExtra("button", true);
+                    }
+
+                    // Adds the back stack
+                    stackBuilder.addParentStack(InfoActivity.class);
+                    // Adds the Intent to the top of the stack
+                    stackBuilder.addNextIntent(resultIntent);
+                    // Gets a PendingIntent containing the entire back stack
+                    PendingIntent resultPendingIntent =
+                            stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+
+                    builder.setContentIntent(resultPendingIntent)
+                            .setContentTitle("Историческая Пенза")
+                            .setContentText(sight.getTitle())
+                            .setChannelId("channelId")
+                            .setSmallIcon(R.drawable.logo_main);
+                    NotificationManager mNotificationManager =
+                            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    assert mNotificationManager != null;
+
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                        NotificationChannel notificationChannel =
+                                new NotificationChannel(
+                                        "channelId",
+                                        "channelName",
+                                        NotificationManager.IMPORTANCE_DEFAULT);
+                        mNotificationManager.createNotificationChannel(notificationChannel);
+                    }
+
+                    mNotificationManager.notify(sight.getId(), builder.build());
                 }
-
-                // Adds the back stack
-                stackBuilder.addParentStack(InfoActivity.class);
-                // Adds the Intent to the top of the stack
-                stackBuilder.addNextIntent(resultIntent);
-                // Gets a PendingIntent containing the entire back stack
-                PendingIntent resultPendingIntent =
-                        stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-
-                builder.setContentIntent(resultPendingIntent)
-                        .setContentTitle("Историческая Пенза")
-                        .setContentText(sight.getTitle())
-                        .setChannelId("channelId")
-                        .setSmallIcon(R.drawable.logo_main);
-                NotificationManager mNotificationManager =
-                        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                assert mNotificationManager != null;
-
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                    NotificationChannel notificationChannel =
-                            new NotificationChannel(
-                                    "channelId",
-                                    "channelName",
-                                    NotificationManager.IMPORTANCE_DEFAULT);
-                    mNotificationManager.createNotificationChannel(notificationChannel);
-                }
-
-                mNotificationManager.notify(sight.getId(), builder.build());
             }
 
             @Override

@@ -30,6 +30,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -204,7 +206,7 @@ public class MapActivity extends AppCompatActivity
         searchManager.setSearchView((FloatingSearchView) findViewById(R.id.floating_search_view));
         searchManager.setupSearch();
         checkForUpdates();
-
+        checkNotifications();
         check = savedInstanceState != null;
 
     }
@@ -611,6 +613,31 @@ public class MapActivity extends AppCompatActivity
                 startActivity(intent);
             }
         }
+    }
+
+    public void checkNotifications() {
+        Switch notifSwitch = findViewById(R.id.notifSwitch);
+        SharedPreferences preferences = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
+        final SharedPreferences.Editor editor = preferences.edit();
+        if (notifSwitch.isChecked()) {
+            editor.putBoolean("Pref", true);
+            editor.apply();
+        } else {
+            editor.putBoolean("Pref", false);
+            editor.apply();
+        }
+        notifSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                if (checked) {
+                    editor.putBoolean("Pref", true);
+                    editor.apply();
+                } else {
+                    editor.putBoolean("Pref", false);
+                    editor.apply();
+                }
+            }
+        });
     }
 
 }
