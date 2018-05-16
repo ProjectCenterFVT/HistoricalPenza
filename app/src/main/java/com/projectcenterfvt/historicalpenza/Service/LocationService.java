@@ -141,7 +141,6 @@ public class LocationService extends Service implements LocationListener {
             public void onSuccess(final Sight[] result) {
                 if (checked) {
                     Sight sight = result[0];
-
                     resultIntent.putExtra("title", sight.getTitle());
                     resultIntent.putExtra("description", sight.getDescription());
                     resultIntent.putExtra("uml", sight.getImg());
