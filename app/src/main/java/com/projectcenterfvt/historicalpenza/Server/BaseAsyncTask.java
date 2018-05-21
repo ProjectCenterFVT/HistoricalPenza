@@ -8,9 +8,10 @@ import android.os.AsyncTask;
 
 public abstract class BaseAsyncTask<P, R> extends AsyncTask<P, Void, R> {
 
+    public static final String UML_ADDR = "http://hpenza.creativityprojectcenter.ru/img/";
     protected static final String SERVER_ADDR = "http://hpenza.creativityprojectcenter.ru/api.request.php";
-    OnResponseListener listener;
     protected Exception mException;
+    OnResponseListener listener;
 
     @Override
     abstract protected R doInBackground(P... from);

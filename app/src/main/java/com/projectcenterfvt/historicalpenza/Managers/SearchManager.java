@@ -3,10 +3,12 @@ package com.projectcenterfvt.historicalpenza.Managers;
 import android.content.Context;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import com.arlib.floatingsearchview.FloatingSearchView;
 import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion;
+import com.google.android.gms.maps.model.Marker;
 import com.projectcenterfvt.historicalpenza.DataBases.DB_Position;
 import com.projectcenterfvt.historicalpenza.DataBases.DataHelper;
 import com.projectcenterfvt.historicalpenza.DataBases.Sight;
@@ -15,6 +17,7 @@ import com.projectcenterfvt.historicalpenza.Server.BaseAsyncTask;
 import com.projectcenterfvt.historicalpenza.Server.ClientServer;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -35,6 +38,7 @@ public class SearchManager {
     private DrawerLayout mDrawerLayout;
     private Context myContext;
     private DB_Position database;
+    private HashMap<Integer, Marker> stackMarkers = new HashMap<>();
 
     public SearchManager(Context myContext, DrawerLayout mDrawerLayout, DB_Position database) {
         this.myContext = myContext;
@@ -42,6 +46,10 @@ public class SearchManager {
         this.mDrawerLayout = mDrawerLayout;
         this.database = database;
 
+    }
+
+    public void setStackMarkers(HashMap<Integer, Marker> stackMarkers) {
+        this.stackMarkers = stackMarkers;
     }
 
     public void setupSearch() {
@@ -97,9 +105,35 @@ public class SearchManager {
 //                            }
 //
 //                        });
-                Log.d(LOG_SEARCH, "onSuggestionClicked()");
                 Sight sight = database.getCell(id);
                 cameraManager.setCameraPosition(sight.getLocation());
+                InputMethodManager imm = (InputMethodManager) myContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+                Log.d(LOG_SEARCH, "onSuggestionClicked()");
+//                Sight sight = database.getCell(id);
+//                cameraManager.setCameraPosition(sight.getLocation());
+//                Marker marker = placeSuggestion.getMarker();
+//                if (sight1.getFlag()) {
+//                    switch (sight1.getType()) {
+//                        case 0:
+//                            Bitmap bitmap = BitmapFactory.decodeResource(myContext.getResources(), myContext.getResources().
+//                                    getIdentifier("unlock", "drawable", myContext.getPackageName()));
+//                            bitmap = Bitmap.createScaledBitmap(bitmap, 104, 160, false);
+//                            marker.setIcon(BitmapDescriptorFactory.fromBitmap(bitmap));
+//                            break;
+//                        case 1:
+//                            Bitmap bitmapHomestead = BitmapFactory.decodeResource(myContext.getResources(), myContext.getResources().
+//                                    getIdentifier("homestead", "drawable", myContext.getPackageName()));
+//                            bitmap = Bitmap.createScaledBitmap(bitmapHomestead, 104, 160, false);
+//                            marker.setIcon(BitmapDescriptorFactory.fromBitmap(bitmap));
+//                            break;
+//                    }
+//                } else {
+//                    Bitmap bitmap = BitmapFactory.decodeResource(myContext.getResources(), myContext.getResources().
+//                            getIdentifier("lock", "drawable", myContext.getPackageName()));
+//                    bitmap = Bitmap.createScaledBitmap(bitmap, 104, 160, false);
+//                    marker.setIcon(BitmapDescriptorFactory.fromBitmap(bitmap));
+//                }
 
                 lastQuery = searchSuggestion.getBody();
                 searchView.setSearchBarTitle(lastQuery);
@@ -134,7 +168,7 @@ public class SearchManager {
                         ArrayList<PlaceSuggestion> placeSuggestionArrayList = new ArrayList<>();
                         for (Sight item :
                                 result) {
-                            placeSuggestionArrayList.add(new PlaceSuggestion(item.getId(), item.getTitle()));
+                            placeSuggestionArrayList.add(new PlaceSuggestion(item.getId(), item.getTitle(), stackMarkers.get(item.getId())));
                         }
 
                         DataHelper.setsPlaceSuggestions(placeSuggestionArrayList);

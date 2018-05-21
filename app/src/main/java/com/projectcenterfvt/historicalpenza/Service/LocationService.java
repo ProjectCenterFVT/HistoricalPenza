@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.media.RingtoneManager;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -160,7 +161,9 @@ public class LocationService extends Service implements LocationListener {
                             .setContentTitle("Историческая Пенза")
                             .setContentText(sight.getTitle())
                             .setChannelId("channelId")
-                            .setSmallIcon(R.drawable.logo_main);
+                            .setSmallIcon(R.drawable.logo_main)
+                            .setVibrate(new long[]{1000, 1000})
+                            .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
                     NotificationManager mNotificationManager =
                             (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                     assert mNotificationManager != null;
