@@ -62,7 +62,7 @@ public class LocationService extends Service implements LocationListener {
     public int onStartCommand(Intent intent, int flags, int startId) {
         locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 2000, 15, this);
         mToken = intent.getStringExtra("token");
-        return super.onStartCommand(intent, flags, startId);
+        return START_REDELIVER_INTENT;
     }
 
     @Override
