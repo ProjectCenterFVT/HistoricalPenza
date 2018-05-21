@@ -140,7 +140,6 @@ public class DB_Position extends SQLiteOpenHelper {
             final int id_x2 = cursor.getColumnIndex(COLUMN_X2);
             final int id_flag = cursor.getColumnIndex(COLUMN_flag);
             final int id_type = cursor.getColumnIndex(COLUMN_type);
-
             do {
                 Log.d("db ", "проверка");
                 int bol = cursor.getInt(id_flag);

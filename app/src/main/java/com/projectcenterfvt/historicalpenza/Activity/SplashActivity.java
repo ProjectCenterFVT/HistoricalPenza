@@ -63,14 +63,12 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
     static final String KEY_IS_FIRST_TIME = "first_time";
     private static final int REQ_CODE = 9002;
     private static DB_Position db;
-    private static String url = "http://hpenza.creativityprojectcenter.ru/api.request.php";
     /**
      * Экземпляр класс базы данных
      */
     private GoogleSignInOptions signInOptions;
     private SignInButton sign_in_button;
     private TextView textViewHistoric;
-    private TextView textViewPenza;
     private GoogleSignInClient mGoogleSignInClient;
     private SharedPreferences mAccount;
     private Animation mAnimationFadeOut;
@@ -91,7 +89,6 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         mAccount = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
         setContentView(R.layout.activity_splash);
         textViewHistoric = findViewById(R.id.textViewHistorical);
-        textViewPenza = findViewById(R.id.textView8);
         sign_in_button = findViewById(R.id.sign_in_button);
         sign_in_button.setEnabled(false);
         sign_in_button.setOnClickListener(this);
@@ -238,6 +235,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
             handler.postDelayed(new Runnable() {
                 public void run() {
                     startActivity(new Intent(getApplicationContext(), MapActivity.class));
+                    finish();
                 }
             }, 3000);
         } else {
@@ -245,13 +243,10 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
             handler.postDelayed(new Runnable() {
                 public void run() {
                     signOut();
-
-                    textViewHistoric.startAnimation(mAnimationFadeOut);
-                    textViewPenza.startAnimation(mAnimationFadeOut);
-                    textViewHistoric.setVisibility(View.INVISIBLE);
-                    textViewPenza.setVisibility(View.INVISIBLE);
+                    Animation anim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fadein_alpha);
                     sign_in_button.setEnabled(true);
                     sign_in_button.setVisibility(View.VISIBLE);
+                    sign_in_button.startAnimation(anim);
                 }
             }, 2000);
         }
@@ -339,7 +334,6 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
                 } else {
 
                     intent = new Intent(SplashActivity.this, MapActivity.class);
-
                     SplashActivity.this.startActivity(intent);
                     SplashActivity.this.finish();
 

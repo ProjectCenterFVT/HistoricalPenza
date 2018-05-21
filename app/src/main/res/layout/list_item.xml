@@ -18,19 +18,29 @@
             android:layout_width="207dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textSize="17dp"
-            android:gravity="fill"
             android:fontFamily="@font/sfuitext_light"
-            android:text="TextView" />
+            android:gravity="start"
+            android:text="TextView"
+            android:textSize="17dp" />
 
         <TextView
             android:id="@+id/card_distance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:gravity="center_horizontal"
-            android:textSize="17dp"
             android:fontFamily="@font/sfuitext_bold"
-            android:text="TextView" />
+            android:gravity="end"
+            android:text="TextView"
+            android:textSize="17dp" />
+
+        <TextView
+            android:id="@+id/card_metr"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="@font/sfuitext_bold"
+            android:gravity="center_vertical"
+            android:text=" м"
+            android:textSize="13dp" />
     </LinearLayout>
 </LinearLayout>
