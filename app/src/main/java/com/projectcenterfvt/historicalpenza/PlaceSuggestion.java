@@ -3,6 +3,7 @@ package com.projectcenterfvt.historicalpenza;
 import android.os.Parcel;
 
 import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion;
+import com.google.android.gms.maps.model.Marker;
 
 /**
  * Created by Dmitry on 22.12.2017.
@@ -24,16 +25,22 @@ public class PlaceSuggestion implements SearchSuggestion {
     private boolean isHistory = false;
     private String placeName;
     private int id;
+    private Marker marker;
 
-    public PlaceSuggestion(int id, String suggestion) {
+    public PlaceSuggestion(int id, String suggestion, Marker marker) {
         this.placeName = suggestion.toLowerCase();
         this.id = id;
+        this.marker = marker;
 
     }
 
     public PlaceSuggestion(Parcel source) {
         this.placeName = source.readString();
         this.isHistory = source.readInt() != 0;
+    }
+
+    public Marker getMarker() {
+        return marker;
     }
 
     public int getId() {

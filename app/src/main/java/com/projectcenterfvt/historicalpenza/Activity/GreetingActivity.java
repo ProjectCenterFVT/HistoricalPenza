@@ -35,14 +35,12 @@ public class GreetingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_greeting);
 
-
         pager = findViewById(R.id.pager);
         pagerAdapter = new MyFragmentPagerAdapter(getSupportFragmentManager());
         pager.setAdapter(pagerAdapter);
 
         TabLayout tabLayout = findViewById(R.id.tabDots);
         tabLayout.setupWithViewPager(pager, true);
-
     }
 
     /**
@@ -50,7 +48,12 @@ public class GreetingActivity extends AppCompatActivity {
      * @param view Кнопка
      */
     public void continueClick(View view) {
-        startActivity(new Intent(this, MapActivity.class));
+        int currentItem = pager.getCurrentItem();
+        if (currentItem != 2) {
+            pager.setCurrentItem(2);
+        } else {
+            startActivity(new Intent(this, MapActivity.class));
+        }
     }
 
 }

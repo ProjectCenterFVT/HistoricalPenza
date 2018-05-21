@@ -38,6 +38,8 @@ import com.projectcenterfvt.historicalpenza.Server.BaseAsyncTask;
 import com.projectcenterfvt.historicalpenza.Server.ClientServer;
 import com.projectcenterfvt.historicalpenza.Server.LoginServer;
 
+import static com.projectcenterfvt.historicalpenza.DataBases.DB_Position.DB_TABLE;
+
 
 /**
  * Активити
@@ -63,14 +65,12 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
     static final String KEY_IS_FIRST_TIME = "first_time";
     private static final int REQ_CODE = 9002;
     private static DB_Position db;
-    private static String url = "http://hpenza.creativityprojectcenter.ru/api.request.php";
     /**
      * Экземпляр класс базы данных
      */
     private GoogleSignInOptions signInOptions;
     private SignInButton sign_in_button;
     private TextView textViewHistoric;
-    private TextView textViewPenza;
     private GoogleSignInClient mGoogleSignInClient;
     private SharedPreferences mAccount;
     private Animation mAnimationFadeOut;
@@ -91,7 +91,6 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         mAccount = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
         setContentView(R.layout.activity_splash);
         textViewHistoric = findViewById(R.id.textViewHistorical);
-        textViewPenza = findViewById(R.id.textView8);
         sign_in_button = findViewById(R.id.sign_in_button);
         sign_in_button.setEnabled(false);
         sign_in_button.setOnClickListener(this);
@@ -238,6 +237,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
             handler.postDelayed(new Runnable() {
                 public void run() {
                     startActivity(new Intent(getApplicationContext(), MapActivity.class));
+                    finish();
                 }
             }, 3000);
         } else {
@@ -245,13 +245,10 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
             handler.postDelayed(new Runnable() {
                 public void run() {
                     signOut();
-
-                    textViewHistoric.startAnimation(mAnimationFadeOut);
-                    textViewPenza.startAnimation(mAnimationFadeOut);
-                    textViewHistoric.setVisibility(View.INVISIBLE);
-                    textViewPenza.setVisibility(View.INVISIBLE);
+                    Animation anim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fadein_alpha);
                     sign_in_button.setEnabled(true);
                     sign_in_button.setVisibility(View.VISIBLE);
+                    sign_in_button.startAnimation(anim);
                 }
             }, 2000);
         }
@@ -294,7 +291,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
             @Override
             public void onSuccess(Sight[] result) {
                 db.connectToWrite();
-                db.getDB().delete(DB_Position.DB_TABLE, null, null);
+                db.getDB().delete(DB_TABLE, null, null);
 
                 for (Sight aResult : result) {
                     ContentValues contentValues = new ContentValues();
@@ -314,7 +311,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
                     contentValues.put(DB_Position.COLUMN_type, aResult.getType());
                     Log.d(TAG, "вствавил  type = " + aResult.getType());
 
-                    db.getDB().insert(DB_Position.DB_TABLE, null, contentValues);
+                    db.getDB().insert(DB_TABLE, null, contentValues);
                 }
 
                 db.close();
@@ -339,7 +336,6 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
                 } else {
 
                     intent = new Intent(SplashActivity.this, MapActivity.class);
-
                     SplashActivity.this.startActivity(intent);
                     SplashActivity.this.finish();
 
@@ -348,6 +344,36 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
 
         });
         call.getCoordinates(mIdTokrn);
+        ClientServer call2 = new ClientServer();
+        call2.setOnResponseListener(new BaseAsyncTask.OnResponseListener<Sight[]>() {
+            @Override
+            public void onSuccess(Sight[] result) {
+                db.connectToWrite();
+
+                for (Sight aResult : result) {
+                    ContentValues contentValues = new ContentValues();
+
+                    contentValues.put(DB_Position.COLUMN_title, aResult.getTitle());
+                    Log.d(TAG, "вствавил  title = " + aResult.getTitle());
+
+                    contentValues.put(DB_Position.COLUMN_description, aResult.getDescription());
+                    Log.d(TAG, "вствавил  description = " + aResult.getDescription());
+
+                    contentValues.put(DB_Position.COLUMN_img, aResult.getImg());
+                    Log.d(TAG, "вствавил  img = " + "//");
+
+                    db.updateColumn(contentValues, aResult.getId());
+                }
+
+                db.close();
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+
+            }
+        });
+        call2.getAllInfo();
     }
 
 }

@@ -27,7 +27,7 @@ public class PointAdapter extends BaseAdapter {
     public PointAdapter(Context context, ArrayList<Sight> sights, int resource) {
         this.mResource = resource;
         this.sights = sights;
-        mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        mInflater = LayoutInflater.from(context);
         Log.d("adapter", "кол-во в списке " + sights.size());
     }
 
@@ -48,27 +48,30 @@ public class PointAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        return createViewFromResource(position, convertView, parent, mResource);
-    }
 
-    private View createViewFromResource(int position, View convertView, ViewGroup parent, int resource) {
-        View v;
+        ViewHolder viewHolder;
         if (convertView == null) {
-            v = mInflater.inflate(resource, parent, false);
+            convertView = mInflater.inflate(mResource, parent, false);
+            viewHolder = new ViewHolder(convertView);
+            convertView.setTag(viewHolder);
         } else {
-            v = convertView;
+            viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        bindView(position, v);
-
-        return v;
-    }
-
-    private void bindView(int position, View view) {
         Sight sight = (Sight) getItem(position);
-        TextView card_name = view.findViewById(R.id.card_name);
-        TextView card_dist = view.findViewById(R.id.card_distance);
-        card_name.setText(sight.getTitle());
-        card_dist.setText(sight.getDistance() + " м");
+        viewHolder.card_name.setText(sight.getTitle());
+        viewHolder.card_dist.setText(String.format("%d", sight.getDistance()));
+
+        return convertView;
     }
+
+    private class ViewHolder {
+        final TextView card_name, card_dist;
+
+        ViewHolder(View view) {
+            card_name = view.findViewById(R.id.card_name);
+            card_dist = view.findViewById(R.id.card_distance);
+        }
+    }
+
 }

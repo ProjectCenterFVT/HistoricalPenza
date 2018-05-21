@@ -37,6 +37,10 @@ public class MarkerManager {
         this.myContext = myContext;
     }
 
+    public HashMap<Integer, Marker> getStackMarkers() {
+        return stackMarkers;
+    }
+
     /**
      * Добавление маркера на карту(Маркер достоприм)
      *
