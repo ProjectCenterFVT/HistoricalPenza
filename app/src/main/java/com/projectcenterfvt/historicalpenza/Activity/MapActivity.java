@@ -64,6 +64,8 @@ import com.projectcenterfvt.historicalpenza.Service.LocationService;
 import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.UpdateManager;
 
+import static android.app.PendingIntent.getActivity;
+
 /**
  * Вся основная работа происходит в этом классе. Однако основные задачи распределены по классам менеджерам.
  * Класс отрисовывает карту и все её элементы, включая меню
@@ -312,6 +314,14 @@ public class MapActivity extends AppCompatActivity
             LayoutInflater inflater = this.getLayoutInflater();
             View view = inflater.inflate(R.layout.help_project_menu, null);
             view.setBackgroundResource(R.drawable.dialog_bgn);
+            view.findViewById(R.id.buttonSendEm).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                  Intent  intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:"));
+                    intent.putExtra(Intent.EXTRA_EMAIL, new String[]{"creativityprojectcenter@gmail.com"});
+                    startActivity(intent);
+                                  }
+            });
             builder.setView(view);
             final AlertDialog alert = builder.create();
             alert.getWindow().setBackgroundDrawable(new ColorDrawable(0));
