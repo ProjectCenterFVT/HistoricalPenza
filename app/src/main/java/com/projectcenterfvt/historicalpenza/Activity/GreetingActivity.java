@@ -48,7 +48,12 @@ public class GreetingActivity extends AppCompatActivity {
      * @param view Кнопка
      */
     public void continueClick(View view) {
-        startActivity(new Intent(this, MapActivity.class));
+        int currentItem = pager.getCurrentItem();
+        if (currentItem != 2) {
+            pager.setCurrentItem(2);
+        } else {
+            startActivity(new Intent(this, MapActivity.class));
+        }
     }
 
 }
