@@ -38,6 +38,8 @@ import com.projectcenterfvt.historicalpenza.Server.BaseAsyncTask;
 import com.projectcenterfvt.historicalpenza.Server.ClientServer;
 import com.projectcenterfvt.historicalpenza.Server.LoginServer;
 
+import static com.projectcenterfvt.historicalpenza.DataBases.DB_Position.DB_TABLE;
+
 
 /**
  * Активити
@@ -289,7 +291,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
             @Override
             public void onSuccess(Sight[] result) {
                 db.connectToWrite();
-                db.getDB().delete(DB_Position.DB_TABLE, null, null);
+                db.getDB().delete(DB_TABLE, null, null);
 
                 for (Sight aResult : result) {
                     ContentValues contentValues = new ContentValues();
@@ -309,7 +311,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
                     contentValues.put(DB_Position.COLUMN_type, aResult.getType());
                     Log.d(TAG, "вствавил  type = " + aResult.getType());
 
-                    db.getDB().insert(DB_Position.DB_TABLE, null, contentValues);
+                    db.getDB().insert(DB_TABLE, null, contentValues);
                 }
 
                 db.close();
@@ -342,6 +344,36 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
 
         });
         call.getCoordinates(mIdTokrn);
+        ClientServer call2 = new ClientServer();
+        call2.setOnResponseListener(new BaseAsyncTask.OnResponseListener<Sight[]>() {
+            @Override
+            public void onSuccess(Sight[] result) {
+                db.connectToWrite();
+
+                for (Sight aResult : result) {
+                    ContentValues contentValues = new ContentValues();
+
+                    contentValues.put(DB_Position.COLUMN_title, aResult.getTitle());
+                    Log.d(TAG, "вствавил  title = " + aResult.getTitle());
+
+                    contentValues.put(DB_Position.COLUMN_description, aResult.getDescription());
+                    Log.d(TAG, "вствавил  description = " + aResult.getDescription());
+
+                    contentValues.put(DB_Position.COLUMN_img, aResult.getImg());
+                    Log.d(TAG, "вствавил  img = " + "//");
+
+                    db.updateColumn(contentValues, aResult.getId());
+                }
+
+                db.close();
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+
+            }
+        });
+        call2.getAllInfo();
     }
 
 }

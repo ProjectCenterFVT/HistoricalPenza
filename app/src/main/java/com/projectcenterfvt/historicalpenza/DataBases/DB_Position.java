@@ -38,6 +38,12 @@ public class DB_Position extends SQLiteOpenHelper {
     public static final String COLUMN_flag = "flag";
 
     public static final String COLUMN_type = "type";
+
+    public static final String COLUMN_title = "title";
+
+    public static final String COLUMN_description = "description";
+
+    public static final String COLUMN_img = "img";
     /** Версия(Пока не используется, нужно получать от сервера и хранить в бд)*/
     private static final int DB_VERSION = 1;
     /** Имя файла*/
@@ -56,11 +62,14 @@ public class DB_Position extends SQLiteOpenHelper {
      */
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE coordinates (_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+        db.execSQL("CREATE TABLE coordinates (_id INTEGER PRIMARY KEY," +
                 " x1 REAL," +
                 " x2 REAL," +
                 " flag INTEGER," +
-                " type INTEGER);");
+                " type INTEGER," +
+                " title TEXT," +
+                " description TEXT," +
+                " img TEXT);");
     }
 
     /**
@@ -109,15 +118,27 @@ public class DB_Position extends SQLiteOpenHelper {
     public Sight getCell(int id) {
         Sight sight = new Sight();
         connectToRead();
-        Cursor cursor = db.query(DB_Position.DB_TABLE, new String[]{DB_Position.COLUMN_ID, DB_Position.COLUMN_X1, DB_Position.COLUMN_X2, DB_Position.COLUMN_flag}, null, null, null, null, null);
+        Cursor cursor = db.query(DB_Position.DB_TABLE, new String[]{DB_Position.COLUMN_ID, DB_Position.COLUMN_X1, DB_Position.COLUMN_X2,
+                DB_Position.COLUMN_flag, DB_Position.COLUMN_title, DB_Position.COLUMN_description, DB_Position.COLUMN_img}, null, null, null, null, null);
         cursor.move(id);
         final int id_x1 = cursor.getColumnIndex(COLUMN_X1);
         final int id_x2 = cursor.getColumnIndex(COLUMN_X2);
         final int id_flag = cursor.getColumnIndex(COLUMN_type);
+        final int id_title = cursor.getColumnIndex(COLUMN_title);
+        final int id_description = cursor.getColumnIndex(COLUMN_description);
+        final int id_img = cursor.getColumnIndex(COLUMN_img);
         double latitude = cursor.getDouble(id_x1);
         double longtitude = cursor.getDouble(id_x2);
+        boolean flag = cursor.getInt(id_flag) == 1;
+        String title = cursor.getString(id_title);
+        String description = cursor.getString(id_description);
+        String img = cursor.getString(id_img);
         sight.setLatitude(latitude);
         sight.setLongitude(longtitude);
+        sight.setFlag(flag);
+        sight.setTitle(title);
+        sight.setDescription(description);
+        sight.setImg(img);
         cursor.close();
         close();
         return sight;
@@ -131,15 +152,18 @@ public class DB_Position extends SQLiteOpenHelper {
      * @see com.projectcenterfvt.historicalpenza.Activity.MapActivity
      */
     public ArrayList<Sight> fillArray(GoogleMap map, Location mLastKnownLocation, MarkerManager markerManager) {
-        ArrayList<Sight> list = new ArrayList<>();
+        final ArrayList<Sight> list = new ArrayList<>();
         this.connectToRead();
-        Cursor cursor = this.db.query(DB_TABLE, new String[]{COLUMN_ID, COLUMN_X1, COLUMN_X2, COLUMN_flag, COLUMN_type}, null, null, null, null, null);
+        Cursor cursor = this.db.query(DB_TABLE, new String[]{COLUMN_ID, COLUMN_X1, COLUMN_X2, COLUMN_flag, COLUMN_type, COLUMN_title, COLUMN_description, COLUMN_img}, null, null, null, null, null);
         if (cursor.moveToFirst()) {
             final int id_id = cursor.getColumnIndex(COLUMN_ID);
             final int id_x1 = cursor.getColumnIndex(COLUMN_X1);
             final int id_x2 = cursor.getColumnIndex(COLUMN_X2);
             final int id_flag = cursor.getColumnIndex(COLUMN_flag);
             final int id_type = cursor.getColumnIndex(COLUMN_type);
+            final int id_title = cursor.getColumnIndex(COLUMN_title);
+            final int id_description = cursor.getColumnIndex(COLUMN_description);
+            final int id_img = cursor.getColumnIndex(COLUMN_img);
             do {
                 Log.d("db ", "проверка");
                 int bol = cursor.getInt(id_flag);
@@ -148,8 +172,14 @@ public class DB_Position extends SQLiteOpenHelper {
                 boolean isVisited = (bol == 1);
                 double x1 = cursor.getDouble(id_x1);
                 double x2 = cursor.getDouble(id_x2);
+                String title = cursor.getString(id_title);
+                String description = cursor.getString(id_description);
+                String img = cursor.getString(id_img);
                 LatLng position = new LatLng(x1, x2);
                 Sight sight = new Sight(id, x1, x2, isVisited, type);
+                sight.setTitle(title);
+                sight.setDescription(description);
+                sight.setImg(img);
                 if (mLastKnownLocation != null) {
                     sight.setDistance(calculateDistance(mLastKnownLocation, position));
                 } else {
@@ -190,5 +220,11 @@ public class DB_Position extends SQLiteOpenHelper {
         String args[] = {"" + sight.getId()};
         db.update(DB_TABLE, values, selection, args);
         this.close();
+    }
+
+    public void updateColumn(ContentValues values, int id) {
+        String selection = "_id = ?";
+        String args[] = {"" + id};
+        db.update(DB_TABLE, values, selection, args);
     }
 }
