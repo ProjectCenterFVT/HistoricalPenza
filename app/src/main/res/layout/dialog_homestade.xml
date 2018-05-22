@@ -19,6 +19,7 @@
         android:gravity="center"
         android:justificationMode="inter_word"
         android:paddingStart="9sp"
+        android:paddingHorizontal="40px"
         android:text="@string/HomestadeText"
         app:layout_constraintBottom_toTopOf="@+id/homestadeButtonWeb"
         app:layout_constraintEnd_toEndOf="parent"

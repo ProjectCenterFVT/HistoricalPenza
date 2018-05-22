@@ -154,9 +154,8 @@ public class ClientServer extends BaseAsyncTask<String, Sight[]> {
             int id = Integer.parseInt(item.getString("_id"));
             String title = item.getString("title");
             String description = item.getString("description");
-            String img = item.getString("img");
 
-            resultArr[i] = new Sight(id, title, description, img);
+            resultArr[i] = new Sight(id, title, description);
         }
 
         return resultArr;

@@ -69,6 +69,12 @@ public class Sight implements Parcelable {
         this.img = img;
     }
 
+    public Sight(int id, String title, String description) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+    }
+
     private Sight(Parcel in) {
         Log.d(LOG_TAG, "Конструктир читает данные");
         id = in.readInt();

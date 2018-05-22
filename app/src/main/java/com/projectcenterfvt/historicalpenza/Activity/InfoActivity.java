@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.projectcenterfvt.historicalpenza.CustomTextView.TextViewEx;
 import com.projectcenterfvt.historicalpenza.Dialogs.HomestadeDialog;
 import com.projectcenterfvt.historicalpenza.R;
+import com.projectcenterfvt.historicalpenza.Server.BaseAsyncTask;
 
 import java.io.InputStream;
 
@@ -56,12 +57,13 @@ public class InfoActivity extends AppCompatActivity {
         }
         tvTitle.setText(title);
 
-        new DownloadImage((ImageView) findViewById(R.id.ivPhoto)).execute("http://" + uml);
+        new DownloadImage((ImageView) findViewById(R.id.ivPhoto)).execute(uml);
         tvDescription.setText(description, true);
     }
 
-    /**Обработчик нажатия кнопки назад в телефоне */
-    public void onBackClick(View view) {
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
         setResult(RESULT_OK, null);
         finish();
     }
@@ -90,7 +92,8 @@ public class InfoActivity extends AppCompatActivity {
 
         @Override
         protected Bitmap doInBackground(String... urls) {
-            String urldisplay = urls[0];
+            String urldisplay = BaseAsyncTask.UML_ADDR + urls[0];
+            //String urldisplay = urls[0].replaceAll("api/" ,"");
             Bitmap mIcon11 = null;
             try {
                 InputStream in = new java.net.URL(urldisplay).openStream();
