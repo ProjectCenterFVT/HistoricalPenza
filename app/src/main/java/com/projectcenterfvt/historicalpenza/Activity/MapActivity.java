@@ -311,7 +311,7 @@ public class MapActivity extends AppCompatActivity
             final AlertDialog.Builder builder = new AlertDialog.Builder(this);
             LayoutInflater inflater = this.getLayoutInflater();
             View view = inflater.inflate(R.layout.help_project_menu, null);
-            view.setBackgroundResource(R.drawable.dialog_bgn);
+           // view.setBackgroundResource(R.drawable.dialog_bgn);
             builder.setView(view);
             final AlertDialog alert = builder.create();
             alert.getWindow().setBackgroundDrawable(new ColorDrawable(0));
@@ -327,7 +327,7 @@ public class MapActivity extends AppCompatActivity
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             LayoutInflater inflater = this.getLayoutInflater();
             View view = inflater.inflate(R.layout.settings_menu, null);
-            view.setBackgroundResource(R.drawable.dialog_bgn);
+            //view.setBackgroundResource(R.drawable.dialog_bgn);
             builder.setView(view);
             final AlertDialog alert = builder.create();
             alert.getWindow().setBackgroundDrawable(new ColorDrawable(0));

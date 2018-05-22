@@ -26,7 +26,7 @@ public class HomestadeDialog extends android.support.v4.app.DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.dialog_homestade, null);
-        v.setBackgroundResource(R.drawable.dialog_bgn);
+       // v.setBackgroundResource(R.drawable.dialog_bgn);
         v.findViewById(R.id.homestadeButtonWeb).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
