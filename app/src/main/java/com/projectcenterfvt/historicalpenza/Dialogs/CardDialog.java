@@ -55,7 +55,6 @@ public class CardDialog extends android.support.v4.app.DialogFragment {
     @Override
     public View onCreateView(final LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.infocard, null);
-        //v.setBackgroundResource(R.drawable.dialog_bgn);
         v.findViewById(R.id.btn_info_back).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
