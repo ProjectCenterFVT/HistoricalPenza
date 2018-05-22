@@ -39,7 +39,7 @@ public class AboutDialog extends android.support.v4.app.DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.about_menu, null);
-        v.setBackgroundResource(R.drawable.dialog_bgn);
+       // v.setBackgroundResource(R.drawable.dialog_bgn);
         v.findViewById(R.id.btnBackFifth).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

@@ -298,7 +298,6 @@ public class MapActivity extends AppCompatActivity
             final AlertDialog.Builder builder = new AlertDialog.Builder(this);
             LayoutInflater inflater = this.getLayoutInflater();
             View view = inflater.inflate(R.layout.help_project_menu, null);
-            view.setBackgroundResource(R.drawable.dialog_bgn);
             view.findViewById(R.id.buttonSendEm).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -322,7 +321,7 @@ public class MapActivity extends AppCompatActivity
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             LayoutInflater inflater = this.getLayoutInflater();
             View view = inflater.inflate(R.layout.settings_menu, null);
-            view.setBackgroundResource(R.drawable.dialog_bgn);
+            //view.setBackgroundResource(R.drawable.dialog_bgn);
             builder.setView(view);
             checkNotifications(view);
             final AlertDialog alert = builder.create();
