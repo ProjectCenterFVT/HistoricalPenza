@@ -6,16 +6,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.projectcenterfvt.historicalpenza.Activity.MapActivity;
 import com.projectcenterfvt.historicalpenza.Activity.SplashActivity;
 import com.projectcenterfvt.historicalpenza.R;
 
@@ -27,10 +23,10 @@ import static com.projectcenterfvt.historicalpenza.Activity.SplashActivity.APP_P
  */
 
 public class LogoutDialog  extends android.support.v4.app.DialogFragment {
-private Dialog dialog;
-    private SharedPreferences mAccount;
     public static final String APP_PREFERENCES_TOKEN = "token";
     static final String KEY_IS_FIRST_TIME = "first_time";
+    private Dialog dialog;
+    private SharedPreferences mAccount;
 
     @Nullable
     @Override
@@ -45,15 +41,15 @@ private Dialog dialog;
     }
     private void signOut() {
         SharedPreferences mAccount = getActivity().getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
-            String vakue = " ";
+        String value = " ";
         //SharedPreferences.Editor editor = getActivity().getPreferences(Context.MODE_PRIVATE).edit();
         SharedPreferences.Editor editor = mAccount.edit();
-        editor.putString(APP_PREFERENCES_TOKEN, vakue);
+        editor.putString(APP_PREFERENCES_TOKEN, value);
         editor.putBoolean(KEY_IS_FIRST_TIME, true);
         editor.apply();
 
 
-        dialog.hide();
+        dialog.dismiss();
         startActivity(new Intent(getActivity(), SplashActivity.class));
     }
 
@@ -66,7 +62,7 @@ private Dialog dialog;
         v.findViewById(R.id.btnBackForth).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                    dialog.hide();
+                dialog.dismiss();
             }
         });
         v.findViewById(R.id.button_log_out).setOnClickListener(new View.OnClickListener() {

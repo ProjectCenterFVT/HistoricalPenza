@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,9 +30,34 @@ import java.util.ArrayList;
 
 public class CardDialog extends android.support.v4.app.DialogFragment {
 
+    private final String DIALOG_TAG = "dialog_tag";
+    private final String KEY_ADAPTER = "adapter";
     onEventListener listener;
     private ArrayList<Sight> sights;
-    private ArrayList<String> listString = new ArrayList<>();
+    private View v;
+    private ListView listView;
+    private Parcelable state;
+    private Parcelable state2;
+    private PointAdapter adapter;
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelable(KEY_ADAPTER, adapter);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (savedInstanceState != null) {
+            adapter = savedInstanceState.getParcelable(KEY_ADAPTER);
+        }
+    }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -54,16 +80,17 @@ public class CardDialog extends android.support.v4.app.DialogFragment {
     @Nullable
     @Override
     public View onCreateView(final LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.infocard, null);
+        Log.d(DIALOG_TAG, "onCreateView");
+        v = inflater.inflate(R.layout.infocard, null);
         v.findViewById(R.id.btn_info_back).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 dismiss();
             }
         });
-        ListView listView = v.findViewById(R.id.info_list);
-        Log.d("adapter", "кол-во в списке " + sights.size());
-        PointAdapter adapter = new PointAdapter(getContext(), sights, R.layout.list_item);
+        listView = v.findViewById(R.id.info_list);
+        Log.d(DIALOG_TAG, "кол-во в списке " + sights.size());
+        adapter = new PointAdapter(getContext(), sights, R.layout.list_item);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
