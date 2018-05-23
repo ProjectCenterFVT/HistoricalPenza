@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 
+import com.projectcenterfvt.historicalpenza.CustomTextView.TextViewEx;
 import com.projectcenterfvt.historicalpenza.R;
 
 /**
@@ -26,6 +27,9 @@ public class HomestadeDialog extends android.support.v4.app.DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.dialog_homestade, null);
+        TextViewEx txtViewEx =     v.findViewById(R.id.tvHome);
+        String text  = getString(R.string.HomestadeText).toString();
+        txtViewEx.setText(text,true);
         v.findViewById(R.id.homestadeButtonWeb).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -33,6 +37,12 @@ public class HomestadeDialog extends android.support.v4.app.DialogFragment {
                 Intent openlinkIntent = new Intent(Intent.ACTION_VIEW, address);
                 dismiss();
                 startActivity(openlinkIntent);
+            }
+        });
+        v.findViewById(R.id.btnBackHome).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
             }
         });
         return v;
