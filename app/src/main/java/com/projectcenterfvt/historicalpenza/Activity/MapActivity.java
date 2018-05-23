@@ -69,8 +69,6 @@ import com.projectcenterfvt.historicalpenza.Service.LocationService;
 import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.UpdateManager;
 
-import static android.app.PendingIntent.getActivity;
-
 /**
  * Вся основная работа происходит в этом классе. Однако основные задачи распределены по классам менеджерам.
  * Класс отрисовывает карту и все её элементы, включая меню
@@ -86,7 +84,8 @@ import static android.app.PendingIntent.getActivity;
  */
 
 public class MapActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, GoogleMap.OnMarkerClickListener, CardDialog.onEventListener {
+        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks,
+        GoogleMap.OnMarkerClickListener, CardDialog.onEventListener {
 
     public static final String APP_PREFERENCES = "account";
     public static final String APP_PREFERENCES_TOKEN = "token";
@@ -288,72 +287,79 @@ public class MapActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
 
         int id = item.getItemId();
+        switch (id) {
+            case R.id.name_sight:
+                FragmentManager fragmentManager_sight = getSupportFragmentManager();
+                CardDialog cardDialog = new CardDialog();
+                cardDialog.setList(listManager.getList());
+                cardDialog.show(fragmentManager_sight, "dialog");
+                break;
+            case R.id.name_helpProject:
+                final AlertDialog.Builder builder_help = new AlertDialog.Builder(this);
+                LayoutInflater inflater_help = this.getLayoutInflater();
+                View view_help = inflater_help.inflate(R.layout.help_project_menu, null);
+                view_help.findViewById(R.id.buttonSendEm).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:"));
+                        intent.putExtra(Intent.EXTRA_EMAIL, new String[]{"creativityprojectcenter@gmail.com"});
+                        startActivity(intent);
+                    }
+                });
+                builder_help.setView(view_help);
+                final AlertDialog alert_help = builder_help.create();
+                alert_help.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+                view_help.findViewById(R.id.btnBackThird).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        alert_help.dismiss();
+                    }
+                });
+                alert_help.show();
+                break;
+            case R.id.name_settings:
+                Log.d("click ", "нажал на кнопку сетингс");
+                AlertDialog.Builder builder_settings = new AlertDialog.Builder(this);
+                LayoutInflater inflater_settings = this.getLayoutInflater();
+                View view_settings = inflater_settings.inflate(R.layout.settings_menu, null);
+                //view.setBackgroundResource(R.drawable.dialog_bgn);
+                builder_settings.setView(view_settings);
+                checkNotifications(view_settings);
+                final AlertDialog alert_settings = builder_settings.create();
+                alert_settings.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+                view_settings.findViewById(R.id.btnBackForth).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        alert_settings.dismiss();
+                    }
+                });
+                alert_settings.show();
+                break;
+            case R.id.name_help:
+                Log.d("click ", "нажал на кнопку хелп");
+                FragmentManager fragmentManager_hp = getSupportFragmentManager();
+                PageDialog dialog_hp = new PageDialog();
+                dialog_hp.show(fragmentManager_hp, "dialog");
+                break;
+            case R.id.name_about:
+                Log.d("click ", "нажал на кнопку абоут");
+                FragmentManager fragmentManager_about = getSupportFragmentManager();
+                AboutDialog dialog_about = new AboutDialog();
+                dialog_about.show(fragmentManager_about, "dialog");
+                break;
+            case R.id.name_homestade:
+                Log.d("click ", "нажал на кнопку усадеб");
+                FragmentManager fragmentManager_homestade = getSupportFragmentManager();
+                HomestadeDialog dialog_homestade = new HomestadeDialog();
+                dialog_homestade.show(fragmentManager_homestade, "dialog");
+                break;
+            case R.id.name_logout:
+                Log.d("click", "Нажал на выйти из аккаунта");
+                FragmentManager fragmentManager_logout = getSupportFragmentManager();
+                LogoutDialog logoutDialog = new LogoutDialog();
+                logoutDialog.show(fragmentManager_logout, "dialog");
 
-        if (id == R.id.name_sight) {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            CardDialog cardDialog = new CardDialog();
-            cardDialog.setList(listManager.getList());
-            cardDialog.show(fragmentManager, "dialog");
-        } else if (id == R.id.name_helpProject) {
-            final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            LayoutInflater inflater = this.getLayoutInflater();
-            View view = inflater.inflate(R.layout.help_project_menu, null);
-            view.findViewById(R.id.buttonSendEm).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                  Intent  intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:"));
-                    intent.putExtra(Intent.EXTRA_EMAIL, new String[]{"creativityprojectcenter@gmail.com"});
-                    startActivity(intent);
-                                  }
-            });
-            builder.setView(view);
-            final AlertDialog alert = builder.create();
-            alert.getWindow().setBackgroundDrawable(new ColorDrawable(0));
-            view.findViewById(R.id.btnBackThird).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    alert.dismiss();
-                }
-            });
-            alert.show();
-        } else if (id == R.id.name_settings) {
-            Log.d("click ", "нажал на кнопку сетингс");
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            LayoutInflater inflater = this.getLayoutInflater();
-            View view = inflater.inflate(R.layout.settings_menu, null);
-            //view.setBackgroundResource(R.drawable.dialog_bgn);
-            builder.setView(view);
-            checkNotifications(view);
-            final AlertDialog alert = builder.create();
-            alert.getWindow().setBackgroundDrawable(new ColorDrawable(0));
-            view.findViewById(R.id.btnBackForth).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    alert.dismiss();
-                }
-            });
-            alert.show();
-        } else if (id == R.id.name_help) {
-            Log.d("click ", "нажал на кнопку хелп");
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            PageDialog dialog = new PageDialog();
-            dialog.show(fragmentManager, "dialog");
-
-        } else if (id == R.id.name_about) {
-            Log.d("click ", "нажал на кнопку абоут");
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            AboutDialog dialog = new AboutDialog();
-            dialog.show(fragmentManager, "dialog");
-        } else if (id == R.id.name_homestade) {
-            Log.d("click ", "нажал на кнопку усадеб");
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            HomestadeDialog dialog = new HomestadeDialog();
-            dialog.show(fragmentManager, "dialog");
-        } else if (id == R.id.name_logout) {
-            Log.d("click","Нажал на выйти из аккаунта");
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            LogoutDialog logoutDialog = new LogoutDialog();
-            logoutDialog.show(fragmentManager, "dialog");
+                break;
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -550,7 +556,6 @@ public class MapActivity extends AppCompatActivity
     @Override
     protected void onPause() {
         super.onPause();
-        listManager.clearList();
         unregisterManagers();
     }
 

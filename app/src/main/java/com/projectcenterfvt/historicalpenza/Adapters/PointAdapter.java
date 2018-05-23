@@ -1,6 +1,8 @@
 package com.projectcenterfvt.historicalpenza.Adapters;
 
 import android.content.Context;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,18 +19,41 @@ import java.util.ArrayList;
  * Created by Roman on 15.12.2017.
  */
 
-public class PointAdapter extends BaseAdapter {
+public class PointAdapter extends BaseAdapter implements Parcelable {
 
-    ArrayList<Sight> sights;
+    public static final Creator<PointAdapter> CREATOR = new Creator<PointAdapter>() {
+        @Override
+        public PointAdapter createFromParcel(Parcel in) {
+            return new PointAdapter(in);
+        }
+
+        @Override
+        public PointAdapter[] newArray(int size) {
+            return new PointAdapter[size];
+        }
+    };
+    private ArrayList<Sight> sights;
     private LayoutInflater mInflater;
     private int mResource;
-
+    private ArrayList<String> strings;
 
     public PointAdapter(Context context, ArrayList<Sight> sights, int resource) {
         this.mResource = resource;
         this.sights = sights;
         mInflater = LayoutInflater.from(context);
+        strings = new ArrayList<>();
+        strings.add("Проверка");
         Log.d("adapter", "кол-во в списке " + sights.size());
+    }
+
+    protected PointAdapter(Parcel in) {
+        sights = in.createTypedArrayList(Sight.CREATOR);
+        mResource = in.readInt();
+    }
+
+    @Override
+    public PointAdapter clone() throws CloneNotSupportedException {
+        return (PointAdapter) super.clone();
     }
 
     @Override
@@ -65,6 +90,17 @@ public class PointAdapter extends BaseAdapter {
         return convertView;
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeTypedList(sights);
+        parcel.writeInt(mResource);
+    }
+
     private class ViewHolder {
         final TextView card_name, card_dist;
 
@@ -73,5 +109,6 @@ public class PointAdapter extends BaseAdapter {
             card_dist = view.findViewById(R.id.card_distance);
         }
     }
+
 
 }
