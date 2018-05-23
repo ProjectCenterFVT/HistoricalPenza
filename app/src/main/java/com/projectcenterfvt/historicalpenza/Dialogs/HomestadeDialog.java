@@ -27,8 +27,6 @@ public class HomestadeDialog extends android.support.v4.app.DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.dialog_homestade, null);
-       // v.setBackgroundResource(R.drawable.dialog_bgn);
-
         TextViewEx txtViewEx =     v.findViewById(R.id.tvHome);
         String text  = getString(R.string.HomestadeText).toString();
         txtViewEx.setText(text,true);
@@ -37,6 +35,7 @@ public class HomestadeDialog extends android.support.v4.app.DialogFragment {
             public void onClick(View view) {
                 Uri address = Uri.parse("https://vk.com/po_sledam_usadeb58");
                 Intent openlinkIntent = new Intent(Intent.ACTION_VIEW, address);
+                dismiss();
                 startActivity(openlinkIntent);
             }
         });

@@ -46,7 +46,7 @@ public class PageDialog extends DialogFragment {
         v.findViewById(R.id.btnBackSecond).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dialog.hide();
+                dialog.dismiss();
             }
         });
 
