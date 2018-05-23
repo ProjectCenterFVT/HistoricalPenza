@@ -123,7 +123,7 @@ public class DB_Position extends SQLiteOpenHelper {
         cursor.move(id);
         final int id_x1 = cursor.getColumnIndex(COLUMN_X1);
         final int id_x2 = cursor.getColumnIndex(COLUMN_X2);
-        final int id_flag = cursor.getColumnIndex(COLUMN_type);
+        final int id_flag = cursor.getColumnIndex(COLUMN_flag);
         final int id_title = cursor.getColumnIndex(COLUMN_title);
         final int id_description = cursor.getColumnIndex(COLUMN_description);
         final int id_img = cursor.getColumnIndex(COLUMN_img);
