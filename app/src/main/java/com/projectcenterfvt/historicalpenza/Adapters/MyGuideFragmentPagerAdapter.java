@@ -12,7 +12,7 @@ import com.projectcenterfvt.historicalpenza.Fragments.GuidePageFragment;
 
 public class MyGuideFragmentPagerAdapter extends FragmentPagerAdapter {
 
-    private static final int PAGE_COUNT = 3;
+    private static final int PAGE_COUNT = 4;
 
     public MyGuideFragmentPagerAdapter(FragmentManager fm) {
         super(fm);

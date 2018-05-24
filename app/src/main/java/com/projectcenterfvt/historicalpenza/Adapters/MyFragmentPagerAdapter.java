@@ -12,7 +12,7 @@ import com.projectcenterfvt.historicalpenza.Fragments.PageFragment;
 
 public class MyFragmentPagerAdapter extends FragmentPagerAdapter {
 
-    private static final int PAGE_COUNT = 3;
+    private static final int PAGE_COUNT = 4;
 
     public MyFragmentPagerAdapter(FragmentManager fm) {
         super(fm);
