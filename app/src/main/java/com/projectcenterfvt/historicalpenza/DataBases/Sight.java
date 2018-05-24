@@ -169,8 +169,9 @@ public class Sight implements Parcelable {
     }
 
     public void setCoordinates(String coordRaw) {
-        this.latitude = Double.parseDouble(coordRaw.substring(0, coordRaw.indexOf(",")));
-        this.longitude = Double.parseDouble(coordRaw.substring(coordRaw.indexOf(" ") + 1, coordRaw.length() - 1));
+        String[] coord = coordRaw.split(",");
+        this.latitude = Double.parseDouble(coord[0].trim());
+        this.longitude = Double.parseDouble(coord[1].trim());
     }
 
     @Override

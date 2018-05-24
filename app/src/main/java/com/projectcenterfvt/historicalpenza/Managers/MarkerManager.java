@@ -52,26 +52,26 @@ public class MarkerManager {
     public void addSightMarker(Boolean flag, int type, LatLng position, Sight sight) {
         MarkerOptions options = new MarkerOptions();
         options.position(position);
-        if (flag) {
-            switch (type) {
-                case 0:
-                    Bitmap bitmap = BitmapFactory.decodeResource(myContext.getResources(), myContext.getResources().
+        switch (type) {
+            case 0:
+                if (flag) {
+                    Bitmap bitmap_unlock = BitmapFactory.decodeResource(myContext.getResources(), myContext.getResources().
                             getIdentifier("unlock", "drawable", myContext.getPackageName()));
-                    bitmap = Bitmap.createScaledBitmap(bitmap, 74, 100, false);
-                    options.icon(BitmapDescriptorFactory.fromBitmap(bitmap));
-                    break;
-                case 1:
-                    Bitmap bitmapHomestead = BitmapFactory.decodeResource(myContext.getResources(), myContext.getResources().
-                            getIdentifier("homestead", "drawable", myContext.getPackageName()));
-                    bitmap = Bitmap.createScaledBitmap(bitmapHomestead, 74, 100, false);
-                    options.icon(BitmapDescriptorFactory.fromBitmap(bitmap));
-                    break;
-            }
-        } else {
-            Bitmap bitmap = BitmapFactory.decodeResource(myContext.getResources(), myContext.getResources().
-                    getIdentifier("lock", "drawable", myContext.getPackageName()));
-            bitmap = Bitmap.createScaledBitmap(bitmap, 62, 100, false);
-            options.icon(BitmapDescriptorFactory.fromBitmap(bitmap));
+                    bitmap_unlock = Bitmap.createScaledBitmap(bitmap_unlock, 74, 100, false);
+                    options.icon(BitmapDescriptorFactory.fromBitmap(bitmap_unlock));
+                } else {
+                    Bitmap bitmap_lock = BitmapFactory.decodeResource(myContext.getResources(), myContext.getResources().
+                            getIdentifier("lock", "drawable", myContext.getPackageName()));
+                    bitmap_lock = Bitmap.createScaledBitmap(bitmap_lock, 62, 100, false);
+                    options.icon(BitmapDescriptorFactory.fromBitmap(bitmap_lock));
+                }
+                break;
+            case 1:
+                Bitmap bitmapHomestead = BitmapFactory.decodeResource(myContext.getResources(), myContext.getResources().
+                        getIdentifier("homestead", "drawable", myContext.getPackageName()));
+                bitmapHomestead = Bitmap.createScaledBitmap(bitmapHomestead, 74, 100, false);
+                options.icon(BitmapDescriptorFactory.fromBitmap(bitmapHomestead));
+                break;
         }
         Marker marker = mMap.addMarker(options);
         sight.setType(type);
