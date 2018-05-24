@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
@@ -60,10 +59,9 @@ import com.projectcenterfvt.historicalpenza.Dialogs.PageDialog;
 import com.projectcenterfvt.historicalpenza.Managers.CameraManager;
 import com.projectcenterfvt.historicalpenza.Managers.ListManager;
 import com.projectcenterfvt.historicalpenza.Managers.MarkerManager;
+import com.projectcenterfvt.historicalpenza.Managers.PreferencesManager;
 import com.projectcenterfvt.historicalpenza.Managers.SearchManager;
 import com.projectcenterfvt.historicalpenza.R;
-import com.projectcenterfvt.historicalpenza.Server.BaseAsyncTask;
-import com.projectcenterfvt.historicalpenza.Server.ClientServer;
 import com.projectcenterfvt.historicalpenza.Service.LocationService;
 
 import net.hockeyapp.android.CrashManager;
@@ -87,8 +85,6 @@ public class MapActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks,
         GoogleMap.OnMarkerClickListener, CardDialog.onEventListener {
 
-    public static final String APP_PREFERENCES = "account";
-    public static final String APP_PREFERENCES_TOKEN = "token";
     /** Сохранение предыдушей позиции камеры после разворота приложения*/
     private static final String KEY_CAMERA_POSITION = "camera_position";
     /**Сохранение предыдушей позиции после разворота приложения */
@@ -118,6 +114,10 @@ public class MapActivity extends AppCompatActivity
     private ListManager listManager;
     /** Менеджер геопозиции*/
     private com.projectcenterfvt.historicalpenza.Managers.LocationManager locationManager;
+    /**
+     * Менеджер настроек
+     */
+    private PreferencesManager preferencesManager;
 
     /**
      * !!!! Не трогать и не прикосаться. Это тестирующий вариант обработки местоположения. ТРЕБУЕТСЯ В ДОРАБОТКЕ И ТЕСТИРОВАНИИ
@@ -180,6 +180,7 @@ public class MapActivity extends AppCompatActivity
         setContentView(R.layout.activity_map);
         database = new DB_Position(this);
         listManager = new ListManager();
+        preferencesManager = new PreferencesManager(getApplicationContext());
         btn_pos = findViewById(R.id.btn_position);
         final LocationManager lM = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
@@ -392,8 +393,7 @@ public class MapActivity extends AppCompatActivity
         listManager.setList(database.fillArray(mMap, mLastKnownLocation, markerManager));
         listManager.setDistance(mLastKnownLocation);
         searchManager.setStackMarkers(markerManager.getStackMarkers());
-        SharedPreferences mAccount = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
-        String token = mAccount.getString(APP_PREFERENCES_TOKEN, " ");
+        String token = preferencesManager.getToken();
         serviceIntent.putExtra("token", token);
         locationService.setContext(this);
         locationService.setMarkerManager(markerManager);
@@ -447,7 +447,6 @@ public class MapActivity extends AppCompatActivity
             if (marker.getTag() != null) {
                 isMarkerClick = true;
                 final Sight sight = (Sight) marker.getTag();
-                final int id = sight.getId();
 
                 final AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 final LayoutInflater inflater = this.getLayoutInflater();
@@ -471,69 +470,56 @@ public class MapActivity extends AppCompatActivity
                 });
                 final AlertDialog alert = builder.create();
 
-                ClientServer call = new ClientServer();
-                call.setOnResponseListener(new BaseAsyncTask.OnResponseListener<Sight[]>() {
-                    @Override
-                    public void onSuccess(final Sight[] result) {
-                        info.setText(result[0].getTitle());
-                        if (sight.getFlag()) {
-                            were.setText("Вы тут были");
-                            first.setText("Узнать больше");
+                info.setText(sight.getTitle());
+                if (sight.getFlag()) {
+                    were.setText("Вы тут были");
+                    first.setText("Узнать больше");
 
-                            if (mLastKnownLocation != null) {
-                                int dist = listManager.calculateDistance(mLastKnownLocation, marker.getPosition());
-                                distance.setText(dist + " м");
-                            }
-
-                            first.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    Intent intent = new Intent(context, InfoActivity.class);
-                                    intent.putExtra("title", result[0].getTitle());
-                                    intent.putExtra("description", result[0].getDescription());
-                                    intent.putExtra("uml", result[0].getImg());
-                                    if (sight.getType() == 1) {
-                                        intent.putExtra("button", true);
-                                    }
-                                    startActivityForResult(intent, CAMERA_KEY);
-                                    isMarkerClick = false;
-                                    alert.dismiss();
-                                }
-                            });
-
-                        } else {
-                            were.setText("Вы тут еще не были");
-                            first.setText("Хочу открыть");
-                            first.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    isMarkerClick = false;
-                                    Toast.makeText(MapActivity.this, "Доступно в следующий версиях", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                            if (mLastKnownLocation != null) {
-                                int dist = listManager.calculateDistance(mLastKnownLocation, marker.getPosition());
-                                distance.setText(dist + " м");
-                            }
-                        }
-                        alert.getWindow().setBackgroundDrawable(new ColorDrawable(0));
-                        second.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                isMarkerClick = false;
-                                alert.dismiss();
-                            }
-                        });
-                        alert.show();
+                    if (mLastKnownLocation != null) {
+                        int dist = listManager.calculateDistance(mLastKnownLocation, marker.getPosition());
+                        distance.setText(dist + " м");
                     }
 
+                    first.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Intent intent = new Intent(context, InfoActivity.class);
+                            intent.putExtra("title", sight.getTitle());
+                            intent.putExtra("description", sight.getDescription());
+                            intent.putExtra("uml", sight.getImg());
+                            if (sight.getType() == 1) {
+                                intent.putExtra("button", true);
+                            }
+                            startActivityForResult(intent, CAMERA_KEY);
+                            isMarkerClick = false;
+                            alert.dismiss();
+                        }
+                    });
+
+                } else {
+                    were.setText("Вы тут еще не были");
+                    first.setText("Хочу открыть");
+                    first.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            isMarkerClick = false;
+                            Toast.makeText(MapActivity.this, "Доступно в следующий версиях", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    if (mLastKnownLocation != null) {
+                        int dist = listManager.calculateDistance(mLastKnownLocation, marker.getPosition());
+                        distance.setText(dist + " м");
+                    }
+                }
+                alert.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+                second.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onFailure(Exception e) {
-                        Toast.makeText(MapActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    public void onClick(View view) {
                         isMarkerClick = false;
+                        alert.dismiss();
                     }
                 });
-                call.getInfo(id);
+                alert.show();
             }
         }
         return false;
@@ -617,32 +603,17 @@ public class MapActivity extends AppCompatActivity
     }
 
     public void checkNotifications(View view) {
-        final String s = "Pref";
         Switch notifSwitch = view.findViewById(R.id.notifSwitch);
-        SharedPreferences preferences = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
-        final SharedPreferences.Editor editor = preferences.edit();
-        if (preferences.getBoolean(s, true)) {
+        if (preferencesManager.getNotificationStatus()) {
             notifSwitch.setChecked(true);
         } else {
             notifSwitch.setChecked(false);
         }
-        if (notifSwitch.isChecked()) {
-            editor.putBoolean(s, true);
-            editor.apply();
-        } else {
-            editor.putBoolean(s, false);
-            editor.apply();
-        }
+        preferencesManager.setNotificationStatus(notifSwitch.isChecked());
         notifSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
-                if (checked) {
-                    editor.putBoolean(s, true);
-                    editor.apply();
-                } else {
-                    editor.putBoolean(s, false);
-                    editor.apply();
-                }
+                preferencesManager.setNotificationStatus(checked);
             }
         });
     }

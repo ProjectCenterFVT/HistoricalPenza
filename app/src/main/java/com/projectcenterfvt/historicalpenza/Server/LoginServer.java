@@ -1,8 +1,9 @@
 package com.projectcenterfvt.historicalpenza.Server;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.util.Log;
+
+import com.projectcenterfvt.historicalpenza.Managers.PreferencesManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,16 +23,22 @@ import java.net.URL;
 public class LoginServer extends BaseAsyncTask<String,String>{
 
     InputStream is = null;
-    private int IdAccount;
-    private Context context;
+    private PreferencesManager preferencesManager;
 
-    public LoginServer() {
+    public LoginServer(Context context) {
+        preferencesManager = new PreferencesManager(context);
     }
 
-    public void getLogin(String token){
+    public void getLogin() {
 
-        this.execute("{\"type\":\"login\",\n" +
-                "\"token\":\""+token+"\"}");
+        JSONObject JSONToServer = new JSONObject();
+        try {
+            JSONToServer.put("type", "login");
+            JSONToServer.put("token", preferencesManager.getToken());
+            this.execute(JSONToServer.toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
     }
 
