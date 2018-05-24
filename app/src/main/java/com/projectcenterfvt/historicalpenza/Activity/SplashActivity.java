@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -37,6 +38,8 @@ import com.projectcenterfvt.historicalpenza.R;
 import com.projectcenterfvt.historicalpenza.Server.BaseAsyncTask;
 import com.projectcenterfvt.historicalpenza.Server.ClientServer;
 import com.projectcenterfvt.historicalpenza.Server.LoginServer;
+
+import java.net.InetAddress;
 
 import static com.projectcenterfvt.historicalpenza.DataBases.DB_Position.DB_TABLE;
 
@@ -273,13 +276,19 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
+
     @Override
     public void onClick(View view) {
+
+
         switch (view.getId()) {
             case R.id.sign_in_button:
                 signIn();
                 break;
+
         }
+
+
     }
 
     private void idToServer(final String mIdTokrn) {
