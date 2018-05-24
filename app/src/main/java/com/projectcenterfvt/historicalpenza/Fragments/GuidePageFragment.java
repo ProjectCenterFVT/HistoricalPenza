@@ -24,6 +24,7 @@ public class GuidePageFragment extends Fragment {
             R.drawable.help_location,
             R.drawable.help_unlock,
             R.drawable.help_lock,
+            R.drawable.help_homestade,
     };
 
     public static GuidePageFragment newInstance(int page) {
