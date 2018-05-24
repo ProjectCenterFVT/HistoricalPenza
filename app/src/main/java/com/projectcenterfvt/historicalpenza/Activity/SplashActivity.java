@@ -58,6 +58,8 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
 
     public static final String APP_PREFERENCES = "account";
     public static final String APP_PREFERENCES_TOKEN = "token";
+    public static  final  String TIME  = "time";
+
     /**
      * ID, по которому выводятся логи в Logcat
      */

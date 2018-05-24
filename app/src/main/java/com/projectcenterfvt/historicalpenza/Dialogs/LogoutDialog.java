@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 
+import com.projectcenterfvt.historicalpenza.Activity.MapActivity;
 import com.projectcenterfvt.historicalpenza.Activity.SplashActivity;
 import com.projectcenterfvt.historicalpenza.R;
 
@@ -50,7 +51,11 @@ public class LogoutDialog  extends android.support.v4.app.DialogFragment {
 
 
         dialog.dismiss();
-        startActivity(new Intent(getActivity(), SplashActivity.class));
+        Intent intent  = new Intent(getActivity(), SplashActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+        startActivity(intent);
+        getActivity().finish();
     }
 
     @Nullable
