@@ -1,8 +1,10 @@
 package com.projectcenterfvt.historicalpenza.Server;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.projectcenterfvt.historicalpenza.DataBases.Sight;
+import com.projectcenterfvt.historicalpenza.Managers.PreferencesManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,10 +28,11 @@ import java.net.URL;
 public class ClientServer extends BaseAsyncTask<String, Sight[]> {
 
     private int id;
-    private String ver = "0.0.0";
+    private PreferencesManager preferencesManager;
     private String TAG_JSON = "JSON_SERVER";
 
-    public ClientServer() {
+    public ClientServer(Context context) {
+        preferencesManager = new PreferencesManager(context);
     }
 
     public void getInfo(int id) {
@@ -55,12 +58,23 @@ public class ClientServer extends BaseAsyncTask<String, Sight[]> {
         }
     }
 
-    public void getCoordinates(String mToken) {
+    public void getCoordinates() {
         JSONObject JSONToServer = new JSONObject();
         try {
             JSONToServer.put("type", "getCoordinates");
-            JSONToServer.put("ver", ver);
-            JSONToServer.put("enc_id", mToken);
+            JSONToServer.put("ver", preferencesManager.getVersion());
+            JSONToServer.put("enc_id", preferencesManager.getToken());
+            this.execute(JSONToServer.toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void getVersion() {
+        JSONObject JSONToServer = new JSONObject();
+        try {
+            JSONToServer.put("type", "getVersion");
+            JSONToServer.put("enc_id", preferencesManager.getToken());
             this.execute(JSONToServer.toString());
         } catch (JSONException e) {
             e.printStackTrace();
@@ -172,13 +186,18 @@ public class ClientServer extends BaseAsyncTask<String, Sight[]> {
             int flag = Integer.parseInt(item.getString("flag"));
             String coordRaw = item.getString("coordinates");
             int type = item.getInt("type");
+            String img = item.getString("img");
+            String description = item.getString("description");
+            String title = item.getString("title");
 
             resultArr[i] = new Sight(id);
             resultArr[i].setCoordinates(coordRaw);
             resultArr[i].setFlag(flag == 1);
             resultArr[i].setType(type);
+            resultArr[i].setImg(img);
+            resultArr[i].setTitle(title);
+            resultArr[i].setDescription(description);
         }
-
         return resultArr;
     }
 }

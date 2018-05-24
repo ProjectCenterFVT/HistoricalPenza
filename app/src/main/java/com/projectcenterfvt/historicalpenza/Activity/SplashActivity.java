@@ -2,9 +2,7 @@ package com.projectcenterfvt.historicalpenza.Activity;
 
 import android.Manifest;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.Uri;
@@ -18,7 +16,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -34,6 +31,7 @@ import com.google.android.gms.tasks.Task;
 import com.projectcenterfvt.historicalpenza.BuildConfig;
 import com.projectcenterfvt.historicalpenza.DataBases.DB_Position;
 import com.projectcenterfvt.historicalpenza.DataBases.Sight;
+import com.projectcenterfvt.historicalpenza.Managers.PreferencesManager;
 import com.projectcenterfvt.historicalpenza.R;
 import com.projectcenterfvt.historicalpenza.Server.BaseAsyncTask;
 import com.projectcenterfvt.historicalpenza.Server.ClientServer;
@@ -55,11 +53,6 @@ import static com.projectcenterfvt.historicalpenza.DataBases.DB_Position.DB_TABL
  */
 
 public class SplashActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
-
-    public static final String APP_PREFERENCES = "account";
-    public static final String APP_PREFERENCES_TOKEN = "token";
-    public static  final  String TIME  = "time";
-
     /**
      * ID, по которому выводятся логи в Logcat
      */
@@ -67,7 +60,6 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
     /**
      * Ключ, по которому проверяется первый запуск приложения
      */
-    static final String KEY_IS_FIRST_TIME = "first_time";
     private static final int REQ_CODE = 9002;
     private static DB_Position db;
     /**
@@ -75,32 +67,18 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
      */
     private GoogleSignInOptions signInOptions;
     private SignInButton sign_in_button;
-    private TextView textViewHistoric;
     private GoogleSignInClient mGoogleSignInClient;
-    private SharedPreferences mAccount;
-    private Animation mAnimationFadeOut;
-    /**
-     * Метод вызывается при создании или перезапуска активности <br>
-     * (Временное решение) Удаляется старая бд и от сервера получаем новую <br>
-     * Если {@link #KEY_IS_FIRST_TIME} = true, то переходим на <b>GreetingActivity</b> <br>
-     * Иначе переходим на <b>MapActivity</b> <br>
-     *
-     * @param savedInstanceState сохраненное состояние <br>
-     * @see GreetingActivity
-     * @see MapActivity
-     */
+    private PreferencesManager preferencesManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        mAccount = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
         setContentView(R.layout.activity_splash);
-        textViewHistoric = findViewById(R.id.textViewHistorical);
+        preferencesManager = new PreferencesManager(getApplicationContext());
         sign_in_button = findViewById(R.id.sign_in_button);
         sign_in_button.setEnabled(false);
         sign_in_button.setOnClickListener(this);
         validateServerClientID();
-        mAnimationFadeOut = AnimationUtils.loadAnimation(this, android.R.anim.fade_out);
 
         signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.client_server_id))
@@ -162,17 +140,11 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
-    public boolean isFirstTime() {
-        return mAccount.getBoolean(KEY_IS_FIRST_TIME, true);
-
-    }
-
     private void handleSignInResult(@NonNull Task<GoogleSignInAccount> completedTask) {
         try {
 
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-            String idToken = account.getIdToken();
-            sendToBackEnd(idToken);
+            sendToBackEnd();
 
         } catch (ApiException e) {
             Log.w(TAG, "handleSignInResult:error", e);
@@ -181,32 +153,29 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
     }
 /**
  * метод отправляет данные на сервер*/
-    private void sendToBackEnd(String idToken) {
-        LoginServer ls = new LoginServer();
+private void sendToBackEnd() {
+    LoginServer ls = new LoginServer(getApplicationContext());
         ls.setOnResponseListener(new BaseAsyncTask.OnResponseListener<String>() {
             @Override
             public void onSuccess(String result) {
 
                 Log.d("mToken", result);
-                SharedPreferences.Editor editor = mAccount.edit();
-                editor.putString(APP_PREFERENCES_TOKEN, result);
-                editor.putBoolean(KEY_IS_FIRST_TIME, false);
-                editor.apply();
+                preferencesManager.setToken(result);
+                preferencesManager.setFirstTime(false);
 
-                idToServer(result);
+                idToServer();
                 Intent intent = new Intent(getApplicationContext(), GreetingActivity.class);
-                 SplashActivity.this.startActivity(intent);
+                SplashActivity.this.startActivity(intent);
                 SplashActivity.this.finish();
 
             }
 
             @Override
             public void onFailure(Exception e) {
-                Toast.makeText(SplashActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                 e.printStackTrace();
             }
         });
-        ls.getLogin(idToken);
+    ls.getLogin();
 
     }
 
@@ -236,8 +205,8 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
     }
     public void nextPage() {
 
-        if (!isFirstTime()) {
-            idToServer(mAccount.getString(APP_PREFERENCES_TOKEN, ""));
+        if (!preferencesManager.getFirstTime()) {
+            idToServer();
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 public void run() {
@@ -293,8 +262,8 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
 
     }
 
-    private void idToServer(final String mIdTokrn) {
-        ClientServer call = new ClientServer();
+    private void idToServer() {
+        ClientServer call = new ClientServer(getApplicationContext());
         call.setOnResponseListener(new BaseAsyncTask.OnResponseListener<Sight[]>() {
             /**
              * Метод вызывается при успешном ответе от сервера
@@ -322,6 +291,15 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
                     contentValues.put(DB_Position.COLUMN_type, aResult.getType());
                     Log.d(TAG, "вствавил  type = " + aResult.getType());
 
+                    contentValues.put(DB_Position.COLUMN_title, aResult.getTitle());
+                    Log.d(TAG, "вствавил  title = " + aResult.getTitle());
+
+                    contentValues.put(DB_Position.COLUMN_description, aResult.getDescription());
+                    Log.d(TAG, "вствавил  description = " + aResult.getDescription());
+
+                    contentValues.put(DB_Position.COLUMN_img, aResult.getImg());
+                    Log.d(TAG, "вствавил  img = " + aResult.getImg());
+
                     db.getDB().insert(DB_TABLE, null, contentValues);
                 }
 
@@ -334,15 +312,14 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
              */
             @Override
             public void onFailure(Exception e) {
-
-                Toast.makeText(SplashActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                e.printStackTrace();
                 Intent intent;
 
-                if (isFirstTime()) {
+                if (preferencesManager.getFirstTime()) {
 
-                    mAccount.edit().putBoolean(KEY_IS_FIRST_TIME, false).apply();
+                    preferencesManager.setFirstTime(false);
                     intent = new Intent(SplashActivity.this, GreetingActivity.class);
+                    SplashActivity.this.startActivity(intent);
+                    SplashActivity.this.finish();
 
                 } else {
 
@@ -354,38 +331,9 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
             }
 
         });
-        call.getCoordinates(mIdTokrn);
-        ClientServer call2 = new ClientServer();
-        call2.setOnResponseListener(new BaseAsyncTask.OnResponseListener<Sight[]>() {
-            @Override
-            public void onSuccess(Sight[] result) {
-                db.connectToWrite();
-
-                for (Sight aResult : result) {
-                    ContentValues contentValues = new ContentValues();
-
-                    contentValues.put(DB_Position.COLUMN_title, aResult.getTitle());
-                    Log.d(TAG, "вствавил  title = " + aResult.getTitle());
-
-                    contentValues.put(DB_Position.COLUMN_description, aResult.getDescription());
-                    Log.d(TAG, "вствавил  description = " + aResult.getDescription());
-
-                    contentValues.put(DB_Position.COLUMN_img, aResult.getImg());
-                    Log.d(TAG, "вствавил  img = " + "//");
-
-                    db.updateColumn(contentValues, aResult.getId());
-                }
-
-                db.close();
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-
-            }
-        });
-        call2.getAllInfo();
+        call.getCoordinates();
     }
+
 
 }
 

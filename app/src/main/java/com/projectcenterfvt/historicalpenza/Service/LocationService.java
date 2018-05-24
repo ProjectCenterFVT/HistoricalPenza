@@ -136,7 +136,7 @@ public class LocationService extends Service implements LocationListener {
 
         SharedPreferences preferences = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
         final boolean checked = preferences.getBoolean("Pref", true);
-        ClientServer call = new ClientServer();
+        ClientServer call = new ClientServer(getApplicationContext());
         call.setOnResponseListener(new BaseAsyncTask.OnResponseListener<Sight[]>() {
             @Override
             public void onSuccess(final Sight[] result) {
