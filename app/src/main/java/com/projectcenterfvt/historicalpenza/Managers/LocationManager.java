@@ -44,24 +44,6 @@ public class LocationManager {
         this.activity = activity;
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
         createLocationRequest();
-        mLocationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                if (locationResult == null) {
-                    Log.d(TAG, "нет позиции");
-                }
-                for (Location location : locationResult.getLocations()) {
-                    mLastKnownLocation = location;
-                    if (markerManager != null) {
-                        markerManager.addMyMarker(location);
-                    }
-                    if (listManager != null) {
-                        listManager.setDistance(mLastKnownLocation);
-                    }
-                    Log.d(TAG, "Смена позиции");
-                }
-            }
-        };
         startLocationUpdate();
         getLocation();
     }
@@ -71,11 +53,17 @@ public class LocationManager {
             @Override
             public void onLocationResult(LocationResult locationResult) {
                 if (locationResult == null) {
-                    Log.d(TAG_SERVICE, "нет позиции");
+                    Log.d(TAG, "нет позиции");
                 }
                 for (Location location : locationResult.getLocations()) {
+                    Log.d(TAG, "Смена позиции");
                     mLastKnownLocation = location;
-                    Log.d(TAG_SERVICE, "Служба обновляет данные : " + location.toString());
+                    if (markerManager != null) {
+                        markerManager.addMyMarker(location);
+                    }
+                    if (listManager != null) {
+                        listManager.setDistance(mLastKnownLocation);
+                    }
                 }
             }
         };
