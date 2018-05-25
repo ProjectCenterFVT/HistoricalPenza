@@ -62,11 +62,11 @@ public class LocationManager {
                 }
             }
         };
-        startLocationUpdates();
+        startLocationUpdate();
         getLocation();
     }
 
-    public void startLocationUpdate() {
+    private void startLocationUpdate() {
         mLocationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
@@ -85,9 +85,9 @@ public class LocationManager {
     @SuppressLint("RestrictedApi")
     private void createLocationRequest() {
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(2000);
-        mLocationRequest.setFastestInterval(1000);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setInterval(15000);
+        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
     }
 
     @SuppressLint("MissingPermission")
