@@ -3,6 +3,7 @@ package com.projectcenterfvt.historicalpenza;
 import android.os.Parcel;
 
 import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
 /**
@@ -27,10 +28,14 @@ public class PlaceSuggestion implements SearchSuggestion {
     private int id;
     private Marker marker;
 
-    public PlaceSuggestion(int id, String suggestion, Marker marker) {
+
+    private LatLng location;
+
+    public PlaceSuggestion(int id, String suggestion, Marker marker, double latitude, double longitude) {
         this.placeName = suggestion.toLowerCase();
         this.id = id;
         this.marker = marker;
+        location = new LatLng(latitude, longitude);
 
     }
 
@@ -45,6 +50,10 @@ public class PlaceSuggestion implements SearchSuggestion {
 
     public int getId() {
         return id;
+    }
+
+    public LatLng getLocation() {
+        return location;
     }
 
     @Override

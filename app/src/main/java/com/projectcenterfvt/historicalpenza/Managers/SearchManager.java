@@ -4,7 +4,6 @@ import android.content.Context;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Toast;
 
 import com.arlib.floatingsearchview.FloatingSearchView;
 import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion;
@@ -13,8 +12,6 @@ import com.projectcenterfvt.historicalpenza.DataBases.DB_Position;
 import com.projectcenterfvt.historicalpenza.DataBases.DataHelper;
 import com.projectcenterfvt.historicalpenza.DataBases.Sight;
 import com.projectcenterfvt.historicalpenza.PlaceSuggestion;
-import com.projectcenterfvt.historicalpenza.Server.BaseAsyncTask;
-import com.projectcenterfvt.historicalpenza.Server.ClientServer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,6 +33,8 @@ public class SearchManager {
     private String lastQuery = "";
     private CameraManager cameraManager;
     private DrawerLayout mDrawerLayout;
+    private ListManager listManager;
+
     private Context myContext;
     private DB_Position database;
     private HashMap<Integer, Marker> stackMarkers = new HashMap<>();
@@ -53,6 +52,12 @@ public class SearchManager {
     }
 
     public void setupSearch() {
+        ArrayList<PlaceSuggestion> placeSuggestionArrayList = new ArrayList<>();
+        for (Sight item : listManager.getList()
+                ) {
+            placeSuggestionArrayList.add(new PlaceSuggestion(item.getId(), item.getTitle(), stackMarkers.get(item.getId()), item.getLatitude(), item.getLongitude()));
+        }
+        DataHelper.setsPlaceSuggestions(placeSuggestionArrayList);
         searchView.setOnQueryChangeListener(new FloatingSearchView.OnQueryChangeListener() {
 
             @Override
@@ -95,7 +100,6 @@ public class SearchManager {
             @Override
             public void onSuggestionClicked(final SearchSuggestion searchSuggestion) {
                 PlaceSuggestion placeSuggestion = (PlaceSuggestion) searchSuggestion;
-                int id = placeSuggestion.getId();
 //                DataHelper.findSuggestions(this, PlaceSuggestion.getBody(),
 //                        new DataHelper.OnFindColorsListener() {
 //
@@ -105,8 +109,7 @@ public class SearchManager {
 //                            }
 //
 //                        });
-                Sight sight = database.getCell(id);
-                cameraManager.setCameraPosition(sight.getLocation());
+                cameraManager.setCameraPosition(placeSuggestion.getLocation());
                 InputMethodManager imm = (InputMethodManager) myContext.getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
                 Log.d(LOG_SEARCH, "onSuggestionClicked()");
@@ -161,29 +164,7 @@ public class SearchManager {
         searchView.setOnFocusChangeListener(new FloatingSearchView.OnFocusChangeListener() {
             @Override
             public void onFocus() {
-                ClientServer call = new ClientServer(myContext);
-                call.setOnResponseListener(new BaseAsyncTask.OnResponseListener<Sight[]>() {
-                    @Override
-                    public void onSuccess(Sight[] result) {
-                        ArrayList<PlaceSuggestion> placeSuggestionArrayList = new ArrayList<>();
-                        for (Sight item :
-                                result) {
-                            placeSuggestionArrayList.add(new PlaceSuggestion(item.getId(), item.getTitle(), stackMarkers.get(item.getId())));
-                        }
-
-                        DataHelper.setsPlaceSuggestions(placeSuggestionArrayList);
-
-                        //show suggestions when search bar gains focus (typically history suggestions)
-                        searchView.swapSuggestions(DataHelper.getHistory(3));
-                    }
-
-                    @Override
-                    public void onFailure(Exception e) {
-                        e.printStackTrace();
-                        Toast.makeText(myContext, e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-                call.getAllInfo();
+                searchView.swapSuggestions(DataHelper.getHistory(3));
 
                 Log.d(LOG_SEARCH, "onFocus()");
             }
@@ -205,10 +186,13 @@ public class SearchManager {
     public void setSearchView(FloatingSearchView searchView) {
         this.searchView = searchView;
         searchView.attachNavigationDrawerToMenuButton(mDrawerLayout);
-        setupSearch();
     }
 
     public void setCameraManager(CameraManager cameraManager) {
         this.cameraManager = cameraManager;
+    }
+
+    public void setListManager(ListManager listManager) {
+        this.listManager = listManager;
     }
 }
