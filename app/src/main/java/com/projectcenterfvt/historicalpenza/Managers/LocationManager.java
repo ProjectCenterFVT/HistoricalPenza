@@ -44,6 +44,11 @@ public class LocationManager {
         this.activity = activity;
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
         createLocationRequest();
+        startLocationUpdate();
+        getLocation();
+    }
+
+    private void startLocationUpdate() {
         mLocationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
@@ -51,6 +56,7 @@ public class LocationManager {
                     Log.d(TAG, "нет позиции");
                 }
                 for (Location location : locationResult.getLocations()) {
+                    Log.d(TAG, "Смена позиции");
                     mLastKnownLocation = location;
                     if (markerManager != null) {
                         markerManager.addMyMarker(location);
@@ -58,24 +64,6 @@ public class LocationManager {
                     if (listManager != null) {
                         listManager.setDistance(mLastKnownLocation);
                     }
-                    Log.d(TAG, "Смена позиции");
-                }
-            }
-        };
-        startLocationUpdates();
-        getLocation();
-    }
-
-    public void startLocationUpdate() {
-        mLocationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                if (locationResult == null) {
-                    Log.d(TAG_SERVICE, "нет позиции");
-                }
-                for (Location location : locationResult.getLocations()) {
-                    mLastKnownLocation = location;
-                    Log.d(TAG_SERVICE, "Служба обновляет данные : " + location.toString());
                 }
             }
         };
@@ -85,9 +73,9 @@ public class LocationManager {
     @SuppressLint("RestrictedApi")
     private void createLocationRequest() {
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(2000);
-        mLocationRequest.setFastestInterval(1000);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setInterval(15000);
+        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
     }
 
     @SuppressLint("MissingPermission")

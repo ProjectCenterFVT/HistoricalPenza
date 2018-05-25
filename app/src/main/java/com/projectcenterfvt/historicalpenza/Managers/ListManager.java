@@ -21,7 +21,7 @@ import java.util.Comparator;
 public class ListManager {
 
     private ArrayList<Sight> list = new ArrayList<>();
-    private int range = 300;
+    private int range = 30;
 
     /**
      * Расчет дистанции(Можно нагрузить на сервер, а можно оставить на клиенте)
@@ -37,7 +37,7 @@ public class ListManager {
         double x3 = l2.latitude * Math.PI / 180;
         double x4 = l2.longitude * Math.PI / 180;
         double res = Math.acos(Math.sin(x1) * Math.sin(x3) + Math.cos(x1) * Math.cos(x3) * Math.cos(x2 - x4)) * R;
-        Log.d("distance", "res = " + res);
+        //Log.d("distance", "res = " + res);
         return (int) res;
     }
 
@@ -74,10 +74,6 @@ public class ListManager {
     public void setList(ArrayList<Sight> list) {
         this.list = list;
         sortList();
-    }
-
-    public void clearList() {
-        list.clear();
     }
 
     public boolean isWithinPoint(Location mLocation, Sight point) {

@@ -49,6 +49,11 @@
             android:name=".Service.LocationService"
             android:enabled="true"
             android:exported="true" />
+
+        <receiver
+            android:name=".Service.InternetReceive"
+            android:enabled="true"
+            android:exported="true"></receiver>
     </application>
 
 </manifest>

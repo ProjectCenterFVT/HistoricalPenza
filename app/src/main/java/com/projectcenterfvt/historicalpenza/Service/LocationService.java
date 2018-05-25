@@ -60,7 +60,7 @@ public class LocationService extends Service implements LocationListener {
     @SuppressLint("MissingPermission")
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 2000, 15, this);
+        locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 1000 * 60 * 2, 10, this);
         mToken = intent.getStringExtra("token");
         return START_REDELIVER_INTENT;
     }

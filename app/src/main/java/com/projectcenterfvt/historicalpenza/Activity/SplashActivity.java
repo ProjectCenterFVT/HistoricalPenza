@@ -1,8 +1,10 @@
 package com.projectcenterfvt.historicalpenza.Activity;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.Uri;
@@ -36,8 +38,7 @@ import com.projectcenterfvt.historicalpenza.R;
 import com.projectcenterfvt.historicalpenza.Server.BaseAsyncTask;
 import com.projectcenterfvt.historicalpenza.Server.ClientServer;
 import com.projectcenterfvt.historicalpenza.Server.LoginServer;
-
-import java.net.InetAddress;
+import com.projectcenterfvt.historicalpenza.Service.InternetReceive;
 
 import static com.projectcenterfvt.historicalpenza.DataBases.DB_Position.DB_TABLE;
 
@@ -69,6 +70,8 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
     private SignInButton sign_in_button;
     private GoogleSignInClient mGoogleSignInClient;
     private PreferencesManager preferencesManager;
+    private Activity activity;
+    private InternetReceive internetReceive;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -78,28 +81,51 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         sign_in_button = findViewById(R.id.sign_in_button);
         sign_in_button.setEnabled(false);
         sign_in_button.setOnClickListener(this);
-        validateServerClientID();
+        internetReceive = new InternetReceive();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(internetReceive, intentFilter);
+        activity = this;
+        internetReceive.setOnInternetStatusChange(new InternetReceive.onInternetStatusChange() {
+            @Override
+            public void onSuccess() {
+                Log.d("Broadcast", "Получил callback от сервера: интернет есть");
+                validateServerClientID();
+                signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                        .requestIdToken(getString(R.string.client_server_id))
+                        .requestEmail()
+                        .build();
 
-        signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.client_server_id))
-                .requestEmail()
-                .build();
+                mGoogleSignInClient = GoogleSignIn.getClient(activity, signInOptions);
 
-        mGoogleSignInClient = GoogleSignIn.getClient(this, signInOptions);
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(activity,
+                            new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
                     34);
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    ActivityCompat.requestPermissions(activity,
+                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     35);
-        }
+                }
 
-        db = new DB_Position(this);
-        nextPage();
+                db = new DB_Position(activity);
+                nextPage();
+            }
+
+            @Override
+            public void onFailure() {
+                Log.d("Broadcast", "Получил callback от сервера: интернета нет");
+                Toast.makeText(getApplicationContext(), "Необходимо подключение к интернету!", Toast.LENGTH_LONG).show();
+            }
+        });
 
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        this.unregisterReceiver(internetReceive);
+    }
+
 /**
  * вызывается при нажатии на кнопку войти*/
     private void signIn() {
@@ -302,7 +328,6 @@ private void sendToBackEnd() {
 
                     db.getDB().insert(DB_TABLE, null, contentValues);
                 }
-
                 db.close();
 
             }
@@ -312,22 +337,23 @@ private void sendToBackEnd() {
              */
             @Override
             public void onFailure(Exception e) {
-                Intent intent;
-
-                if (preferencesManager.getFirstTime()) {
-
-                    preferencesManager.setFirstTime(false);
-                    intent = new Intent(SplashActivity.this, GreetingActivity.class);
-                    SplashActivity.this.startActivity(intent);
-                    SplashActivity.this.finish();
-
-                } else {
-
-                    intent = new Intent(SplashActivity.this, MapActivity.class);
-                    SplashActivity.this.startActivity(intent);
-                    SplashActivity.this.finish();
-
-                }
+                Log.d(TAG, "Нет интернета!");
+//                Intent intent;
+//
+//                if (preferencesManager.getFirstTime()) {
+//
+//                    preferencesManager.setFirstTime(false);
+//                    intent = new Intent(SplashActivity.this, GreetingActivity.class);
+//                    SplashActivity.this.startActivity(intent);
+//                    SplashActivity.this.finish();
+//
+//                } else {
+//
+//                    intent = new Intent(SplashActivity.this, MapActivity.class);
+//                    SplashActivity.this.startActivity(intent);
+//                    SplashActivity.this.finish();
+//
+//                }
             }
 
         });
