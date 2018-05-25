@@ -210,7 +210,6 @@ public class MapActivity extends AppCompatActivity
         mDrawerLayout = findViewById(R.id.drawer_layout);
         searchManager = new SearchManager(this, mDrawerLayout, database);
         searchManager.setSearchView((FloatingSearchView) findViewById(R.id.floating_search_view));
-        searchManager.setupSearch();
         checkForUpdates();
 
     }
@@ -393,6 +392,8 @@ public class MapActivity extends AppCompatActivity
         listManager.setList(database.fillArray(mMap, mLastKnownLocation, markerManager));
         listManager.setDistance(mLastKnownLocation);
         searchManager.setStackMarkers(markerManager.getStackMarkers());
+        searchManager.setListManager(listManager);
+        searchManager.setupSearch();
         String token = preferencesManager.getToken();
         serviceIntent.putExtra("token", token);
         locationService.setContext(this);
