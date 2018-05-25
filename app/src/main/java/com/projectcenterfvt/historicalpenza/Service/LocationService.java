@@ -76,7 +76,7 @@ public class LocationService extends Service implements LocationListener {
         try {
             final Sight sight = listManager.getList().get(0);
             Log.d(TAG, "точка значение - " + sight.getFlag());
-            if (!sight.getFlag() && listManager.isWithinPoint(location, sight)) {
+            if (!sight.getFlag() && sight.getType() != 1 && listManager.isWithinPoint(location, sight)) {
                 Log.d(TAG, "Точка входит");
 
                 SetPlacesServer setPoint = new SetPlacesServer();

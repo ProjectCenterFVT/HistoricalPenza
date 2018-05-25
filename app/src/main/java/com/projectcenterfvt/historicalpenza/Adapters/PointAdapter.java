@@ -85,7 +85,14 @@ public class PointAdapter extends BaseAdapter implements Parcelable {
 
         Sight sight = (Sight) getItem(position);
         viewHolder.card_name.setText(sight.getTitle());
-        viewHolder.card_dist.setText(String.format("%d", sight.getDistance()));
+        double distance = sight.getDistance();
+        if (distance >= 1000) {
+            distance /= 1000;
+            viewHolder.card_dist.setText(String.format("%.2f", distance));
+            viewHolder.card_metr.setText("км");
+        } else {
+            viewHolder.card_dist.setText(String.format("%d", distance));
+        }
 
         return convertView;
     }
@@ -102,11 +109,12 @@ public class PointAdapter extends BaseAdapter implements Parcelable {
     }
 
     private class ViewHolder {
-        final TextView card_name, card_dist;
+        final TextView card_name, card_dist, card_metr;
 
         ViewHolder(View view) {
             card_name = view.findViewById(R.id.card_name);
             card_dist = view.findViewById(R.id.card_distance);
+            card_metr = view.findViewById(R.id.card_metr);
         }
     }
 
