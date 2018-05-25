@@ -472,7 +472,7 @@ public class MapActivity extends AppCompatActivity
                 final AlertDialog alert = builder.create();
 
                 info.setText(sight.getTitle());
-                if (sight.getFlag()) {
+                if (sight.getFlag() | sight.getType() == 1) {
                     were.setText("Вы тут были");
                     first.setText("Узнать больше");
 
