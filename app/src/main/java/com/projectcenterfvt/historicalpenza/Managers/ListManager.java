@@ -79,7 +79,7 @@ public class ListManager {
     public boolean isWithinPoint(Location mLocation, Sight point) {
         int distance = calculateDistance(mLocation, new LatLng(point.getLatitude(), point.getLongitude()));
         Log.d("distance", "дистанция от сервиса =  " + distance);
-        return distance <= range;
+        return distance <= point.getRange();
     }
 
     public void refreshSight(Sight sight) {

@@ -45,7 +45,10 @@ public class Sight implements Parcelable {
     private boolean flag;
     /** Дистанция от объекта до пользователя*/
     private int distance;
+
     private int type;
+
+    private double range;
 
     public Sight(int id) {
         this.id = id;
@@ -86,6 +89,14 @@ public class Sight implements Parcelable {
         flag = in.readByte() != 0;
         distance = in.readInt();
         type = in.readInt();
+    }
+
+    public double getRange() {
+        return range;
+    }
+
+    public void setRange(double range) {
+        this.range = range;
     }
 
     public int getId() {

@@ -44,8 +44,10 @@ public class DB_Position extends SQLiteOpenHelper {
     public static final String COLUMN_description = "description";
 
     public static final String COLUMN_img = "img";
+
+    public static final String COLUMN_range = "range";
     /** Версия(Пока не используется, нужно получать от сервера и хранить в бд)*/
-    private static final int DB_VERSION = 2;
+    private static final int DB_VERSION = 3;
     /** Имя файла*/
     public static String DB_NAME = "coordinatesDb";
     private final String DB_TAG = "db";
@@ -71,7 +73,8 @@ public class DB_Position extends SQLiteOpenHelper {
                 " type INTEGER," +
                 " title TEXT," +
                 " description TEXT," +
-                " img TEXT);");
+                " img TEXT," +
+                " range REAL);");
     }
 
     /**
@@ -157,7 +160,7 @@ public class DB_Position extends SQLiteOpenHelper {
     public ArrayList<Sight> fillArray(GoogleMap map, Location mLastKnownLocation, MarkerManager markerManager) {
         final ArrayList<Sight> list = new ArrayList<>();
         this.connectToRead();
-        Cursor cursor = this.db.query(DB_TABLE, new String[]{COLUMN_ID, COLUMN_X1, COLUMN_X2, COLUMN_flag, COLUMN_type, COLUMN_title, COLUMN_description, COLUMN_img}, null, null, null, null, null);
+        Cursor cursor = this.db.query(DB_TABLE, new String[]{COLUMN_ID, COLUMN_X1, COLUMN_X2, COLUMN_flag, COLUMN_type, COLUMN_title, COLUMN_description, COLUMN_img, COLUMN_range}, null, null, null, null, null);
         if (cursor.moveToFirst()) {
             final int id_id = cursor.getColumnIndex(COLUMN_ID);
             final int id_x1 = cursor.getColumnIndex(COLUMN_X1);
@@ -167,6 +170,7 @@ public class DB_Position extends SQLiteOpenHelper {
             final int id_title = cursor.getColumnIndex(COLUMN_title);
             final int id_description = cursor.getColumnIndex(COLUMN_description);
             final int id_img = cursor.getColumnIndex(COLUMN_img);
+            final int id_range = cursor.getColumnIndex(COLUMN_range);
             do {
                 int bol = cursor.getInt(id_flag);
                 int id = cursor.getInt(id_id);
@@ -174,6 +178,7 @@ public class DB_Position extends SQLiteOpenHelper {
                 boolean isVisited = (bol == 1);
                 double x1 = cursor.getDouble(id_x1);
                 double x2 = cursor.getDouble(id_x2);
+                double range = cursor.getDouble(id_range);
                 String title = cursor.getString(id_title);
                 String description = cursor.getString(id_description);
                 String img = cursor.getString(id_img);
@@ -182,6 +187,7 @@ public class DB_Position extends SQLiteOpenHelper {
                 sight.setTitle(title);
                 sight.setDescription(description);
                 sight.setImg(img);
+                sight.setRange(range);
                 if (mLastKnownLocation != null) {
                     sight.setDistance(calculateDistance(mLastKnownLocation, position));
                 } else {

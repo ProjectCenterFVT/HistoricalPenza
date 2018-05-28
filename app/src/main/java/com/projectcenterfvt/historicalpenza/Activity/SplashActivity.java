@@ -232,7 +232,7 @@ private void sendToBackEnd(String id) {
     public void nextPage() {
 
         if (!preferencesManager.getFirstTime()) {
-            if (idToServer()) {
+            idToServer();
                 Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     public void run() {
@@ -240,7 +240,6 @@ private void sendToBackEnd(String id) {
                         finish();
                     }
                 }, 3000);
-            }
         } else {
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
@@ -289,9 +288,8 @@ private void sendToBackEnd(String id) {
 
     }
 
-    private boolean idToServer() {
+    private void idToServer() {
         ClientServer call = new ClientServer(getApplicationContext());
-        final boolean[] res = new boolean[1];
         call.setOnResponseListener(new BaseAsyncTask.OnResponseListener<Sight[]>() {
             /**
              * Метод вызывается при успешном ответе от сервера
@@ -331,7 +329,6 @@ private void sendToBackEnd(String id) {
                     db.getDB().insert(DB_TABLE, null, contentValues);
                 }
                 db.close();
-                res[0] = true;
 
             }
 
@@ -341,8 +338,7 @@ private void sendToBackEnd(String id) {
             @Override
             public void onFailure(Exception e) {
                 Log.d(TAG, "Нет интернета!");
-                Toast.makeText(getApplicationContext(), "Ошибка соединения с сервером, пожалуйста, повторите попытку позже!", Toast.LENGTH_LONG).show();
-                res[0] = false;
+                //Toast.makeText(getApplicationContext(), "Ошибка соединения с сервером, пожалуйста, повторите попытку позже!", Toast.LENGTH_LONG).show();
 //                Intent intent;
 //
 //                if (preferencesManager.getFirstTime()) {
@@ -363,7 +359,6 @@ private void sendToBackEnd(String id) {
 
         });
         call.getCoordinates();
-        return res[0];
     }
 
 
