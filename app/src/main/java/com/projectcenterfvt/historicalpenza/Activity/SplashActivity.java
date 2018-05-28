@@ -326,6 +326,8 @@ private void sendToBackEnd(String id) {
                     contentValues.put(DB_Position.COLUMN_img, aResult.getImg());
                     Log.d(TAG, "вствавил  img = " + aResult.getImg());
 
+                    contentValues.put(DB_Position.COLUMN_range, aResult.getRange());
+
                     db.getDB().insert(DB_TABLE, null, contentValues);
                 }
                 db.close();
