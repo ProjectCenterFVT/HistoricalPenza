@@ -29,12 +29,12 @@ public class LoginServer extends BaseAsyncTask<String,String>{
         preferencesManager = new PreferencesManager(context);
     }
 
-    public void getLogin() {
+    public void getLogin(String id) {
 
         JSONObject JSONToServer = new JSONObject();
         try {
             JSONToServer.put("type", "login");
-            JSONToServer.put("token", preferencesManager.getToken());
+            JSONToServer.put("token", id);
             this.execute(JSONToServer.toString());
         } catch (JSONException e) {
             e.printStackTrace();

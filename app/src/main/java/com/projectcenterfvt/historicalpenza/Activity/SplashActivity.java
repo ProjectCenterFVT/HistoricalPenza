@@ -170,7 +170,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         try {
 
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-            sendToBackEnd();
+            sendToBackEnd(account.getIdToken());
 
         } catch (ApiException e) {
             Log.w(TAG, "handleSignInResult:error", e);
@@ -179,7 +179,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
     }
 /**
  * метод отправляет данные на сервер*/
-private void sendToBackEnd() {
+private void sendToBackEnd(String id) {
     LoginServer ls = new LoginServer(getApplicationContext());
         ls.setOnResponseListener(new BaseAsyncTask.OnResponseListener<String>() {
             @Override
@@ -201,7 +201,7 @@ private void sendToBackEnd() {
                 e.printStackTrace();
             }
         });
-    ls.getLogin();
+    ls.getLogin(id);
 
     }
 
@@ -232,14 +232,15 @@ private void sendToBackEnd() {
     public void nextPage() {
 
         if (!preferencesManager.getFirstTime()) {
-            idToServer();
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                public void run() {
-                    startActivity(new Intent(getApplicationContext(), MapActivity.class));
-                    finish();
-                }
-            }, 3000);
+            if (idToServer()) {
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    public void run() {
+                        startActivity(new Intent(getApplicationContext(), MapActivity.class));
+                        finish();
+                    }
+                }, 3000);
+            }
         } else {
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
@@ -288,8 +289,9 @@ private void sendToBackEnd() {
 
     }
 
-    private void idToServer() {
+    private boolean idToServer() {
         ClientServer call = new ClientServer(getApplicationContext());
+        final boolean[] res = new boolean[1];
         call.setOnResponseListener(new BaseAsyncTask.OnResponseListener<Sight[]>() {
             /**
              * Метод вызывается при успешном ответе от сервера
@@ -329,6 +331,7 @@ private void sendToBackEnd() {
                     db.getDB().insert(DB_TABLE, null, contentValues);
                 }
                 db.close();
+                res[0] = true;
 
             }
 
@@ -338,6 +341,8 @@ private void sendToBackEnd() {
             @Override
             public void onFailure(Exception e) {
                 Log.d(TAG, "Нет интернета!");
+                Toast.makeText(getApplicationContext(), "Ошибка соединения с сервером, пожалуйста, повторите попытку позже!", Toast.LENGTH_LONG).show();
+                res[0] = false;
 //                Intent intent;
 //
 //                if (preferencesManager.getFirstTime()) {
@@ -358,6 +363,7 @@ private void sendToBackEnd() {
 
         });
         call.getCoordinates();
+        return res[0];
     }
 
 
