@@ -47,33 +47,11 @@ public class ClientServer extends BaseAsyncTask<String, Sight[]> {
         }
     }
 
-    public void getAllInfo() {
-        JSONObject JSONToServer = new JSONObject();
-        try {
-            JSONToServer.put("type", "getAllInfo");
-            JSONToServer.put("id", 1);
-            this.execute(JSONToServer.toString());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
     public void getCoordinates() {
         JSONObject JSONToServer = new JSONObject();
         try {
             JSONToServer.put("type", "getCoordinates");
             JSONToServer.put("ver", preferencesManager.getVersion());
-            JSONToServer.put("enc_id", preferencesManager.getToken());
-            this.execute(JSONToServer.toString());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void getVersion() {
-        JSONObject JSONToServer = new JSONObject();
-        try {
-            JSONToServer.put("type", "getVersion");
             JSONToServer.put("enc_id", preferencesManager.getToken());
             this.execute(JSONToServer.toString());
         } catch (JSONException e) {
@@ -189,6 +167,7 @@ public class ClientServer extends BaseAsyncTask<String, Sight[]> {
             String img = item.getString("img");
             String description = item.getString("description");
             String title = item.getString("title");
+            //double range = item.getDouble("range");
 
             resultArr[i] = new Sight(id);
             resultArr[i].setCoordinates(coordRaw);
@@ -197,6 +176,7 @@ public class ClientServer extends BaseAsyncTask<String, Sight[]> {
             resultArr[i].setImg(img);
             resultArr[i].setTitle(title);
             resultArr[i].setDescription(description);
+            resultArr[i].setRange(15);
         }
         return resultArr;
     }
