@@ -45,9 +45,10 @@ public class DB_Position extends SQLiteOpenHelper {
 
     public static final String COLUMN_img = "img";
     /** Версия(Пока не используется, нужно получать от сервера и хранить в бд)*/
-    private static final int DB_VERSION = 1;
+    private static final int DB_VERSION = 2;
     /** Имя файла*/
     public static String DB_NAME = "coordinatesDb";
+    private final String DB_TAG = "db";
     private Context myContext;
     private SQLiteDatabase db;
 
@@ -62,6 +63,7 @@ public class DB_Position extends SQLiteOpenHelper {
      */
     @Override
     public void onCreate(SQLiteDatabase db) {
+        Log.d(DB_TAG, "База данных создана!");
         db.execSQL("CREATE TABLE coordinates (_id INTEGER PRIMARY KEY," +
                 " x1 REAL," +
                 " x2 REAL," +
@@ -75,12 +77,13 @@ public class DB_Position extends SQLiteOpenHelper {
     /**
      * Обновление БД, пока не используется!
      * @param db экземпляр класса <b>SQLiteDatabase </b>для работы с бд
-     * @param i старая версия
-     * @param i1 новая версия
+     * @param oldVersion старая версия
+     * @param newVersion новая версия
      */
     @Override
-    public void onUpgrade(SQLiteDatabase db, int i, int i1) {
-        db.execSQL("drop table if exists " + DB_TABLE);
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        Log.d(DB_TAG, "База данных обновлена с версии " + oldVersion + " до " + newVersion);
+        db.execSQL("DROP TABLE IF EXISTS coordinates;");
 
         onCreate(db);
     }
@@ -165,7 +168,6 @@ public class DB_Position extends SQLiteOpenHelper {
             final int id_description = cursor.getColumnIndex(COLUMN_description);
             final int id_img = cursor.getColumnIndex(COLUMN_img);
             do {
-                Log.d("db ", "проверка");
                 int bol = cursor.getInt(id_flag);
                 int id = cursor.getInt(id_id);
                 int type = cursor.getInt(id_type);
@@ -222,9 +224,4 @@ public class DB_Position extends SQLiteOpenHelper {
         this.close();
     }
 
-    public void updateColumn(ContentValues values, int id) {
-        String selection = "_id = ?";
-        String args[] = {"" + id};
-        db.update(DB_TABLE, values, selection, args);
-    }
 }
