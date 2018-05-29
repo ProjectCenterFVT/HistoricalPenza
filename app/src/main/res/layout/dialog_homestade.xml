@@ -10,7 +10,7 @@
     <com.projectcenterfvt.historicalpenza.CustomTextView.TextViewEx
         android:id="@+id/tvHome"
         android:layout_width="match_parent"
-        android:layout_height="128dp"
+        android:layout_height="143dp"
         android:layout_marginBottom="3dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
