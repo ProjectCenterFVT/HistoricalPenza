@@ -93,7 +93,6 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
                 validateServerClientID();
                 signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                         .requestIdToken(getString(R.string.client_server_id))
-                        .requestEmail()
                         .build();
 
                 mGoogleSignInClient = GoogleSignIn.getClient(activity, signInOptions);
