@@ -15,8 +15,9 @@ import java.util.Comparator;
 
 public class DSightHandler {
 
-    ArrayList<DSight> list;
-    Context context;
+    private ArrayList<DSight> list;
+    private Context context;
+    private String DB_TAG = "DS_Handler";
 
     public DSightHandler(Context context) {
         list = new ArrayList<>();
@@ -55,7 +56,7 @@ public class DSightHandler {
 
     public void sortList(Location location) {
         for (int i = 0; i < list.size(); i++) {
-            DSight dSight = list.get(0);
+            DSight dSight = list.get(i);
             dSight.setDistance(calculateDistance(location, dSight.getLocation()));
         }
         Collections.sort(list, new Comparator<DSight>() {
