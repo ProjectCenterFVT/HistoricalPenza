@@ -8,7 +8,7 @@ import android.view.inputmethod.InputMethodManager;
 import com.arlib.floatingsearchview.FloatingSearchView;
 import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion;
 import com.google.android.gms.maps.model.Marker;
-import com.projectcenterfvt.historicalpenza.DataBases.DB_Position;
+import com.projectcenterfvt.historicalpenza.DataBases.DataBaseHandler;
 import com.projectcenterfvt.historicalpenza.DataBases.DataHelper;
 import com.projectcenterfvt.historicalpenza.DataBases.Sight;
 import com.projectcenterfvt.historicalpenza.PlaceSuggestion;
@@ -33,17 +33,15 @@ public class SearchManager {
     private String lastQuery = "";
     private CameraManager cameraManager;
     private DrawerLayout mDrawerLayout;
-    private ListManager listManager;
 
     private Context myContext;
-    private DB_Position database;
+    private DataBaseHandler database;
     private HashMap<Integer, Marker> stackMarkers = new HashMap<>();
 
-    public SearchManager(Context myContext, DrawerLayout mDrawerLayout, DB_Position database) {
+    public SearchManager(Context myContext, DrawerLayout mDrawerLayout) {
         this.myContext = myContext;
         this.cameraManager = cameraManager;
         this.mDrawerLayout = mDrawerLayout;
-        this.database = database;
 
     }
 
@@ -52,9 +50,9 @@ public class SearchManager {
     }
 
     public void setupSearch() {
+        database = new DataBaseHandler(myContext);
         ArrayList<PlaceSuggestion> placeSuggestionArrayList = new ArrayList<>();
-        for (Sight item : listManager.getList()
-                ) {
+        for (Sight item : database.getAllSight()) {
             placeSuggestionArrayList.add(new PlaceSuggestion(item.getId(), item.getTitle(), stackMarkers.get(item.getId()), item.getLatitude(), item.getLongitude()));
         }
         DataHelper.setsPlaceSuggestions(placeSuggestionArrayList);
@@ -192,7 +190,4 @@ public class SearchManager {
         this.cameraManager = cameraManager;
     }
 
-    public void setListManager(ListManager listManager) {
-        this.listManager = listManager;
-    }
 }

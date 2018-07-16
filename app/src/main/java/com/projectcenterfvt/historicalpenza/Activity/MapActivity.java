@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
@@ -49,7 +50,8 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.projectcenterfvt.historicalpenza.BuildConfig;
-import com.projectcenterfvt.historicalpenza.DataBases.DB_Position;
+import com.projectcenterfvt.historicalpenza.DataBases.DSightHandler;
+import com.projectcenterfvt.historicalpenza.DataBases.DataBaseHandler;
 import com.projectcenterfvt.historicalpenza.DataBases.Sight;
 import com.projectcenterfvt.historicalpenza.Dialogs.AboutDialog;
 import com.projectcenterfvt.historicalpenza.Dialogs.CardDialog;
@@ -57,7 +59,6 @@ import com.projectcenterfvt.historicalpenza.Dialogs.HomestadeDialog;
 import com.projectcenterfvt.historicalpenza.Dialogs.LogoutDialog;
 import com.projectcenterfvt.historicalpenza.Dialogs.PageDialog;
 import com.projectcenterfvt.historicalpenza.Managers.CameraManager;
-import com.projectcenterfvt.historicalpenza.Managers.ListManager;
 import com.projectcenterfvt.historicalpenza.Managers.MarkerManager;
 import com.projectcenterfvt.historicalpenza.Managers.PreferencesManager;
 import com.projectcenterfvt.historicalpenza.Managers.SearchManager;
@@ -74,7 +75,6 @@ import net.hockeyapp.android.UpdateManager;
  * @author Roman, Dmitry
  * @version 1.0.0
  * @see CameraManager
- * @see ListManager
  * @see com.projectcenterfvt.historicalpenza.Managers.LocationManager
  * @see MarkerManager
  * @see SearchManager
@@ -102,22 +102,20 @@ public class MapActivity extends AppCompatActivity
     private Context context = this;
     /** Меню*/
     private DrawerLayout mDrawerLayout;
-    /** БД*/
-    private DB_Position database;
     /** Менеджер маркеров*/
     private MarkerManager markerManager;
     /** Менеджер поиска*/
     private SearchManager searchManager;
     /** Менеджер камеры*/
     private CameraManager cameraManager;
-    /** Менеджер достопримечательностей*/
-    private ListManager listManager;
     /** Менеджер геопозиции*/
     private com.projectcenterfvt.historicalpenza.Managers.LocationManager locationManager;
     /**
      * Менеджер настроек
      */
     private PreferencesManager preferencesManager;
+
+    private DSightHandler dSightHandler;
 
     /**
      * !!!! Не трогать и не прикосаться. Это тестирующий вариант обработки местоположения. ТРЕБУЕТСЯ В ДОРАБОТКЕ И ТЕСТИРОВАНИИ
@@ -162,7 +160,6 @@ public class MapActivity extends AppCompatActivity
         }
     };
 
-    //comment
     @Override
     public void setPosition(LatLng loc) {
         cameraManager.setCameraPosition(loc);
@@ -176,17 +173,17 @@ public class MapActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         serviceIntent = new Intent(MapActivity.this, LocationService.class);
         setContentView(R.layout.activity_map);
-        database = new DB_Position(this);
-        listManager = new ListManager();
         preferencesManager = new PreferencesManager(getApplicationContext());
         btn_pos = findViewById(R.id.btn_position);
         final LocationManager lM = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
         locationManager = new com.projectcenterfvt.historicalpenza.Managers.LocationManager(this, MapActivity.this);
-        locationManager.setListManager(listManager);
         locationManager.updateLocationUI(true, btn_pos);
+        dSightHandler = new DSightHandler(getApplicationContext());
+        locationManager.setdSightHandler(dSightHandler);
 
         lM.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 4, locationListener);
         lM.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 2000, 4, locationListener);
@@ -208,7 +205,7 @@ public class MapActivity extends AppCompatActivity
         navigationView1.setNavigationItemSelectedListener(this);
 
         mDrawerLayout = findViewById(R.id.drawer_layout);
-        searchManager = new SearchManager(this, mDrawerLayout, database);
+        searchManager = new SearchManager(this, mDrawerLayout);
         searchManager.setSearchView((FloatingSearchView) findViewById(R.id.floating_search_view));
         checkForUpdates();
 
@@ -291,7 +288,7 @@ public class MapActivity extends AppCompatActivity
             case R.id.name_sight:
                 FragmentManager fragmentManager_sight = getSupportFragmentManager();
                 CardDialog cardDialog = new CardDialog();
-                cardDialog.setList(listManager.getList());
+                cardDialog.setList(mLastKnownLocation, new DataBaseHandler(this).getAllSight());
                 cardDialog.show(fragmentManager_sight, "dialog");
                 break;
             case R.id.name_helpProject:
@@ -382,23 +379,22 @@ public class MapActivity extends AppCompatActivity
         markerManager = new MarkerManager(mMap, this);
         locationManager.setMarkerManager(markerManager);
         mLastKnownLocation = locationManager.getDeviceLocation();
+        dSightHandler.sortList(mLastKnownLocation);
         markerManager.addStartMarker();
         markerManager.addMyMarker(mLastKnownLocation);
+        markerManager.drawMarkers();
         cameraManager = new CameraManager(this, mMap);
         searchManager.setCameraManager(cameraManager);
         Log.d("check", "check = " + check);
         if (!check)
             cameraManager.setCameraPosition(mLastKnownLocation);
-        listManager.setList(database.fillArray(mMap, mLastKnownLocation, markerManager));
-        listManager.setDistance(mLastKnownLocation);
         searchManager.setStackMarkers(markerManager.getStackMarkers());
-        searchManager.setListManager(listManager);
         searchManager.setupSearch();
         String token = preferencesManager.getToken();
         serviceIntent.putExtra("token", token);
         locationService.setContext(this);
         locationService.setMarkerManager(markerManager);
-        locationService.setListManager(listManager);
+        locationService.setdSightHandler(dSightHandler);
         startService(serviceIntent);
     }
 
@@ -477,7 +473,7 @@ public class MapActivity extends AppCompatActivity
                     first.setText("Узнать больше");
 
                     if (mLastKnownLocation != null) {
-                        int dist = listManager.calculateDistance(mLastKnownLocation, marker.getPosition());
+                        int dist = DSightHandler.calculateDistance(mLastKnownLocation, sight.getLatitude(), sight.getLongitude());
                         distance.setText(dist + " м");
                     }
 
@@ -508,7 +504,7 @@ public class MapActivity extends AppCompatActivity
                         }
                     });
                     if (mLastKnownLocation != null) {
-                        int dist = listManager.calculateDistance(mLastKnownLocation, marker.getPosition());
+                        int dist = DSightHandler.calculateDistance(mLastKnownLocation, sight.getLatitude(), sight.getLongitude());
                         distance.setText(dist + " м");
                     }
                 }
@@ -565,9 +561,9 @@ public class MapActivity extends AppCompatActivity
         final Animation animAlpha = AnimationUtils.loadAnimation(this, R.anim.scale);
         view.startAnimation(animAlpha);
         try {
-            if (mLastKnownLocation != null && cameraManager != null && listManager != null) {
-                synchronized (listManager) {
-                    cameraManager.setCameraPosition(listManager.getList().get(0).getLocation());
+            if (mLastKnownLocation != null && cameraManager != null && dSightHandler != null) {
+                synchronized (dSightHandler) {
+                    cameraManager.setCameraPosition(dSightHandler.getCloseLocation());
                 }
             }
         } catch (Exception ex) {

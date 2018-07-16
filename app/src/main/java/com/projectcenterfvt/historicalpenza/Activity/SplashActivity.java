@@ -2,7 +2,6 @@ package com.projectcenterfvt.historicalpenza.Activity;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -31,7 +30,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.projectcenterfvt.historicalpenza.BuildConfig;
-import com.projectcenterfvt.historicalpenza.DataBases.DB_Position;
+import com.projectcenterfvt.historicalpenza.DataBases.DataBaseHandler;
 import com.projectcenterfvt.historicalpenza.DataBases.Sight;
 import com.projectcenterfvt.historicalpenza.Managers.PreferencesManager;
 import com.projectcenterfvt.historicalpenza.R;
@@ -40,16 +39,14 @@ import com.projectcenterfvt.historicalpenza.Server.ClientServer;
 import com.projectcenterfvt.historicalpenza.Server.LoginServer;
 import com.projectcenterfvt.historicalpenza.Service.InternetReceive;
 
-import static com.projectcenterfvt.historicalpenza.DataBases.DB_Position.DB_TABLE;
-
 
 /**
  * Активити
- * Класс служит для отрисовки лого и подгрузки базы данных <b>DB_Position</b>
+ * Класс служит для отрисовки лого и подгрузки базы данных <b>DataBaseHandler</b>
  *
  * @author Roman, Dmitry
  * @version 1.0.0
- * @see DB_Position
+ * @see DataBaseHandler
  * @since 1.0.0
  */
 
@@ -62,7 +59,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
      * Ключ, по которому проверяется первый запуск приложения
      */
     private static final int REQ_CODE = 9002;
-    private static DB_Position db;
+    private static DataBaseHandler db;
     /**
      * Экземпляр класс базы данных
      */
@@ -106,7 +103,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
                     35);
                 }
 
-                db = new DB_Position(activity);
+                db = new DataBaseHandler(activity);
                 nextPage();
             }
 
@@ -295,39 +292,9 @@ private void sendToBackEnd(String id) {
              */
             @Override
             public void onSuccess(Sight[] result) {
-                db.connectToWrite();
-                db.getDB().delete(DB_TABLE, null, null);
-
+                db.deleteAll();
                 for (Sight aResult : result) {
-                    ContentValues contentValues = new ContentValues();
-
-                    contentValues.put(DB_Position.COLUMN_ID, aResult.getId());
-                    Log.d(TAG, "вствавил  id = " + aResult.getId());
-
-                    contentValues.put(DB_Position.COLUMN_X1, aResult.getLatitude());
-                    Log.d(TAG, "вствавил  x1 = " + aResult.getLatitude());
-
-                    contentValues.put(DB_Position.COLUMN_X2, aResult.getLongitude());
-                    Log.d(TAG, "вствавил  x2 = " + aResult.getLongitude());
-
-                    contentValues.put(DB_Position.COLUMN_flag, aResult.getFlag());
-                    Log.d(TAG, "вствавил  flag = " + aResult.getFlag());
-
-                    contentValues.put(DB_Position.COLUMN_type, aResult.getType());
-                    Log.d(TAG, "вствавил  type = " + aResult.getType());
-
-                    contentValues.put(DB_Position.COLUMN_title, aResult.getTitle());
-                    Log.d(TAG, "вствавил  title = " + aResult.getTitle());
-
-                    contentValues.put(DB_Position.COLUMN_description, aResult.getDescription());
-                    Log.d(TAG, "вствавил  description = " + aResult.getDescription());
-
-                    contentValues.put(DB_Position.COLUMN_img, aResult.getImg());
-                    Log.d(TAG, "вствавил  img = " + aResult.getImg());
-
-                    contentValues.put(DB_Position.COLUMN_range, aResult.getRange());
-
-                    db.getDB().insert(DB_TABLE, null, contentValues);
+                    db.addSight(aResult);
                 }
                 db.close();
 

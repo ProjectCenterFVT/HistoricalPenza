@@ -22,7 +22,7 @@ import java.util.ArrayList;
  * @since 1.0.0
  */
 
-public class DB_Position extends SQLiteOpenHelper {
+public class DataBaseHandler extends SQLiteOpenHelper implements IDatabaseHandler {
 
     /**
      * Имя таблицы
@@ -47,16 +47,15 @@ public class DB_Position extends SQLiteOpenHelper {
 
     public static final String COLUMN_range = "range";
     /** Версия(Пока не используется, нужно получать от сервера и хранить в бд)*/
-    private static final int DB_VERSION = 3;
+    private static final int DB_VERSION = 4;
     /** Имя файла*/
     public static String DB_NAME = "coordinatesDb";
     private final String DB_TAG = "db";
-    private Context myContext;
+    public int count = 0;
     private SQLiteDatabase db;
 
-    public DB_Position(Context context) {
+    public DataBaseHandler(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
-        this.myContext = context;
     }
 
     /**
@@ -94,14 +93,14 @@ public class DB_Position extends SQLiteOpenHelper {
     /**
      * Возможность чтения БД
      */
-    public void connectToRead() {
+    private void connectToRead() {
         db = this.getReadableDatabase();
     }
 
     /**
      * Возможность записи БД
      */
-    public void connectToWrite() {
+    private void connectToWrite() {
         db = this.getWritableDatabase();
     }
 
@@ -116,39 +115,6 @@ public class DB_Position extends SQLiteOpenHelper {
         return db;
     }
 
-    /**
-     * Получение строки из БД по id
-     * @param id id
-     * @return объект Sight
-     */
-    public Sight getCell(int id) {
-        Sight sight = new Sight();
-        connectToRead();
-        Cursor cursor = db.query(DB_Position.DB_TABLE, new String[]{DB_Position.COLUMN_ID, DB_Position.COLUMN_X1, DB_Position.COLUMN_X2,
-                DB_Position.COLUMN_flag, DB_Position.COLUMN_title, DB_Position.COLUMN_description, DB_Position.COLUMN_img}, null, null, null, null, null);
-        cursor.move(id);
-        final int id_x1 = cursor.getColumnIndex(COLUMN_X1);
-        final int id_x2 = cursor.getColumnIndex(COLUMN_X2);
-        final int id_flag = cursor.getColumnIndex(COLUMN_flag);
-        final int id_title = cursor.getColumnIndex(COLUMN_title);
-        final int id_description = cursor.getColumnIndex(COLUMN_description);
-        final int id_img = cursor.getColumnIndex(COLUMN_img);
-        double latitude = cursor.getDouble(id_x1);
-        double longtitude = cursor.getDouble(id_x2);
-        boolean flag = cursor.getInt(id_flag) == 1;
-        String title = cursor.getString(id_title);
-        String description = cursor.getString(id_description);
-        String img = cursor.getString(id_img);
-        sight.setLatitude(latitude);
-        sight.setLongitude(longtitude);
-        sight.setFlag(flag);
-        sight.setTitle(title);
-        sight.setDescription(description);
-        sight.setImg(img);
-        cursor.close();
-        close();
-        return sight;
-    }
 
     /**
      * Отрисовка карты в <b>MapActivity</b> и заполнение листа Sight
@@ -157,6 +123,7 @@ public class DB_Position extends SQLiteOpenHelper {
      * @return Лист достоприм
      * @see com.projectcenterfvt.historicalpenza.Activity.MapActivity
      */
+    @Deprecated
     public ArrayList<Sight> fillArray(GoogleMap map, Location mLastKnownLocation, MarkerManager markerManager) {
         final ArrayList<Sight> list = new ArrayList<>();
         this.connectToRead();
@@ -188,13 +155,13 @@ public class DB_Position extends SQLiteOpenHelper {
                 sight.setDescription(description);
                 sight.setImg(img);
                 sight.setRange(range);
-                if (mLastKnownLocation != null) {
-                    sight.setDistance(calculateDistance(mLastKnownLocation, position));
-                } else {
-                    sight.setDistance(0);
-                }
+//                if (mLastKnownLocation != null) {
+//                    sight.setDistance(calculateDistance(mLastKnownLocation, position));
+//                } else {
+//                    sight.setDistance(0);
+//                }
                 list.add(sight);
-                markerManager.addSightMarker(isVisited, type, position, list.get(list.size() - 1));
+                // markerManager.addSightMarker(isVisited, type, position, list.get(list.size() - 1));
             } while (cursor.moveToNext());
         }
         cursor.close();
@@ -202,32 +169,101 @@ public class DB_Position extends SQLiteOpenHelper {
         return list;
     }
 
-    /**
-     * Расчет дистанции(Можно нагрузить на сервер, а можно оставить на клиенте)
-     * @param l1 Позиция пользователя
-     * @param l2 Позиция объекта
-     * @return Расстояние
-     */
-    private int calculateDistance(Location l1, LatLng l2) {
-        Log.d("marker ", "Мое местоположение = " + l1.toString());
-        final int R = 6372795;
-        double x1 = l1.getLatitude() * Math.PI / 180;
-        double x2 = l1.getLongitude() * Math.PI / 180;
-        double x3 = l2.latitude * Math.PI / 180;
-        double x4 = l2.longitude * Math.PI / 180;
-        double res = Math.acos(Math.sin(x1) * Math.sin(x3) + Math.cos(x1) * Math.cos(x3) * Math.cos(x2 - x4)) * R;
-        Log.d("marker", "res = " + res);
-        return (int) res;
+    @Override
+    public Sight getSight(int id) {
+        connectToRead();
+
+        Cursor cursor = db.query(DB_TABLE, new String[]{COLUMN_ID, COLUMN_X1, COLUMN_X2, COLUMN_flag, COLUMN_type,
+                        COLUMN_title, COLUMN_description, COLUMN_img, COLUMN_range}, COLUMN_ID + "=?", new String[]{String.valueOf(id)},
+                null, null, null, null);
+        if (cursor != null) {
+            cursor.moveToFirst();
+        }
+
+        Sight sight = new Sight();
+        sight.setId(id);
+        sight.setLatitude(cursor.getDouble(1));
+        sight.setLongitude(cursor.getDouble(2));
+        sight.setFlag(cursor.getInt(3) == 1);
+        sight.setType(cursor.getInt(4));
+        sight.setTitle(cursor.getString(5));
+        sight.setDescription(cursor.getString(6));
+        sight.setImg(cursor.getString(7));
+        sight.setRange(cursor.getDouble(8));
+
+        cursor.close();
+        close();
+
+        return sight;
     }
 
-    public void updateColumn(Sight sight) {
+    @Override
+    public void addSight(Sight sight) {
+        connectToWrite();
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COLUMN_ID, sight.getId());
+        contentValues.put(COLUMN_X1, sight.getLatitude());
+        contentValues.put(COLUMN_X2, sight.getLongitude());
+        contentValues.put(COLUMN_flag, sight.getFlag());
+        contentValues.put(COLUMN_type, sight.getType());
+        contentValues.put(COLUMN_title, sight.getTitle());
+        contentValues.put(COLUMN_description, sight.getDescription());
+        contentValues.put(COLUMN_img, sight.getImg());
+        contentValues.put(COLUMN_range, sight.getRange());
+
+        db.insert(DB_TABLE, null, contentValues);
+        count++;
+
+        close();
+    }
+
+
+    @Override
+    public void changeStatus(int id) {
         ContentValues values = new ContentValues();
         connectToWrite();
         values.put(COLUMN_flag, true);
         String selection = "_id = ?";
-        String args[] = {"" + sight.getId()};
+        String args[] = {"" + id};
         db.update(DB_TABLE, values, selection, args);
-        this.close();
+        close();
     }
 
+    @Override
+    public void deleteAll() {
+        connectToWrite();
+        db.delete(DB_TABLE, null, null);
+        close();
+    }
+
+    @Override
+    public ArrayList<Sight> getAllSight() {
+        connectToRead();
+
+        Cursor cursor = this.db.query(DB_TABLE, new String[]{COLUMN_ID, COLUMN_X1, COLUMN_X2, COLUMN_flag, COLUMN_type, COLUMN_title,
+                COLUMN_description, COLUMN_img, COLUMN_range}, null, null, null, null, null);
+
+
+        ArrayList<Sight> sights = new ArrayList<>();
+        cursor.moveToFirst();
+        do {
+            Sight sight = new Sight();
+            sight.setId(cursor.getInt(0));
+            sight.setLatitude(cursor.getDouble(1));
+            sight.setLongitude(cursor.getDouble(2));
+            sight.setFlag(cursor.getInt(3) == 1);
+            sight.setType(cursor.getInt(4));
+            sight.setTitle(cursor.getString(5));
+            sight.setDescription(cursor.getString(6));
+            sight.setImg(cursor.getString(7));
+            sight.setRange(cursor.getDouble(8));
+            sights.add(sight);
+        } while (cursor.moveToNext());
+
+        cursor.close();
+        close();
+
+        return sights;
+    }
 }

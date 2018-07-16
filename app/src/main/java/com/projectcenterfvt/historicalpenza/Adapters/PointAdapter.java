@@ -1,5 +1,6 @@
 package com.projectcenterfvt.historicalpenza.Adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -71,6 +72,7 @@ public class PointAdapter extends BaseAdapter implements Parcelable {
         return i;
     }
 
+    @SuppressLint("DefaultLocale")
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
@@ -91,7 +93,7 @@ public class PointAdapter extends BaseAdapter implements Parcelable {
             viewHolder.card_dist.setText(String.format("%.2f", distance));
             viewHolder.card_metr.setText("км");
         } else {
-            viewHolder.card_dist.setText(String.format("%d", distance));
+            viewHolder.card_dist.setText((int) distance);
         }
 
         return convertView;

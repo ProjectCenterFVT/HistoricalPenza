@@ -15,6 +15,7 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.projectcenterfvt.historicalpenza.DataBases.DSightHandler;
 import com.projectcenterfvt.historicalpenza.R;
 
 /**
@@ -37,7 +38,7 @@ public class LocationManager {
     private String TAG_SERVICE = "TagService";
     private MarkerManager markerManager;
 
-    private ListManager listManager;
+    private DSightHandler dSightHandler;
 
     public LocationManager(Context context, Activity activity) {
         this.context = context;
@@ -46,6 +47,10 @@ public class LocationManager {
         createLocationRequest();
         startLocationUpdate();
         getLocation();
+    }
+
+    public void setdSightHandler(DSightHandler dSightHandler) {
+        this.dSightHandler = dSightHandler;
     }
 
     private void startLocationUpdate() {
@@ -61,8 +66,8 @@ public class LocationManager {
                     if (markerManager != null) {
                         markerManager.addMyMarker(location);
                     }
-                    if (listManager != null) {
-                        listManager.setDistance(mLastKnownLocation);
+                    if (dSightHandler != null) {
+                        dSightHandler.sortList(mLastKnownLocation);
                     }
                 }
             }
@@ -99,12 +104,8 @@ public class LocationManager {
         this.markerManager = markerManager;
     }
 
-    public void setListManager(ListManager listManager) {
-        this.listManager = listManager;
-    }
-
     @SuppressLint("MissingPermission")
-    public void getLocation() {
+    private void getLocation() {
         mFusedLocationClient.getLastLocation()
                 .addOnCompleteListener(activity, new OnCompleteListener<Location>() {
                     @SuppressLint("SetTextI18n")
