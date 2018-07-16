@@ -20,9 +20,10 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.projectcenterfvt.historicalpenza.Activity.InfoActivity;
-import com.projectcenterfvt.historicalpenza.DataBases.DB_Position;
+import com.projectcenterfvt.historicalpenza.DataBases.DSight;
+import com.projectcenterfvt.historicalpenza.DataBases.DSightHandler;
+import com.projectcenterfvt.historicalpenza.DataBases.DataBaseHandler;
 import com.projectcenterfvt.historicalpenza.DataBases.Sight;
-import com.projectcenterfvt.historicalpenza.Managers.ListManager;
 import com.projectcenterfvt.historicalpenza.Managers.MarkerManager;
 import com.projectcenterfvt.historicalpenza.R;
 import com.projectcenterfvt.historicalpenza.Server.BaseAsyncTask;
@@ -34,7 +35,7 @@ public class LocationService extends Service implements LocationListener {
     public static final String APP_PREFERENCES = "account";
     LocalBinder binder = new LocalBinder();
     private LocationManager locationManager;
-    private ListManager listManager;
+    private DSightHandler dSightHandler;
     private String TAG = "locationManager";
     private String mToken;
     private Context context;
@@ -45,8 +46,8 @@ public class LocationService extends Service implements LocationListener {
         return binder;
     }
 
-    public void setListManager(ListManager listManager) {
-        this.listManager = listManager;
+    public void setdSightHandler(DSightHandler dSightHandler) {
+        this.dSightHandler = dSightHandler;
     }
 
     @SuppressLint("MissingPermission")
@@ -72,22 +73,23 @@ public class LocationService extends Service implements LocationListener {
 
     @Override
     public void onLocationChanged(Location location) {
-        listManager.sortList();
+        dSightHandler.sortList(location);
         try {
-            final Sight sight = listManager.getList().get(0);
+            DSight dSight = dSightHandler.getCloseSight();
+            DataBaseHandler dataBaseHandler = new DataBaseHandler(getApplicationContext());
+            final Sight sight = dataBaseHandler.getSight(dSight.getId());
             Log.d(TAG, "точка значение - " + sight.getFlag());
-            if (!sight.getFlag() && sight.getType() != 1 && listManager.isWithinPoint(location, sight)) {
+            if (!sight.getFlag() && sight.getType() != 1 && dSightHandler.isWithinPoint(location, sight)) {
                 Log.d(TAG, "Точка входит");
-
                 SetPlacesServer setPoint = new SetPlacesServer();
                 setPoint.setOnResponseListener(new BaseAsyncTask.OnResponseListener<Void>() {
                     @Override
                     public void onSuccess(Void result) {
-                        DB_Position db_position = new DB_Position(context);
-                        db_position.updateColumn(sight);
+                        DataBaseHandler dataBaseHandler = new DataBaseHandler(context);
+                        dataBaseHandler.changeStatus(sight.getId());
                         sight.setFlag(true);
                         markerManager.refreshMarker(sight);
-                        listManager.refreshSight(sight);
+                        dataBaseHandler.changeStatus(sight.getId());
 
                         setUpNotification(sight);
                     }

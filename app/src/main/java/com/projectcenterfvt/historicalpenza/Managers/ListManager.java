@@ -17,7 +17,7 @@ import java.util.Comparator;
  * @since 1.0.0
  * @see com.projectcenterfvt.historicalpenza.Activity.MapActivity
  */
-
+@Deprecated
 public class ListManager {
 
     private ArrayList<Sight> list = new ArrayList<>();

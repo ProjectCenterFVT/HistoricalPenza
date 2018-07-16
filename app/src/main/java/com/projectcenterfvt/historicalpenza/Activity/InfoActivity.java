@@ -1,6 +1,7 @@
 package com.projectcenterfvt.historicalpenza.Activity;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -40,7 +41,7 @@ public class InfoActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info);
-
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         TextViewEx tvDescription = findViewById(R.id.tvDescription);
         tvDescription.setMovementMethod(new ScrollingMovementMethod());
 

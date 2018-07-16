@@ -12,8 +12,10 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.projectcenterfvt.historicalpenza.DataBases.DataBaseHandler;
 import com.projectcenterfvt.historicalpenza.DataBases.Sight;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -44,17 +46,15 @@ public class MarkerManager {
     /**
      * Добавление маркера на карту(Маркер достоприм)
      *
-     * @param flag     Открыт/неоткрыт
-     * @param position Позиция достопримечательности
      * @param sight    Достопримечательность
      */
 
-    public void addSightMarker(Boolean flag, int type, LatLng position, Sight sight) {
+    public void addSightMarker(Sight sight) {
         MarkerOptions options = new MarkerOptions();
-        options.position(position);
-        switch (type) {
+        options.position(sight.getLocation());
+        switch (sight.getType()) {
             case 0:
-                if (flag) {
+                if (sight.getFlag()) {
                     Bitmap bitmap_unlock = BitmapFactory.decodeResource(myContext.getResources(), myContext.getResources().
                             getIdentifier("unlock", "drawable", myContext.getPackageName()));
                     bitmap_unlock = Bitmap.createScaledBitmap(bitmap_unlock, 74, 100, false);
@@ -74,10 +74,9 @@ public class MarkerManager {
                 break;
         }
         Marker marker = mMap.addMarker(options);
-        sight.setType(type);
         marker.setTag(sight);
         stackMarkers.put(sight.getId(), marker);
-        Log.d(TAG, "нарисовал маркер с координатами " + position);
+        Log.d(TAG, "нарисовал маркер с координатами " + sight.getLocation());
     }
 
     @SuppressLint("NewApi")
@@ -143,6 +142,14 @@ public class MarkerManager {
 
     public void refreshMarker(Sight sight) {
         addSightMarker(sight, stackMarkers.get(sight.getId()));
+    }
+
+    public void drawMarkers() {
+        DataBaseHandler dataBaseHandler = new DataBaseHandler(myContext);
+        ArrayList<Sight> sights = dataBaseHandler.getAllSight();
+        for (Sight sight : sights) {
+            addSightMarker(sight);
+        }
     }
 }
 

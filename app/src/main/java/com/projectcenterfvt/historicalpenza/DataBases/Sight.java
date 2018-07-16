@@ -5,6 +5,7 @@ import android.os.Parcelable;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.clustering.ClusterItem;
 
 /**
  *Класс - объект достопримечательности
@@ -13,7 +14,7 @@ import com.google.android.gms.maps.model.LatLng;
  * @since 1.0.0
  */
 
-public class Sight implements Parcelable {
+public class Sight implements Parcelable, ClusterItem {
     final static String LOG_TAG = "SightLog";
     public static final Creator<Sight> CREATOR = new Creator<Sight>() {
         @Override
@@ -107,12 +108,22 @@ public class Sight implements Parcelable {
         this.id = id;
     }
 
+    @Override
+    public LatLng getPosition() {
+        return getLocation();
+    }
+
     public String getTitle() {
         return title;
     }
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    @Override
+    public String getSnippet() {
+        return title;
     }
 
     public String getDescription() {

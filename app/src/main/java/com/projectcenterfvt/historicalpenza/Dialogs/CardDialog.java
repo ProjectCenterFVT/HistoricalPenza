@@ -3,6 +3,7 @@ package com.projectcenterfvt.historicalpenza.Dialogs;
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
@@ -16,10 +17,13 @@ import android.widget.ListView;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.projectcenterfvt.historicalpenza.Adapters.PointAdapter;
+import com.projectcenterfvt.historicalpenza.DataBases.DSightHandler;
 import com.projectcenterfvt.historicalpenza.DataBases.Sight;
 import com.projectcenterfvt.historicalpenza.R;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Отрисовка списка достопримечательностей
@@ -105,8 +109,16 @@ public class CardDialog extends android.support.v4.app.DialogFragment {
         return v;
     }
 
-    public void setList(ArrayList<Sight> list) {
+    public void setList(final Location mLastKnowLocation, ArrayList<Sight> list) {
         sights = list;
+        Collections.sort(sights, new Comparator<Sight>() {
+            @Override
+            public int compare(Sight s0, Sight s1) {
+                s0.setDistance(DSightHandler.calculateDistance(mLastKnowLocation, s0.getLocation()));
+                s1.setDistance(DSightHandler.calculateDistance(mLastKnowLocation, s1.getLocation()));
+                return s0.getDistance() - s1.getDistance();
+            }
+        });
     }
 
     public interface onEventListener {
