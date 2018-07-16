@@ -1,6 +1,7 @@
 package com.projectcenterfvt.historicalpenza.Activity;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -59,6 +60,7 @@ import com.projectcenterfvt.historicalpenza.Dialogs.HomestadeDialog;
 import com.projectcenterfvt.historicalpenza.Dialogs.LogoutDialog;
 import com.projectcenterfvt.historicalpenza.Dialogs.PageDialog;
 import com.projectcenterfvt.historicalpenza.Managers.CameraManager;
+import com.projectcenterfvt.historicalpenza.Managers.ClusterHundler;
 import com.projectcenterfvt.historicalpenza.Managers.MarkerManager;
 import com.projectcenterfvt.historicalpenza.Managers.PreferencesManager;
 import com.projectcenterfvt.historicalpenza.Managers.SearchManager;
@@ -117,6 +119,8 @@ public class MapActivity extends AppCompatActivity
 
     private DSightHandler dSightHandler;
 
+    private Activity activity;
+
     /**
      * !!!! Не трогать и не прикосаться. Это тестирующий вариант обработки местоположения. ТРЕБУЕТСЯ В ДОРАБОТКЕ И ТЕСТИРОВАНИИ
      */
@@ -125,6 +129,7 @@ public class MapActivity extends AppCompatActivity
     private String TAG_GEO = "Geoinformation";
     private Intent serviceIntent;
     private ServiceConnection sConn;
+    private ClusterHundler clusterHundler;
 
     private boolean isMarkerClick = false;
 
@@ -173,6 +178,7 @@ public class MapActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        activity = this;
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         serviceIntent = new Intent(MapActivity.this, LocationService.class);
         setContentView(R.layout.activity_map);
@@ -372,29 +378,27 @@ public class MapActivity extends AppCompatActivity
     public void onMapReady(GoogleMap googleMap) {
 
         mMap = googleMap;
-        mMap.setMinZoomPreference(12.0f);
-        mMap.setMaxZoomPreference(17.0f);
-        mMap.setOnMarkerClickListener(this);
         mMap.getUiSettings().setMapToolbarEnabled(false);
+        clusterHundler = new ClusterHundler(mMap, this, activity);
+        clusterHundler.setupClusterManager();
+        clusterHundler.addSights(new DataBaseHandler(context).getAllSight());
         markerManager = new MarkerManager(mMap, this);
         locationManager.setMarkerManager(markerManager);
         mLastKnownLocation = locationManager.getDeviceLocation();
         dSightHandler.sortList(mLastKnownLocation);
         markerManager.addStartMarker();
         markerManager.addMyMarker(mLastKnownLocation);
-        markerManager.drawMarkers();
         cameraManager = new CameraManager(this, mMap);
         searchManager.setCameraManager(cameraManager);
         Log.d("check", "check = " + check);
         if (!check)
             cameraManager.setCameraPosition(mLastKnownLocation);
-        searchManager.setStackMarkers(markerManager.getStackMarkers());
         searchManager.setupSearch();
         String token = preferencesManager.getToken();
         serviceIntent.putExtra("token", token);
         locationService.setContext(this);
-        locationService.setMarkerManager(markerManager);
         locationService.setdSightHandler(dSightHandler);
+        locationService.setClusterHundler(clusterHundler);
         startService(serviceIntent);
     }
 
@@ -411,15 +415,20 @@ public class MapActivity extends AppCompatActivity
     }
 
     public void plus(View view) {
-        final Animation animAlpha = AnimationUtils.loadAnimation(this, R.anim.activity_down_up_close_enter);
-        view.startAnimation(animAlpha);
-        mMap.animateCamera(CameraUpdateFactory.zoomBy(1.0f));
+        synchronized (clusterHundler) {
+            final Animation animAlpha = AnimationUtils.loadAnimation(this, R.anim.activity_down_up_close_enter);
+            view.startAnimation(animAlpha);
+            mMap.animateCamera(CameraUpdateFactory.zoomBy(0.5f));
+        }
     }
 
     public void minus(View view) {
-        final Animation animAlpha = AnimationUtils.loadAnimation(this, R.anim.activity_down_up_close_enter);
-        view.startAnimation(animAlpha);
-        mMap.animateCamera(CameraUpdateFactory.zoomBy(-1.0f));
+        synchronized (clusterHundler) {
+            final Animation animAlpha = AnimationUtils.loadAnimation(this, R.anim.activity_down_up_close_enter);
+            view.startAnimation(animAlpha);
+            mMap.animateCamera(CameraUpdateFactory.zoomBy(-0.5f));
+        }
+
     }
 
     @Override
@@ -437,6 +446,7 @@ public class MapActivity extends AppCompatActivity
      * @return
      */
     @Override
+    @Deprecated
     public boolean onMarkerClick(final Marker marker) {
         Log.d("marker", "Нажал на маркер " + marker.getId() + " " + marker.getTitle() + " " + marker.getPosition().toString());
         Log.d("marker", "Доступность нажатия : " + isMarkerClick);
