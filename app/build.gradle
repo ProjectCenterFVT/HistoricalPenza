@@ -68,6 +68,7 @@ dependencies {
     compile 'com.google.api-client:google-api-client:1.22.0'
     compile 'com.google.api-client:google-api-client-android:1.22.0'
     compile 'com.google.apis:google-api-services-people:v1-rev139-1.22.0'
+    compile 'com.google.maps.android:android-maps-utils:0.5'
 }
 
 
