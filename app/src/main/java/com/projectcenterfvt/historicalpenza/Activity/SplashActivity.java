@@ -7,10 +7,12 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -59,6 +61,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
      * Ключ, по которому проверяется первый запуск приложения
      */
     private static final int REQ_CODE = 9002;
+    private  static final int REQ_CODE_PERM = 111;
     private static DataBaseHandler db;
     /**
      * Экземпляр класс базы данных
@@ -94,19 +97,9 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
 
                 mGoogleSignInClient = GoogleSignIn.getClient(activity, signInOptions);
 
-                if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(activity,
-                            new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
-                    34);
-                    ActivityCompat.requestPermissions(activity,
-                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    35);
-                }
 
-                db = new DataBaseHandler(activity);
-                nextPage();
+
             }
-
             @Override
             public void onFailure() {
                 Log.d("Broadcast", "Получил callback от сервера: интернета нет");
@@ -114,16 +107,147 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
             }
         });
 
+
+            if (!hasPermissions()){
+                // our app has permissions.
+                requestPermissionWithRationale();
+                Log.d("perm", "не могу найти перммшионс");
+
+            }
+            else {
+                //our app doesn't have permissions, So i m requesting permissions.
+                PermisionsIsGranted();
+                Log.d("perm", " могу найти перммшионс");
+            }
+
+
+    }
+    private  void PermisionsIsGranted(){
+        db = new DataBaseHandler(activity);
+        nextPage();
+    }
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        boolean allowed = true;
+
+        switch (requestCode){
+            case REQ_CODE_PERM:
+
+                for (int res : grantResults){
+                    // if user granted all permissions.
+                    allowed = allowed && (res == PackageManager.PERMISSION_GRANTED);
+                }
+
+                break;
+            default:
+                // if user not granted permissions.
+                allowed = false;
+                break;
+        }
+
+        if (allowed){
+            //дал все разрешения
+            PermisionsIsGranted();
+        }
+        else {
+            // we will give warning to user that they haven't granted permissions.
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION)){
+
+                    Toast.makeText(this, "Без этого невозможно функционирование приложения", Toast.LENGTH_LONG).show();
+                    //Toast.makeText(this,"Приложение будет закрыто",Toast.LENGTH_LONG).show();
+//                    Intent intent = new Intent(getApplicationContext(), SplashActivity.class);
+//                    SplashActivity.this.startActivity(intent);
+//                    SplashActivity.this.finish();
+                    Handler handler = new Handler();
+                  handler.postDelayed(new Runnable() {
+                       public void run() {
+                           Intent intent = new Intent(getApplicationContext(), SplashActivity.class);
+                           SplashActivity.this.startActivity(intent);
+                           SplashActivity.this.finish();
+                       }
+                    }, 5000);
+
+                } else {
+                    showNoStoragePermissionSnackbar();
+                }
+            }
+        }
+
     }
 
+    public void showNoStoragePermissionSnackbar() {
+
+     final Snackbar snackbar2 =   Snackbar.make(SplashActivity.this.findViewById(R.id.activity_splash_p), "Разрешение на отслеживание местоположения не дано" , Snackbar.LENGTH_INDEFINITE);
+        snackbar2.setAction("Настройки", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        openApplicationSettings();
+
+                        Toast.makeText(getApplicationContext(),
+                                "Откройте разрешения и дайте разрешение для отслеживания местоположения",
+                                Toast.LENGTH_SHORT)
+                                .show();
+                        snackbar2.dismiss();
+                    }
+                })
+                .show();
+    }
+    public void openApplicationSettings() {
+        Intent appSettingsIntent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                Uri.parse("package:" + getPackageName()));
+        startActivityForResult(appSettingsIntent, REQ_CODE_PERM);
+    }
+    public void requestPermissionWithRationale() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION)) {
+            final String message = "Нам нужно ваше местополодения для функционироания приложения";
+            final Snackbar snackBar = Snackbar.make(findViewById(R.id.activity_splash_p), message, Snackbar.LENGTH_INDEFINITE);
+            snackBar//.make//(SplashActivity.this.findViewById(R.id.activity_splash_p), message, Snackbar.LENGTH_LONG +300000)
+                    .setAction("Разрешить", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            requestPerms();
+                            snackBar.dismiss();
+                        }
+                    })
+                    .show();
+        } else {
+
+            requestPerms();
+        }
+    }
+
+
+    private void requestPerms(){
+        String[] permissions = new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION };
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            requestPermissions(permissions,REQ_CODE_PERM);
+        }
+    }
+    private boolean hasPermissions(){
+
+        //string array of permissions,
+        String[] permissions = new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION  };
+
+        for (String perms : permissions){
+            int res = checkCallingOrSelfPermission(perms);
+            if (!(res == PackageManager.PERMISSION_GRANTED)){
+                return false;
+            }
+        }
+        return true;
+    }
     @Override
     protected void onDestroy() {
         super.onDestroy();
         this.unregisterReceiver(internetReceive);
     }
 
-/**
- * вызывается при нажатии на кнопку войти*/
+    /**
+     * вызывается при нажатии на кнопку войти*/
     private void signIn() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, REQ_CODE);
@@ -140,27 +264,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == 34 | requestCode == 35) {
-            if (grantResults.length <= 0) {
-                // If user interaction was interrupted, the permission request is cancelled and you
-                // receive empty arrays.
-            } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted.
-                //getLastLocation();
-            } else {
-                Intent intent = new Intent();
-                intent.setAction(
-                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                Uri uri = Uri.fromParts("package",
-                        BuildConfig.APPLICATION_ID, null);
-                intent.setData(uri);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-            }
-        }
-    }
+
 
     private void handleSignInResult(@NonNull Task<GoogleSignInAccount> completedTask) {
         try {
@@ -173,10 +277,10 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
 
         }
     }
-/**
- * метод отправляет данные на сервер*/
-private void sendToBackEnd(String id) {
-    LoginServer ls = new LoginServer(getApplicationContext());
+    /**
+     * метод отправляет данные на сервер*/
+    private void sendToBackEnd(String id) {
+        LoginServer ls = new LoginServer(getApplicationContext());
         ls.setOnResponseListener(new BaseAsyncTask.OnResponseListener<String>() {
             @Override
             public void onSuccess(String result) {
@@ -197,7 +301,7 @@ private void sendToBackEnd(String id) {
                 e.printStackTrace();
             }
         });
-    ls.getLogin(id);
+        ls.getLogin(id);
 
     }
 
@@ -229,13 +333,13 @@ private void sendToBackEnd(String id) {
 
         if (!preferencesManager.getFirstTime()) {
             idToServer();
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    public void run() {
-                        startActivity(new Intent(getApplicationContext(), MapActivity.class));
-                        finish();
-                    }
-                }, 3000);
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    startActivity(new Intent(getApplicationContext(), MapActivity.class));
+                    finish();
+                }
+            }, 3000);
         } else {
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
@@ -266,6 +370,17 @@ private void sendToBackEnd(String id) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             handleSignInResult(task);
 
+        }
+        if (requestCode == REQ_CODE_PERM) {
+            if (hasPermissions()){
+            PermisionsIsGranted();
+            return;
+            }
+            else {
+                Intent intent = new Intent(getApplicationContext(), SplashActivity.class);
+                SplashActivity.this.startActivity(intent);
+                SplashActivity.this.finish();
+            }
         }
     }
 
