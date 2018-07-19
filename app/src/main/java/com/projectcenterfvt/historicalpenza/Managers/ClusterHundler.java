@@ -18,10 +18,12 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
+import com.google.maps.android.clustering.algo.GridBasedAlgorithm;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.projectcenterfvt.historicalpenza.Activity.InfoActivity;
 import com.projectcenterfvt.historicalpenza.DataBases.DSightHandler;
@@ -29,6 +31,7 @@ import com.projectcenterfvt.historicalpenza.DataBases.Sight;
 import com.projectcenterfvt.historicalpenza.R;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Created by roman on 12.07.2018.
@@ -52,6 +55,7 @@ public class ClusterHundler {
         clusterManager = new ClusterManager<Sight>(context, mMap);
         locationManager = new LocationManager(context, activity);
         clusterManager.setRenderer(new MarkerRender());
+        clusterManager.setAlgorithm(new GridBasedAlgorithm<Sight>());
         mMap.setOnCameraIdleListener(clusterManager);
         clusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<Sight>() {
             @Override
@@ -151,9 +155,12 @@ public class ClusterHundler {
     }
 
     public void refreshMarker(Sight sight) {
-        clusterManager.removeItem(sight);
         sight.setFlag(true);
-        clusterManager.addItem(sight);
+        MarkerRender render = (MarkerRender) clusterManager.getRenderer();
+        Bitmap bitmap_unlock = BitmapFactory.decodeResource(context.getResources(), context.getResources().
+                getIdentifier("unlock", "drawable", context.getPackageName()));
+        bitmap_unlock = Bitmap.createScaledBitmap(bitmap_unlock, 74, 100, false);
+        render.getMarker(sight).setIcon(BitmapDescriptorFactory.fromBitmap(bitmap_unlock));
     }
 
     private class MarkerRender extends DefaultClusterRenderer<Sight> {
