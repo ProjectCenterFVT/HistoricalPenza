@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/HistoricalPenza.iml" filepath="$PROJECT_DIR$/HistoricalPenza.iml" />
+      <module fileurl="file://E:\development\ANDROID PROJECTS\Penza\HistoricalPenza.iml" filepath="E:\development\ANDROID PROJECTS\Penza\HistoricalPenza.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Penza.iml" filepath="$PROJECT_DIR$/Penza.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

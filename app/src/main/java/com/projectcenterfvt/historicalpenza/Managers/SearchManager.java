@@ -45,9 +45,6 @@ public class SearchManager {
 
     }
 
-    public void setStackMarkers(HashMap<Integer, Marker> stackMarkers) {
-        this.stackMarkers = stackMarkers;
-    }
 
     public void setupSearch() {
         database = new DataBaseHandler(myContext);
