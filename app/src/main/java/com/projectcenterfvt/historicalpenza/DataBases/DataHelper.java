@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Класс для работы с поиском
@@ -46,7 +48,7 @@ public class DataHelper {
         }
     }
 
-    public static void findSuggestions(String query, final int limit, final long simulatedDelay,
+    public static void findSuggestions(final String query, final int limit, final long simulatedDelay,
                                        final OnFindSuggestionsListener listener) {
         new Filter() {
 
@@ -61,17 +63,20 @@ public class DataHelper {
 
                 DataHelper.resetSuggestionsHistory();
                 List<PlaceSuggestion> suggestionList = new ArrayList<>();
+                Pattern pattern = Pattern.compile(query.toLowerCase());
                 if (!(constraint == null || constraint.length() == 0)) {
-
-
                     for (PlaceSuggestion suggestion : sPlaceSuggestions) {
-                        if (suggestion.getBody().toUpperCase()
-                                .startsWith(constraint.toString().toUpperCase())) {
-
+//                        if (suggestion.getBody().toUpperCase()
+//                                .startsWith(constraint.toString().toUpperCase())) {
+//
+//                            suggestionList.add(suggestion);
+//                            if (limit != -1 && suggestionList.size() == limit) {
+//                                break;
+//                            }
+//                        }
+                        Matcher matcher = pattern.matcher(suggestion.getBody().toLowerCase());
+                        if (matcher.find()){
                             suggestionList.add(suggestion);
-                            if (limit != -1 && suggestionList.size() == limit) {
-                                break;
-                            }
                         }
                     }
                 }
