@@ -67,4 +67,19 @@ public class CameraManager {
         }
     }
 
+    public void setCameraToCloseSight(LatLng location){
+        synchronized (location) {
+            if (mCameraPosition != null) {
+                mMap.moveCamera(CameraUpdateFactory.newCameraPosition(mCameraPosition));
+            } else if (location.latitude != 0) {
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                        new LatLng(location.latitude,
+                                location.longitude), DEFAULT_ZOOM));
+            } else {
+                Log.d("TAG", "Current location is null. Using defaults.");
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
+            }
+        }
+    }
+
 }

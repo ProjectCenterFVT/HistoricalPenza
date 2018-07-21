@@ -154,6 +154,15 @@ public class ClusterHundler {
         clusterManager.addItems(sights);
     }
 
+    public void clearMap(){
+        clusterManager.clearItems();
+        clusterManager.cluster();
+    }
+
+    public void restoreMap(){
+        clusterManager.cluster();
+    }
+
     public void refreshMarker(Sight sight) {
         sight.setFlag(true);
         MarkerRender render = (MarkerRender) clusterManager.getRenderer();

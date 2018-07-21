@@ -21,16 +21,15 @@ import java.util.ArrayList;
 
 public class SightAdapter extends RecyclerView.Adapter<SightAdapter.ViewHolder> {
 
-    private LayoutInflater inflater;
     private ArrayList<Sight> sights;
 
-    public SightAdapter(Context context, ArrayList<Sight> sights){
-        this.inflater = LayoutInflater.from(context);
+    public SightAdapter(ArrayList<Sight> sights){
+        this.sights = sights;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = inflater.inflate(R.layout.sight_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.sight_item, parent, false);
         return new ViewHolder(view);
     }
 
@@ -42,9 +41,9 @@ public class SightAdapter extends RecyclerView.Adapter<SightAdapter.ViewHolder> 
         double distance = sight.getDistance();
         if (distance>1000){
             distance /= 1000;
-            holder.sItem.setText(String.format("%.2f", distance));
+            holder.sItem.setText(String.format("Расстояние : %.2f км", distance));
         } else {
-            holder.sItem.setText("" + sight.getDistance());
+            holder.sItem.setText("Расстояние : " + sight.getDistance()+" м");
         }
     }
 

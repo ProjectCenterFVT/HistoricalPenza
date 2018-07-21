@@ -21,7 +21,6 @@ import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -56,11 +55,9 @@ import com.projectcenterfvt.historicalpenza.DataBases.DSightHandler;
 import com.projectcenterfvt.historicalpenza.DataBases.DataBaseHandler;
 import com.projectcenterfvt.historicalpenza.DataBases.Sight;
 import com.projectcenterfvt.historicalpenza.Dialogs.AboutDialog;
-import com.projectcenterfvt.historicalpenza.Dialogs.CardDialog;
 import com.projectcenterfvt.historicalpenza.Dialogs.HomestadeDialog;
 import com.projectcenterfvt.historicalpenza.Dialogs.LogoutDialog;
 import com.projectcenterfvt.historicalpenza.Dialogs.PageDialog;
-import com.projectcenterfvt.historicalpenza.Fragments.SightFragment;
 import com.projectcenterfvt.historicalpenza.Managers.CameraManager;
 import com.projectcenterfvt.historicalpenza.Managers.ClusterHundler;
 import com.projectcenterfvt.historicalpenza.Managers.MarkerManager;
@@ -71,6 +68,10 @@ import com.projectcenterfvt.historicalpenza.Service.LocationService;
 
 import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.UpdateManager;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Вся основная работа происходит в этом классе. Однако основные задачи распределены по классам менеджерам.
@@ -87,12 +88,13 @@ import net.hockeyapp.android.UpdateManager;
 
 public class MapActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks,
-        GoogleMap.OnMarkerClickListener, SightFragment.onSightItemClickListener {
+        GoogleMap.OnMarkerClickListener {
 
     /** Сохранение предыдушей позиции камеры после разворота приложения*/
     private static final String KEY_CAMERA_POSITION = "camera_position";
     /**Сохранение предыдушей позиции после разворота приложения */
     private static final String KEY_LOCATION = "location";
+    private static final int SIGHT_KEY = 2;
     LocationService locationService;
     /** Карта*/
     private GoogleMap mMap;
@@ -133,6 +135,7 @@ public class MapActivity extends AppCompatActivity
     private ServiceConnection sConn;
     private ClusterHundler clusterHundler;
 
+    private boolean isMapDraw = false;
     private boolean isMarkerClick = false;
 
     private LocationListener locationListener = new LocationListener() {
@@ -168,8 +171,10 @@ public class MapActivity extends AppCompatActivity
     };
 
     @Override
-    public void setPosition(LatLng loc) {
-        cameraManager.setCameraPosition(loc);
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        isMapDraw = savedInstanceState.getBoolean("mapState");
     }
 
     /**
@@ -216,6 +221,10 @@ public class MapActivity extends AppCompatActivity
         searchManager = new SearchManager(this, mDrawerLayout);
         searchManager.setSearchView((FloatingSearchView) findViewById(R.id.floating_search_view));
         checkForUpdates();
+
+        if (savedInstanceState != null){
+            isMarkerClick = savedInstanceState.getBoolean("mapState");
+        }
 
     }
 
@@ -299,6 +308,19 @@ public class MapActivity extends AppCompatActivity
 //                CardDialog cardDialog = new CardDialog();
 //                cardDialog.setList(mLastKnownLocation, new DataBaseHandler(this).getAllSight());
 //                cardDialog.show(fragmentManager_sight, "dialog");
+                mLastKnownLocation = locationManager.getDeviceLocation();
+                ArrayList<Sight> sights = new DataBaseHandler(this).getAllSight();
+                Collections.sort(sights, new Comparator<Sight>() {
+                    @Override
+                    public int compare(Sight s0, Sight s1) {
+                        s0.setDistance(DSightHandler.calculateDistance(mLastKnownLocation, s0.getLocation()));
+                        s1.setDistance(DSightHandler.calculateDistance(mLastKnownLocation, s1.getLocation()));
+                        return s0.getDistance() - s1.getDistance();
+                    }
+                });
+                Intent intent = new Intent(this, SightActivity.class);
+                intent.putParcelableArrayListExtra("sights",sights);
+                startActivityForResult(intent, SIGHT_KEY);
                 break;
             case R.id.name_helpProject:
                 final AlertDialog.Builder builder_help = new AlertDialog.Builder(this);
@@ -373,18 +395,30 @@ public class MapActivity extends AppCompatActivity
         return true;
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        isMapDraw = true;
+        outState.putBoolean("mapState", isMapDraw);
+
+        super.onSaveInstanceState(outState);
+    }
+
     /**
      * Отрисовка карты, объявление менеджеров
      * @param googleMap Карта
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
-
         mMap = googleMap;
         mMap.getUiSettings().setMapToolbarEnabled(false);
         clusterHundler = new ClusterHundler(mMap, this, activity);
         clusterHundler.setupClusterManager();
-        clusterHundler.addSights(new DataBaseHandler(context).getAllSight());
+        if (!isMapDraw) {
+            clusterHundler.addSights(new DataBaseHandler(context).getAllSight());
+        } else {
+            clusterHundler.addSights(new DataBaseHandler(context).getAllSight());
+            clusterHundler.restoreMap();
+        }
         markerManager = new MarkerManager(mMap, this);
         locationManager.setMarkerManager(markerManager);
         mLastKnownLocation = locationManager.getDeviceLocation();
@@ -439,6 +473,12 @@ public class MapActivity extends AppCompatActivity
         Log.d("Camera", "Получил результат " + requestCode);
         if (requestCode == CAMERA_KEY) {
             check = true;
+        }
+        if (requestCode == SIGHT_KEY && data != null){
+            check = true;
+            double lat = data.getDoubleExtra("latitude", 0);
+            double lon = data.getDoubleExtra("longitude", 0);
+            cameraManager.setCameraToCloseSight(new LatLng(lat,lon));
         }
         //super.onActivityResult(requestCode, resultCode, data);
     }
@@ -553,6 +593,7 @@ public class MapActivity extends AppCompatActivity
     protected void onPause() {
         super.onPause();
         unregisterManagers();
+        clusterHundler.clearMap();
     }
 
     @Override
