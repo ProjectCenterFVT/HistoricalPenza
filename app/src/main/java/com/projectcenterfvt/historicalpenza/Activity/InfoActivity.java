@@ -29,7 +29,7 @@ import java.io.InputStream;
  * @version 1.0.0
  * @since 1.0.0
  */
-
+@Deprecated
 public class InfoActivity extends AppCompatActivity {
 
     /**
