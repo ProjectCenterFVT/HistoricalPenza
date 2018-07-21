@@ -1,12 +1,15 @@
 package com.projectcenterfvt.historicalpenza.Dialogs;
 
 import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,7 +35,7 @@ import java.util.Comparator;
  * @since 1.0.0
  */
 
-public class CardDialog extends android.support.v4.app.DialogFragment {
+public class CardDialog extends DialogFragment {
 
     private final String DIALOG_TAG = "dialog_tag";
     private final String KEY_ADAPTER = "adapter";
@@ -81,6 +84,7 @@ public class CardDialog extends android.support.v4.app.DialogFragment {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Nullable
     @Override
     public View onCreateView(final LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {

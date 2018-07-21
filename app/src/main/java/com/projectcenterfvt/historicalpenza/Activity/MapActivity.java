@@ -21,6 +21,7 @@ import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -59,6 +60,7 @@ import com.projectcenterfvt.historicalpenza.Dialogs.CardDialog;
 import com.projectcenterfvt.historicalpenza.Dialogs.HomestadeDialog;
 import com.projectcenterfvt.historicalpenza.Dialogs.LogoutDialog;
 import com.projectcenterfvt.historicalpenza.Dialogs.PageDialog;
+import com.projectcenterfvt.historicalpenza.Fragments.SightFragment;
 import com.projectcenterfvt.historicalpenza.Managers.CameraManager;
 import com.projectcenterfvt.historicalpenza.Managers.ClusterHundler;
 import com.projectcenterfvt.historicalpenza.Managers.MarkerManager;
@@ -85,7 +87,7 @@ import net.hockeyapp.android.UpdateManager;
 
 public class MapActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks,
-        GoogleMap.OnMarkerClickListener, CardDialog.onEventListener {
+        GoogleMap.OnMarkerClickListener, SightFragment.onSightItemClickListener {
 
     /** Сохранение предыдушей позиции камеры после разворота приложения*/
     private static final String KEY_CAMERA_POSITION = "camera_position";
@@ -292,10 +294,11 @@ public class MapActivity extends AppCompatActivity
         int id = item.getItemId();
         switch (id) {
             case R.id.name_sight:
-                FragmentManager fragmentManager_sight = getSupportFragmentManager();
-                CardDialog cardDialog = new CardDialog();
-                cardDialog.setList(mLastKnownLocation, new DataBaseHandler(this).getAllSight());
-                cardDialog.show(fragmentManager_sight, "dialog");
+                //делать активити!
+//                FragmentManager fragmentManager = getFragmentManager();
+//                CardDialog cardDialog = new CardDialog();
+//                cardDialog.setList(mLastKnownLocation, new DataBaseHandler(this).getAllSight());
+//                cardDialog.show(fragmentManager_sight, "dialog");
                 break;
             case R.id.name_helpProject:
                 final AlertDialog.Builder builder_help = new AlertDialog.Builder(this);

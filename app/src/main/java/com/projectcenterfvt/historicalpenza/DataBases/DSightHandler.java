@@ -55,16 +55,18 @@ public class DSightHandler {
     }
 
     public void sortList(Location location) {
-        for (int i = 0; i < list.size(); i++) {
-            DSight dSight = list.get(i);
-            dSight.setDistance(calculateDistance(location, dSight.getLocation()));
-        }
-        Collections.sort(list, new Comparator<DSight>() {
-            @Override
-            public int compare(DSight d0, DSight d1) {
-                return d0.getDistance() - d1.getDistance();
+        if (location!=null) {
+            for (int i = 0; i < list.size(); i++) {
+                DSight dSight = list.get(i);
+                dSight.setDistance(calculateDistance(location, dSight.getLocation()));
             }
-        });
+            Collections.sort(list, new Comparator<DSight>() {
+                @Override
+                public int compare(DSight d0, DSight d1) {
+                    return d0.getDistance() - d1.getDistance();
+                }
+            });
+        }
     }
 
     public LatLng getCloseLocation() {
