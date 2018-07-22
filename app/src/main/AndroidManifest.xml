@@ -15,7 +15,7 @@
         android:largeHeap="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme.NoActionBar">
+        android:theme="@style/MyTheme">
         <activity
             android:name=".Activity.SplashActivity"
             android:theme="@style/AppFullScreenTheme">
@@ -43,6 +43,9 @@
         <activity
             android:name=".Activity.InfoActivity"
             android:parentActivityName=".Activity.MapActivity" />
+        <activity android:name=".Activity.SightActivity"
+            android:parentActivityName=".Activity.MapActivity"
+            android:label="SightActivity"/>
 
         <meta-data
             android:name="net.hockeyapp.android.appIdentifier"

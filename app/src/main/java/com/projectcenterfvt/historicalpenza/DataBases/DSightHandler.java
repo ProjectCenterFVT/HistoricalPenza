@@ -55,6 +55,7 @@ public class DSightHandler {
     }
 
     public void sortList(Location location) {
+
         if (location != null) {
             for (int i = 0; i < list.size(); i++) {
                 DSight dSight = list.get(i);

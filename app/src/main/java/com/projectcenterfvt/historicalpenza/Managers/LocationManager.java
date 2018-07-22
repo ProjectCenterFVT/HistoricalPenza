@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.location.Location;
+import android.nfc.Tag;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Button;
@@ -14,6 +15,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.projectcenterfvt.historicalpenza.DataBases.DSightHandler;
 import com.projectcenterfvt.historicalpenza.R;
@@ -96,7 +98,6 @@ public class LocationManager {
      * @return Местоположение пользователя
      */
     public Location getDeviceLocation() {
-        getLocation();
         return mLastKnownLocation;
     }
 
@@ -106,19 +107,18 @@ public class LocationManager {
 
     @SuppressLint("MissingPermission")
     private void getLocation() {
-        mFusedLocationClient.getLastLocation()
-                .addOnCompleteListener(activity, new OnCompleteListener<Location>() {
-                    @SuppressLint("SetTextI18n")
-                    @Override
-                    public void onComplete(@NonNull Task<Location> task) {
-                        if (task.isSuccessful() && task.getResult() != null) {
-                            mLastKnownLocation = task.getResult();
-                            Log.d(TAG, "Моя позиция = " + mLastKnownLocation.toString());
-                        } else {
-                            Log.d(TAG, "Ошибка");
-                        }
-                    }
-                });
+        mFusedLocationClient.getLastLocation().addOnSuccessListener(activity, new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                Log.d(TAG, "location : " + location);
+                if (location != null) {
+                    mLastKnownLocation = location;
+                    Log.d(TAG, "Моя позиция = " + mLastKnownLocation.toString());
+                } else {
+                    Log.d(TAG, "Ошибка");
+                }
+            }
+        });
     }
 
     /**

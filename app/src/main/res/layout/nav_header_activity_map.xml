@@ -7,8 +7,8 @@
     android:gravity="bottom"
     android:orientation="vertical"
     android:paddingBottom="8dp"
-    android:paddingTop="32dp"
     android:paddingLeft="16dp"
+    android:paddingTop="32dp"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
     <TextView

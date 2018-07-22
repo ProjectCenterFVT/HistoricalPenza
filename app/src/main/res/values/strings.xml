@@ -26,4 +26,5 @@
     <string name="splesh_historic"> Историческая </string>
     <string name="splesh_penza"> Пенза </string>
     <string name="client_server_id">732937176154-shj0athm5rsplqor87f1bj71ssh2e2fa.apps.googleusercontent.com</string>
+    <string name="sort">Фильтры</string>
 </resources>
