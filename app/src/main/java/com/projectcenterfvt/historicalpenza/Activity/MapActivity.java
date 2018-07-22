@@ -87,8 +87,7 @@ import java.util.Comparator;
  */
 
 public class MapActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks,
-        GoogleMap.OnMarkerClickListener {
+        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks{
 
     /** Сохранение предыдушей позиции камеры после разворота приложения*/
     private static final String KEY_CAMERA_POSITION = "camera_position";
@@ -303,11 +302,6 @@ public class MapActivity extends AppCompatActivity
         int id = item.getItemId();
         switch (id) {
             case R.id.name_sight:
-                //делать активити!
-//                FragmentManager fragmentManager = getFragmentManager();
-//                CardDialog cardDialog = new CardDialog();
-//                cardDialog.setList(mLastKnownLocation, new DataBaseHandler(this).getAllSight());
-//                cardDialog.show(fragmentManager_sight, "dialog");
                 mLastKnownLocation = locationManager.getDeviceLocation();
                 ArrayList<Sight> sights = new DataBaseHandler(this).getAllSight();
                 Collections.sort(sights, new Comparator<Sight>() {
@@ -480,99 +474,6 @@ public class MapActivity extends AppCompatActivity
             double lon = data.getDoubleExtra("longitude", 0);
             cameraManager.setCameraToCloseSight(new LatLng(lat,lon));
         }
-        //super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    /**
-     * Обработка нажатие на маркер
-     * @param marker Маркер
-     * @return
-     */
-    @Override
-    @Deprecated
-    public boolean onMarkerClick(final Marker marker) {
-        Log.d("marker", "Нажал на маркер " + marker.getId() + " " + marker.getTitle() + " " + marker.getPosition().toString());
-        Log.d("marker", "Доступность нажатия : " + isMarkerClick);
-        if (!isMarkerClick) {
-            if (marker.getTag() != null) {
-                isMarkerClick = true;
-                final Sight sight = (Sight) marker.getTag();
-
-                final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                final LayoutInflater inflater = this.getLayoutInflater();
-                final View view = inflater.inflate(R.layout.dialog, null);
-                view.setBackgroundResource(R.drawable.dialog_bgn);
-
-                final TextView info = view.findViewById(R.id.dialog_text_info);
-                final TextView distance = view.findViewById(R.id.dialog_text_distance);
-                final TextView were = view.findViewById(R.id.dialog_text_were);
-
-                final Button first = view.findViewById(R.id.first_btn);
-                final Button second = view.findViewById(R.id.second_btn);
-
-                builder.setView(view);
-                builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialogInterface) {
-                        Log.d("marker", "окно закрылось");
-                        isMarkerClick = false;
-                    }
-                });
-                final AlertDialog alert = builder.create();
-
-                info.setText(sight.getTitle());
-                if (sight.getFlag() | sight.getType() == 1) {
-                    were.setText("Вы тут были");
-                    first.setText("Узнать больше");
-
-                    if (mLastKnownLocation != null) {
-                        int dist = DSightHandler.calculateDistance(mLastKnownLocation, sight.getLatitude(), sight.getLongitude());
-                        distance.setText(dist + " м");
-                    }
-
-                    first.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            Intent intent = new Intent(context, InfoActivity.class);
-                            intent.putExtra("title", sight.getTitle());
-                            intent.putExtra("description", sight.getDescription());
-                            intent.putExtra("uml", sight.getImg());
-                            if (sight.getType() == 1) {
-                                intent.putExtra("button", true);
-                            }
-                            startActivityForResult(intent, CAMERA_KEY);
-                            isMarkerClick = false;
-                            alert.dismiss();
-                        }
-                    });
-
-                } else {
-                    were.setText("Вы тут еще не были");
-                    first.setText("Хочу открыть");
-                    first.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            isMarkerClick = false;
-                            Toast.makeText(MapActivity.this, "Доступно в следующий версиях", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                    if (mLastKnownLocation != null) {
-                        int dist = DSightHandler.calculateDistance(mLastKnownLocation, sight.getLatitude(), sight.getLongitude());
-                        distance.setText(dist + " м");
-                    }
-                }
-                alert.getWindow().setBackgroundDrawable(new ColorDrawable(0));
-                second.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        isMarkerClick = false;
-                        alert.dismiss();
-                    }
-                });
-                alert.show();
-            }
-        }
-        return false;
     }
 
     public void lookAtMe(View view) {
