@@ -70,6 +70,8 @@ dependencies {
     compile 'com.google.api-client:google-api-client-android:1.22.0'
     compile 'com.google.apis:google-api-services-people:v1-rev139-1.22.0'
     compile 'com.google.maps.android:android-maps-utils:0.5'
+    compile 'com.github.ksoichiro:android-observablescrollview:1.6.0'
+    compile 'com.nineoldandroids:library:2.4.0'
 }
 
 

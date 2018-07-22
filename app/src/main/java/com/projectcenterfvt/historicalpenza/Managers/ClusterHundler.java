@@ -26,6 +26,7 @@ import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.algo.GridBasedAlgorithm;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.projectcenterfvt.historicalpenza.Activity.InfoActivity;
+import com.projectcenterfvt.historicalpenza.Activity.LandmarkActivity;
 import com.projectcenterfvt.historicalpenza.DataBases.DSightHandler;
 import com.projectcenterfvt.historicalpenza.DataBases.Sight;
 import com.projectcenterfvt.historicalpenza.R;
@@ -107,7 +108,7 @@ public class ClusterHundler {
                     first.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            Intent intent = new Intent(context, InfoActivity.class);
+                            Intent intent = new Intent(context, LandmarkActivity.class);
                             intent.putExtra("title", sight.getTitle());
                             intent.putExtra("description", sight.getDescription());
                             intent.putExtra("uml", sight.getImg());
