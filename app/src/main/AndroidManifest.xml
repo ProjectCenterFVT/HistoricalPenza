@@ -32,7 +32,7 @@
         <activity android:name=".Activity.LandmarkActivity"
             android:label="LandmarkActivity"
             android:theme="@style/AppTheme.Toolbar"
-            />
+            android:parentActivityName=".Activity.MapActivity" />
         <activity
             android:name=".Activity.MapActivity"
             android:label="@string/title_activity_map" />

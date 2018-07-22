@@ -45,6 +45,7 @@ public class LandmarkActivity  extends AppCompatActivity implements ObservableSc
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mImageView = findViewById(R.id.image_info);
         Intent intent = getIntent();
         String title = intent.getStringExtra("title");
@@ -73,6 +74,13 @@ getSupportActionBar().setTitle(title);
         super.onBackPressed();
         setResult(RESULT_OK, null);
         finish();
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        setResult(RESULT_OK, null);
+        finish();
+        return true;
     }
 
     /**Обработчик нажатия кнопки камеры */
