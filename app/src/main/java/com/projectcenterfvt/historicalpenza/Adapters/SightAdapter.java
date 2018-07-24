@@ -61,8 +61,8 @@ public class SightAdapter extends RecyclerView.Adapter<SightAdapter.ViewHolder> 
         TextView tlItem, sItem;
         ViewHolder(View view){
             super(view);
-            tlItem = (TextView) view.findViewById(R.id.two_line_item);
-            sItem = (TextView) view.findViewById(R.id.secondary_item);
+            tlItem = view.findViewById(R.id.two_line_item);
+            sItem = view.findViewById(R.id.secondary_item);
         }
 
     }
