@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/splash"
+    android:id="@+id/activity_splash_p"
     android:background="@drawable/main_bgrnd"
     tools:context="com.projectcenterfvt.historicalpenza.Activity.SplashActivity">
 
