@@ -91,27 +91,6 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(internetReceive, intentFilter);
         activity = this;
-        MultiplePermissionsListener snackbarMultiplePermissionsListener =
-                SnackbarOnAnyDeniedMultiplePermissionsListener.Builder
-                        .with(this.findViewById(R.id.activity_splash_p), "Необохдим доступ к вашему местоположению")
-                        .withOpenSettingsButton("Settings")
-                        .withCallback(new Snackbar.Callback() {
-                            @Override
-                            public void onShown(Snackbar snackbar) {
-                                // Event handler for when the given Snackbar has been dismissed
-                            }
-                            @Override
-                            public void onDismissed(Snackbar snackbar, int event) {
-                                // Event handler for when the given Snackbar is visible
-                            }
-                        })
-                        .build();
-        Dexter.withActivity(activity)
-                .withPermissions(
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.ACCESS_COARSE_LOCATION)
-                .withListener(snackbarMultiplePermissionsListener)
-                .check();
         internetReceive.setOnInternetStatusChange(new InternetReceive.onInternetStatusChange() {
             @Override
             public void onSuccess() {
@@ -123,34 +102,15 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
 
                 mGoogleSignInClient = GoogleSignIn.getClient(activity, signInOptions);
 
-                PermisionsIsGranted();
+                nextPage();
             }
 
             @Override
             public void onFailure() {
-                Log.d("Broadcast", "Получил callback от сервера: интернета нет");
                 Toast.makeText(getApplicationContext(), "Необходимо подключение к интернету!", Toast.LENGTH_LONG).show();
             }
         });
 
-
-            if (!hasPermissions()){
-                // our app has permissions.
-                requestPermissionWithRationale();
-                Log.d("perm", "не могу найти перммшионс");
-
-            }
-            else {
-                //our app doesn't have permissions, So i m requesting permissions.
-                Log.d("perm", " могу найти перммшионс");
-            }
-
-
-
-    }
-    private  void PermisionsIsGranted(){
-        db = new DataBaseHandler(activity);
-        nextPage();
     }
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         boolean allowed = true;
@@ -171,7 +131,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         }
 
         if (allowed){
-            //дал все разрешения
+            nextPage();
         }
         else {
             // we will give warning to user that they haven't granted permissions.
@@ -233,6 +193,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
                         @Override
                         public void onClick(View v) {
                             requestPerms();
+
                             snackBar.dismiss();
                         }
                     })
@@ -353,28 +314,36 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
                 });
     }
     public void nextPage() {
+        if (!hasPermissions()){
+            requestPermissionWithRationale();
+            Log.d("perm", "не могу найти перммшионс");
 
-        if (!preferencesManager.getFirstTime()) {
-            idToServer();
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                public void run() {
-                    startActivity(new Intent(getApplicationContext(), MapActivity.class));
-                    finish();
-                }
-            }, 3000);
-        } else {
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                public void run() {
-                    signOut();
-                    Animation anim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fadein_alpha);
-                    sign_in_button.setEnabled(true);
-                    sign_in_button.setVisibility(View.VISIBLE);
-                    sign_in_button.startAnimation(anim);
-                }
-            }, 2000);
         }
+        else {
+            db = new DataBaseHandler(activity);
+            if (!preferencesManager.getFirstTime()) {
+                idToServer();
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    public void run() {
+                        startActivity(new Intent(getApplicationContext(), MapActivity.class));
+                        finish();
+                    }
+                }, 3000);
+            } else {
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    public void run() {
+                        signOut();
+                        Animation anim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fadein_alpha);
+                        sign_in_button.setEnabled(true);
+                        sign_in_button.setVisibility(View.VISIBLE);
+                        sign_in_button.startAnimation(anim);
+                    }
+                }, 2000);
+            }
+        }
+
 
     }
 
@@ -396,7 +365,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         }
         if (requestCode == REQ_CODE_PERM) {
             if (hasPermissions()){
-
+                nextPage();
             return;
             }
             else {
@@ -411,14 +380,12 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     public void onClick(View view) {
 
-
         switch (view.getId()) {
             case R.id.sign_in_button:
                 signIn();
                 break;
 
         }
-
 
     }
 

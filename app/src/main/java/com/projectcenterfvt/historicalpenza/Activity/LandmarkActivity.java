@@ -68,7 +68,7 @@ public class LandmarkActivity  extends AppCompatActivity implements ObservableSc
         Boolean check = intent.getBooleanExtra("button", false);
         mToolbarView = findViewById(R.id.toolbar);
         mToolbarView.setBackgroundColor(ScrollUtils.getColorWithAlpha(0, getResources().getColor(R.color.colorPrimary)));
-        mScrollView = (ObservableScrollView) findViewById(R.id.scroll);
+        mScrollView = findViewById(R.id.scroll);
         mScrollView.setScrollViewCallbacks(this);
         ImageCacheManager imageCacheManager = new ImageCacheManager(getApplicationContext(), this);
         imageCacheManager.setImage((ImageView) mImageView, uml);

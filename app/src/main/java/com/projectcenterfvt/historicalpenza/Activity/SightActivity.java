@@ -54,12 +54,12 @@ public class SightActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sight_list);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.stoolbar);
+        Toolbar toolbar = findViewById(R.id.stoolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Пенза");
 
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.sight_recycler_view);
+        RecyclerView recyclerView = findViewById(R.id.sight_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         Intent intent = getIntent();
         ArrayList<Sight> sights = intent.getParcelableArrayListExtra("sights");
