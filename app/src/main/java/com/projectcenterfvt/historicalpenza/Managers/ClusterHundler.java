@@ -1,12 +1,16 @@
 package com.projectcenterfvt.historicalpenza.Managers;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,12 +43,18 @@ import java.util.Collection;
  */
 
 public class ClusterHundler {
+    private static final int READ_EXTERNAL_RESPONSE_KEY = 36;
+    private static final int WRITE_EXTERNAL_RESPONSE_KEY = 37;
+    private int CAMERA_KEY = 1;
     private ClusterManager<Sight> clusterManager;
     private GoogleMap mMap;
     private Context context;
     private Activity activity;
     private LocationManager locationManager;
-    private int CAMERA_KEY = 1;
+
+    public void setLocationManager(LocationManager locationManager) {
+        this.locationManager = locationManager;
+    }
 
     public ClusterHundler(GoogleMap mMap, Context context, Activity activity) {
         this.mMap = mMap;
@@ -54,7 +64,6 @@ public class ClusterHundler {
 
     public void setupClusterManager() {
         clusterManager = new ClusterManager<Sight>(context, mMap);
-        locationManager = new LocationManager(context, activity);
         clusterManager.setRenderer(new MarkerRender());
         clusterManager.setAlgorithm(new GridBasedAlgorithm<Sight>());
         mMap.setOnCameraIdleListener(clusterManager);
@@ -205,5 +214,6 @@ public class ClusterHundler {
             }
         }
     }
+
 
 }

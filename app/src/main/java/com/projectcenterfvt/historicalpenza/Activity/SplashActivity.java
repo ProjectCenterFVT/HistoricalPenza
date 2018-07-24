@@ -8,10 +8,13 @@ import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -29,15 +32,21 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.karumi.dexter.listener.multi.SnackbarOnAnyDeniedMultiplePermissionsListener;
 import com.projectcenterfvt.historicalpenza.BuildConfig;
 import com.projectcenterfvt.historicalpenza.DataBases.DataBaseHandler;
 import com.projectcenterfvt.historicalpenza.DataBases.Sight;
+import com.projectcenterfvt.historicalpenza.Managers.ImageCacheManager;
 import com.projectcenterfvt.historicalpenza.Managers.PreferencesManager;
 import com.projectcenterfvt.historicalpenza.R;
 import com.projectcenterfvt.historicalpenza.Server.BaseAsyncTask;
 import com.projectcenterfvt.historicalpenza.Server.ClientServer;
 import com.projectcenterfvt.historicalpenza.Server.LoginServer;
 import com.projectcenterfvt.historicalpenza.Service.InternetReceive;
+
+import java.io.File;
 
 
 /**
@@ -51,14 +60,13 @@ import com.projectcenterfvt.historicalpenza.Service.InternetReceive;
  */
 
 public class SplashActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
-    /**
-     * ID, по которому выводятся логи в Logcat
-     */
+
+
     static final String TAG = "server";
-    /**
-     * Ключ, по которому проверяется первый запуск приложения
-     */
     private static final int REQ_CODE = 9002;
+    private static final int RESPONCE_LOCATION_PERMISSION_KEY = 21;
+    private static final int RESPONCE_EXTERNAL_STORAGE_PERMISSION_KEY = 22;
+    private static final String PERMISIONS_TAG = "permisions";
     private static DataBaseHandler db;
     /**
      * Экземпляр класс базы данных
@@ -83,6 +91,27 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(internetReceive, intentFilter);
         activity = this;
+        MultiplePermissionsListener snackbarMultiplePermissionsListener =
+                SnackbarOnAnyDeniedMultiplePermissionsListener.Builder
+                        .with(this.findViewById(R.id.splash), "Необохдим доступ к вашему местоположению")
+                        .withOpenSettingsButton("Settings")
+                        .withCallback(new Snackbar.Callback() {
+                            @Override
+                            public void onShown(Snackbar snackbar) {
+                                // Event handler for when the given Snackbar has been dismissed
+                            }
+                            @Override
+                            public void onDismissed(Snackbar snackbar, int event) {
+                                // Event handler for when the given Snackbar is visible
+                            }
+                        })
+                        .build();
+        Dexter.withActivity(activity)
+                .withPermissions(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION)
+                .withListener(snackbarMultiplePermissionsListener)
+                .check();
         internetReceive.setOnInternetStatusChange(new InternetReceive.onInternetStatusChange() {
             @Override
             public void onSuccess() {
@@ -93,15 +122,6 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
                         .build();
 
                 mGoogleSignInClient = GoogleSignIn.getClient(activity, signInOptions);
-
-                if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(activity,
-                            new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
-                    34);
-                    ActivityCompat.requestPermissions(activity,
-                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    35);
-                }
 
                 db = new DataBaseHandler(activity);
                 nextPage();
@@ -116,14 +136,30 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
 
     }
 
+//    private void checkLocationPermission(){
+//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+//            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+//                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+//
+//            } else {
+//                Log.d(PERMISIONS_TAG, "Разрешения на местоположения не получены");
+//                ActivityCompat.requestPermissions(this, new String[]
+//                        {
+//                                Manifest.permission.ACCESS_FINE_LOCATION,
+//                                Manifest.permission.ACCESS_COARSE_LOCATION
+//                        }, RESPONCE_LOCATION_PERMISSION_KEY);
+//            }
+//        } else {
+//            Log.d(PERMISIONS_TAG, "Разрешения на местоположения получены");
+//        }
+//    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         this.unregisterReceiver(internetReceive);
     }
 
-/**
- * вызывается при нажатии на кнопку войти*/
     private void signIn() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, REQ_CODE);
@@ -140,27 +176,35 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == 34 | requestCode == 35) {
-            if (grantResults.length <= 0) {
-                // If user interaction was interrupted, the permission request is cancelled and you
-                // receive empty arrays.
-            } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted.
-                //getLastLocation();
-            } else {
-                Intent intent = new Intent();
-                intent.setAction(
-                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                Uri uri = Uri.fromParts("package",
-                        BuildConfig.APPLICATION_ID, null);
-                intent.setData(uri);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-            }
-        }
-    }
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+//        switch (requestCode){
+//            case RESPONCE_LOCATION_PERMISSION_KEY:
+//                if (grantResults.length <= 0) {
+//
+//                } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                    Log.d(PERMISIONS_TAG, "Местоположение доступно");
+//                } else {
+//                    Intent intent = new Intent();
+//                    intent.setAction(
+//                            Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+//                    Uri uri = Uri.fromParts("package",
+//                            BuildConfig.APPLICATION_ID, null);
+//                    intent.setData(uri);
+//                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                    startActivity(intent);
+//                }
+//                break;
+//            case RESPONCE_EXTERNAL_STORAGE_PERMISSION_KEY:
+//                if (grantResults.length <= 0) {
+//
+//                } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                    Log.d(PERMISIONS_TAG, "Создаю папку");
+//                    ImageCacheManager.createFolder();
+//                }
+//                break;
+//        }
+//    }
 
     private void handleSignInResult(@NonNull Task<GoogleSignInAccount> completedTask) {
         try {
@@ -175,7 +219,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
     }
 /**
  * метод отправляет данные на сервер*/
-private void sendToBackEnd(String id) {
+    private void sendToBackEnd(String id) {
     LoginServer ls = new LoginServer(getApplicationContext());
         ls.setOnResponseListener(new BaseAsyncTask.OnResponseListener<String>() {
             @Override

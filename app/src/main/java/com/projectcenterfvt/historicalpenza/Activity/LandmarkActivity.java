@@ -1,29 +1,39 @@
 package com.projectcenterfvt.historicalpenza.Activity;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.Image;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.ksoichiro.android.observablescrollview.ObservableScrollView;
 import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
 import com.github.ksoichiro.android.observablescrollview.ScrollState;
 import com.github.ksoichiro.android.observablescrollview.ScrollUtils;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.listener.single.PermissionListener;
+import com.karumi.dexter.listener.single.SnackbarOnDeniedPermissionListener;
 import com.nineoldandroids.view.ViewHelper;
-import com.projectcenterfvt.historicalpenza.CustomTextView.TextViewEx;
 import com.projectcenterfvt.historicalpenza.Dialogs.HomestadeDialog;
+import com.projectcenterfvt.historicalpenza.Managers.ImageCacheManager;
 import com.projectcenterfvt.historicalpenza.R;
 import com.projectcenterfvt.historicalpenza.Server.BaseAsyncTask;
 
@@ -34,10 +44,14 @@ import java.io.InputStream;
  */
 
 public class LandmarkActivity  extends AppCompatActivity implements ObservableScrollViewCallbacks {
+
+    private static final int PERMISSION_REQUEST_CODE = 777;
+
     private View mImageView;
     private View mToolbarView;
     private ObservableScrollView mScrollView;
     private int mParallaxImageHeight;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,7 +70,9 @@ public class LandmarkActivity  extends AppCompatActivity implements ObservableSc
         mToolbarView.setBackgroundColor(ScrollUtils.getColorWithAlpha(0, getResources().getColor(R.color.colorPrimary)));
         mScrollView = (ObservableScrollView) findViewById(R.id.scroll);
         mScrollView.setScrollViewCallbacks(this);
-        new DownloadImageLand((ImageView) findViewById(R.id.image_info)).execute(uml);
+        ImageCacheManager imageCacheManager = new ImageCacheManager(getApplicationContext(), this);
+        imageCacheManager.setImage((ImageView) mImageView, uml);
+        //new DownloadImageLand((ImageView) findViewById(R.id.image_info)).execute(uml);
 
         TextView body = findViewById(R.id.body);
         body.setText(description);
@@ -106,6 +122,8 @@ getSupportActionBar().setTitle(title);
         Log.d("scroll"," У скролено" + Y_scrol);
 
     }
+
+
     @Override
     public void onDownMotionEvent() {
 
@@ -122,6 +140,7 @@ getSupportActionBar().setTitle(title);
         HomestadeDialog dialog = new HomestadeDialog();
         dialog.show(fragmentManager, "dialog");
     }
+
 
     /**
      * Класс для получения изображения от сервера
@@ -155,5 +174,6 @@ getSupportActionBar().setTitle(title);
         protected void onPostExecute(Bitmap result) {
             bmImage.setImageBitmap(result);
         }
+
     }
 }

@@ -1,5 +1,6 @@
 package com.projectcenterfvt.historicalpenza.Activity;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ComponentName;
@@ -21,7 +22,9 @@ import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
@@ -60,6 +63,7 @@ import com.projectcenterfvt.historicalpenza.Dialogs.LogoutDialog;
 import com.projectcenterfvt.historicalpenza.Dialogs.PageDialog;
 import com.projectcenterfvt.historicalpenza.Managers.CameraManager;
 import com.projectcenterfvt.historicalpenza.Managers.ClusterHundler;
+import com.projectcenterfvt.historicalpenza.Managers.ImageCacheManager;
 import com.projectcenterfvt.historicalpenza.Managers.MarkerManager;
 import com.projectcenterfvt.historicalpenza.Managers.PreferencesManager;
 import com.projectcenterfvt.historicalpenza.Managers.SearchManager;
@@ -89,10 +93,6 @@ import java.util.Comparator;
 public class MapActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks{
 
-    /** Сохранение предыдушей позиции камеры после разворота приложения*/
-    private static final String KEY_CAMERA_POSITION = "camera_position";
-    /**Сохранение предыдушей позиции после разворота приложения */
-    private static final String KEY_LOCATION = "location";
     private static final int SIGHT_KEY = 2;
     LocationService locationService;
     /** Карта*/
@@ -406,6 +406,7 @@ public class MapActivity extends AppCompatActivity
         mMap = googleMap;
         mMap.getUiSettings().setMapToolbarEnabled(false);
         clusterHundler = new ClusterHundler(mMap, this, activity);
+        clusterHundler.setLocationManager(locationManager);
         clusterHundler.setupClusterManager();
         if (!isMapDraw) {
             clusterHundler.addSights(new DataBaseHandler(context).getAllSight());
@@ -493,8 +494,12 @@ public class MapActivity extends AppCompatActivity
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterManagers();
-        clusterHundler.clearMap();
+        try{
+            unregisterManagers();
+            clusterHundler.clearMap();
+        } catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     @Override
@@ -553,6 +558,7 @@ public class MapActivity extends AppCompatActivity
             }
         }
     }
+
 
     public void checkNotifications(View view) {
         Switch notifSwitch = view.findViewById(R.id.notifSwitch);
