@@ -1,6 +1,8 @@
 package com.projectcenterfvt.historicalpenza.Activity;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -20,7 +22,9 @@ import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
@@ -54,11 +58,12 @@ import com.projectcenterfvt.historicalpenza.DataBases.DSightHandler;
 import com.projectcenterfvt.historicalpenza.DataBases.DataBaseHandler;
 import com.projectcenterfvt.historicalpenza.DataBases.Sight;
 import com.projectcenterfvt.historicalpenza.Dialogs.AboutDialog;
-import com.projectcenterfvt.historicalpenza.Dialogs.CardDialog;
 import com.projectcenterfvt.historicalpenza.Dialogs.HomestadeDialog;
 import com.projectcenterfvt.historicalpenza.Dialogs.LogoutDialog;
 import com.projectcenterfvt.historicalpenza.Dialogs.PageDialog;
 import com.projectcenterfvt.historicalpenza.Managers.CameraManager;
+import com.projectcenterfvt.historicalpenza.Managers.ClusterHundler;
+import com.projectcenterfvt.historicalpenza.Managers.ImageCacheManager;
 import com.projectcenterfvt.historicalpenza.Managers.MarkerManager;
 import com.projectcenterfvt.historicalpenza.Managers.PreferencesManager;
 import com.projectcenterfvt.historicalpenza.Managers.SearchManager;
@@ -67,6 +72,10 @@ import com.projectcenterfvt.historicalpenza.Service.LocationService;
 
 import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.UpdateManager;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Вся основная работа происходит в этом классе. Однако основные задачи распределены по классам менеджерам.
@@ -82,13 +91,9 @@ import net.hockeyapp.android.UpdateManager;
  */
 
 public class MapActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks,
-        GoogleMap.OnMarkerClickListener, CardDialog.onEventListener {
+        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks{
 
-    /** Сохранение предыдушей позиции камеры после разворота приложения*/
-    private static final String KEY_CAMERA_POSITION = "camera_position";
-    /**Сохранение предыдушей позиции после разворота приложения */
-    private static final String KEY_LOCATION = "location";
+    private static final int SIGHT_KEY = 2;
     LocationService locationService;
     /** Карта*/
     private GoogleMap mMap;
@@ -117,6 +122,8 @@ public class MapActivity extends AppCompatActivity
 
     private DSightHandler dSightHandler;
 
+    private Activity activity;
+
     /**
      * !!!! Не трогать и не прикосаться. Это тестирующий вариант обработки местоположения. ТРЕБУЕТСЯ В ДОРАБОТКЕ И ТЕСТИРОВАНИИ
      */
@@ -125,7 +132,9 @@ public class MapActivity extends AppCompatActivity
     private String TAG_GEO = "Geoinformation";
     private Intent serviceIntent;
     private ServiceConnection sConn;
+    private ClusterHundler clusterHundler;
 
+    private boolean isMapDraw = false;
     private boolean isMarkerClick = false;
 
     private LocationListener locationListener = new LocationListener() {
@@ -161,8 +170,10 @@ public class MapActivity extends AppCompatActivity
     };
 
     @Override
-    public void setPosition(LatLng loc) {
-        cameraManager.setCameraPosition(loc);
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        isMapDraw = savedInstanceState.getBoolean("mapState");
     }
 
     /**
@@ -173,6 +184,7 @@ public class MapActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        activity = this;
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         serviceIntent = new Intent(MapActivity.this, LocationService.class);
         setContentView(R.layout.activity_map);
@@ -208,6 +220,10 @@ public class MapActivity extends AppCompatActivity
         searchManager = new SearchManager(this, mDrawerLayout);
         searchManager.setSearchView((FloatingSearchView) findViewById(R.id.floating_search_view));
         checkForUpdates();
+
+        if (savedInstanceState != null){
+            isMarkerClick = savedInstanceState.getBoolean("mapState");
+        }
 
     }
 
@@ -286,10 +302,19 @@ public class MapActivity extends AppCompatActivity
         int id = item.getItemId();
         switch (id) {
             case R.id.name_sight:
-                FragmentManager fragmentManager_sight = getSupportFragmentManager();
-                CardDialog cardDialog = new CardDialog();
-                cardDialog.setList(mLastKnownLocation, new DataBaseHandler(this).getAllSight());
-                cardDialog.show(fragmentManager_sight, "dialog");
+                mLastKnownLocation = locationManager.getDeviceLocation();
+                ArrayList<Sight> sights = new DataBaseHandler(this).getAllSight();
+                Collections.sort(sights, new Comparator<Sight>() {
+                    @Override
+                    public int compare(Sight s0, Sight s1) {
+                        s0.setDistance(DSightHandler.calculateDistance(mLastKnownLocation, s0.getLocation()));
+                        s1.setDistance(DSightHandler.calculateDistance(mLastKnownLocation, s1.getLocation()));
+                        return s0.getDistance() - s1.getDistance();
+                    }
+                });
+                Intent intent = new Intent(this, SightActivity.class);
+                intent.putParcelableArrayListExtra("sights",sights);
+                startActivityForResult(intent, SIGHT_KEY);
                 break;
             case R.id.name_helpProject:
                 final AlertDialog.Builder builder_help = new AlertDialog.Builder(this);
@@ -364,37 +389,48 @@ public class MapActivity extends AppCompatActivity
         return true;
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        isMapDraw = true;
+        outState.putBoolean("mapState", isMapDraw);
+
+        super.onSaveInstanceState(outState);
+    }
+
     /**
      * Отрисовка карты, объявление менеджеров
      * @param googleMap Карта
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
-
         mMap = googleMap;
-        mMap.setMinZoomPreference(12.0f);
-        mMap.setMaxZoomPreference(17.0f);
-        mMap.setOnMarkerClickListener(this);
         mMap.getUiSettings().setMapToolbarEnabled(false);
+        clusterHundler = new ClusterHundler(mMap, this, activity);
+        clusterHundler.setLocationManager(locationManager);
+        clusterHundler.setupClusterManager();
+        if (!isMapDraw) {
+            clusterHundler.addSights(new DataBaseHandler(context).getAllSight());
+        } else {
+            clusterHundler.addSights(new DataBaseHandler(context).getAllSight());
+            clusterHundler.restoreMap();
+        }
         markerManager = new MarkerManager(mMap, this);
         locationManager.setMarkerManager(markerManager);
         mLastKnownLocation = locationManager.getDeviceLocation();
         dSightHandler.sortList(mLastKnownLocation);
         markerManager.addStartMarker();
         markerManager.addMyMarker(mLastKnownLocation);
-        markerManager.drawMarkers();
         cameraManager = new CameraManager(this, mMap);
         searchManager.setCameraManager(cameraManager);
         Log.d("check", "check = " + check);
         if (!check)
             cameraManager.setCameraPosition(mLastKnownLocation);
-        searchManager.setStackMarkers(markerManager.getStackMarkers());
         searchManager.setupSearch();
         String token = preferencesManager.getToken();
         serviceIntent.putExtra("token", token);
         locationService.setContext(this);
-        locationService.setMarkerManager(markerManager);
         locationService.setdSightHandler(dSightHandler);
+        locationService.setClusterHundler(clusterHundler);
         startService(serviceIntent);
     }
 
@@ -411,15 +447,20 @@ public class MapActivity extends AppCompatActivity
     }
 
     public void plus(View view) {
-        final Animation animAlpha = AnimationUtils.loadAnimation(this, R.anim.activity_down_up_close_enter);
-        view.startAnimation(animAlpha);
-        mMap.animateCamera(CameraUpdateFactory.zoomBy(1.0f));
+        synchronized (clusterHundler) {
+            final Animation animAlpha = AnimationUtils.loadAnimation(this, R.anim.activity_down_up_close_enter);
+            view.startAnimation(animAlpha);
+            mMap.animateCamera(CameraUpdateFactory.zoomBy(0.5f));
+        }
     }
 
     public void minus(View view) {
-        final Animation animAlpha = AnimationUtils.loadAnimation(this, R.anim.activity_down_up_close_enter);
-        view.startAnimation(animAlpha);
-        mMap.animateCamera(CameraUpdateFactory.zoomBy(-1.0f));
+        synchronized (clusterHundler) {
+            final Animation animAlpha = AnimationUtils.loadAnimation(this, R.anim.activity_down_up_close_enter);
+            view.startAnimation(animAlpha);
+            mMap.animateCamera(CameraUpdateFactory.zoomBy(-0.5f));
+        }
+
     }
 
     @Override
@@ -428,98 +469,12 @@ public class MapActivity extends AppCompatActivity
         if (requestCode == CAMERA_KEY) {
             check = true;
         }
-        //super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    /**
-     * Обработка нажатие на маркер
-     * @param marker Маркер
-     * @return
-     */
-    @Override
-    public boolean onMarkerClick(final Marker marker) {
-        Log.d("marker", "Нажал на маркер " + marker.getId() + " " + marker.getTitle() + " " + marker.getPosition().toString());
-        Log.d("marker", "Доступность нажатия : " + isMarkerClick);
-        if (!isMarkerClick) {
-            if (marker.getTag() != null) {
-                isMarkerClick = true;
-                final Sight sight = (Sight) marker.getTag();
-
-                final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                final LayoutInflater inflater = this.getLayoutInflater();
-                final View view = inflater.inflate(R.layout.dialog, null);
-                view.setBackgroundResource(R.drawable.dialog_bgn);
-
-                final TextView info = view.findViewById(R.id.dialog_text_info);
-                final TextView distance = view.findViewById(R.id.dialog_text_distance);
-                final TextView were = view.findViewById(R.id.dialog_text_were);
-
-                final Button first = view.findViewById(R.id.first_btn);
-                final Button second = view.findViewById(R.id.second_btn);
-
-                builder.setView(view);
-                builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialogInterface) {
-                        Log.d("marker", "окно закрылось");
-                        isMarkerClick = false;
-                    }
-                });
-                final AlertDialog alert = builder.create();
-
-                info.setText(sight.getTitle());
-                if (sight.getFlag() | sight.getType() == 1) {
-                    were.setText("Вы тут были");
-                    first.setText("Узнать больше");
-
-                    if (mLastKnownLocation != null) {
-                        int dist = DSightHandler.calculateDistance(mLastKnownLocation, sight.getLatitude(), sight.getLongitude());
-                        distance.setText(dist + " м");
-                    }
-
-                    first.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            Intent intent = new Intent(context, InfoActivity.class);
-                            intent.putExtra("title", sight.getTitle());
-                            intent.putExtra("description", sight.getDescription());
-                            intent.putExtra("uml", sight.getImg());
-                            if (sight.getType() == 1) {
-                                intent.putExtra("button", true);
-                            }
-                            startActivityForResult(intent, CAMERA_KEY);
-                            isMarkerClick = false;
-                            alert.dismiss();
-                        }
-                    });
-
-                } else {
-                    were.setText("Вы тут еще не были");
-                    first.setText("Хочу открыть");
-                    first.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            isMarkerClick = false;
-                            Toast.makeText(MapActivity.this, "Доступно в следующий версиях", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                    if (mLastKnownLocation != null) {
-                        int dist = DSightHandler.calculateDistance(mLastKnownLocation, sight.getLatitude(), sight.getLongitude());
-                        distance.setText(dist + " м");
-                    }
-                }
-                alert.getWindow().setBackgroundDrawable(new ColorDrawable(0));
-                second.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        isMarkerClick = false;
-                        alert.dismiss();
-                    }
-                });
-                alert.show();
-            }
+        if (requestCode == SIGHT_KEY && data != null){
+            check = true;
+            double lat = data.getDoubleExtra("latitude", 0);
+            double lon = data.getDoubleExtra("longitude", 0);
+            cameraManager.setCameraToCloseSight(new LatLng(lat,lon));
         }
-        return false;
     }
 
     public void lookAtMe(View view) {
@@ -539,7 +494,12 @@ public class MapActivity extends AppCompatActivity
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterManagers();
+        try{
+            unregisterManagers();
+            clusterHundler.clearMap();
+        } catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     @Override
@@ -598,6 +558,7 @@ public class MapActivity extends AppCompatActivity
             }
         }
     }
+
 
     public void checkNotifications(View view) {
         Switch notifSwitch = view.findViewById(R.id.notifSwitch);

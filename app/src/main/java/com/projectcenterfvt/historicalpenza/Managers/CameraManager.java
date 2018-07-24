@@ -19,7 +19,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 public class CameraManager {
 
-    private static int DEFAULT_ZOOM = 9;
+    private static float DEFAULT_ZOOM = 15.0f;
     private final LatLng mDefaultLocation = new LatLng(53.204020, 45.012645);
     private Context myContext;
     private GoogleMap mMap;
@@ -41,7 +41,7 @@ public class CameraManager {
         } else if (location != null) {
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
                     new LatLng(location.getLatitude(),
-                            location.getLongitude()), mMap.getCameraPosition().zoom));
+                            location.getLongitude()), DEFAULT_ZOOM));
         } else {
             Log.d("TAG", "Current location is null. Using defaults.");
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
@@ -59,7 +59,22 @@ public class CameraManager {
             } else if (location.latitude != 0) {
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
                         new LatLng(location.latitude,
-                                location.longitude), 16.0f));
+                                location.longitude), mMap.getCameraPosition().zoom));
+            } else {
+                Log.d("TAG", "Current location is null. Using defaults.");
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
+            }
+        }
+    }
+
+    public void setCameraToCloseSight(LatLng location){
+        synchronized (location) {
+            if (mCameraPosition != null) {
+                mMap.moveCamera(CameraUpdateFactory.newCameraPosition(mCameraPosition));
+            } else if (location.latitude != 0) {
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                        new LatLng(location.latitude,
+                                location.longitude), DEFAULT_ZOOM));
             } else {
                 Log.d("TAG", "Current location is null. Using defaults.");
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));

@@ -32,6 +32,7 @@ public class MarkerManager {
     private Context myContext;
     private Marker myMarker;
     private String TAG = "Marker";
+    @Deprecated
     private HashMap<Integer, Marker> stackMarkers = new HashMap<>();
 
     public MarkerManager(GoogleMap mMap, Context myContext) {
@@ -39,6 +40,7 @@ public class MarkerManager {
         this.myContext = myContext;
     }
 
+    @Deprecated
     public HashMap<Integer, Marker> getStackMarkers() {
         return stackMarkers;
     }
@@ -49,6 +51,7 @@ public class MarkerManager {
      * @param sight    Достопримечательность
      */
 
+    @Deprecated
     public void addSightMarker(Sight sight) {
         MarkerOptions options = new MarkerOptions();
         options.position(sight.getLocation());
@@ -79,6 +82,7 @@ public class MarkerManager {
         Log.d(TAG, "нарисовал маркер с координатами " + sight.getLocation());
     }
 
+    @Deprecated
     @SuppressLint("NewApi")
     public void addSightMarker(Sight sight, Marker marker) {
         marker.remove();
@@ -140,10 +144,12 @@ public class MarkerManager {
         Log.d(TAG, "Создал стартовый маркер");
     }
 
+    @Deprecated
     public void refreshMarker(Sight sight) {
         addSightMarker(sight, stackMarkers.get(sight.getId()));
     }
 
+    @Deprecated
     public void drawMarkers() {
         DataBaseHandler dataBaseHandler = new DataBaseHandler(myContext);
         ArrayList<Sight> sights = dataBaseHandler.getAllSight();

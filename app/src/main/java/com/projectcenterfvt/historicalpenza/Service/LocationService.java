@@ -24,7 +24,7 @@ import com.projectcenterfvt.historicalpenza.DataBases.DSight;
 import com.projectcenterfvt.historicalpenza.DataBases.DSightHandler;
 import com.projectcenterfvt.historicalpenza.DataBases.DataBaseHandler;
 import com.projectcenterfvt.historicalpenza.DataBases.Sight;
-import com.projectcenterfvt.historicalpenza.Managers.MarkerManager;
+import com.projectcenterfvt.historicalpenza.Managers.ClusterHundler;
 import com.projectcenterfvt.historicalpenza.R;
 import com.projectcenterfvt.historicalpenza.Server.BaseAsyncTask;
 import com.projectcenterfvt.historicalpenza.Server.ClientServer;
@@ -39,7 +39,11 @@ public class LocationService extends Service implements LocationListener {
     private String TAG = "locationManager";
     private String mToken;
     private Context context;
-    private MarkerManager markerManager;
+    private ClusterHundler clusterHundler;
+
+    public void setClusterHundler(ClusterHundler clusterHundler) {
+        this.clusterHundler = clusterHundler;
+    }
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -87,9 +91,7 @@ public class LocationService extends Service implements LocationListener {
                     public void onSuccess(Void result) {
                         DataBaseHandler dataBaseHandler = new DataBaseHandler(context);
                         dataBaseHandler.changeStatus(sight.getId());
-                        sight.setFlag(true);
-                        markerManager.refreshMarker(sight);
-                        dataBaseHandler.changeStatus(sight.getId());
+                        clusterHundler.refreshMarker(sight);
 
                         setUpNotification(sight);
                     }
@@ -125,10 +127,6 @@ public class LocationService extends Service implements LocationListener {
     @Override
     public void onProviderDisabled(String s) {
 
-    }
-
-    public void setMarkerManager(MarkerManager markerManager) {
-        this.markerManager = markerManager;
     }
 
     private void setUpNotification(Sight sight) {

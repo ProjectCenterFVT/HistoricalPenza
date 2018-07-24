@@ -9,11 +9,13 @@ import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -31,15 +33,21 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.karumi.dexter.listener.multi.SnackbarOnAnyDeniedMultiplePermissionsListener;
 import com.projectcenterfvt.historicalpenza.BuildConfig;
 import com.projectcenterfvt.historicalpenza.DataBases.DataBaseHandler;
 import com.projectcenterfvt.historicalpenza.DataBases.Sight;
+import com.projectcenterfvt.historicalpenza.Managers.ImageCacheManager;
 import com.projectcenterfvt.historicalpenza.Managers.PreferencesManager;
 import com.projectcenterfvt.historicalpenza.R;
 import com.projectcenterfvt.historicalpenza.Server.BaseAsyncTask;
 import com.projectcenterfvt.historicalpenza.Server.ClientServer;
 import com.projectcenterfvt.historicalpenza.Server.LoginServer;
 import com.projectcenterfvt.historicalpenza.Service.InternetReceive;
+
+import java.io.File;
 
 
 /**
@@ -53,15 +61,12 @@ import com.projectcenterfvt.historicalpenza.Service.InternetReceive;
  */
 
 public class SplashActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
-    /**
-     * ID, по которому выводятся логи в Logcat
-     */
+
+
     static final String TAG = "server";
-    /**
-     * Ключ, по которому проверяется первый запуск приложения
-     */
     private static final int REQ_CODE = 9002;
     private  static final int REQ_CODE_PERM = 111;
+
     private static DataBaseHandler db;
     /**
      * Экземпляр класс базы данных
@@ -86,6 +91,27 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(internetReceive, intentFilter);
         activity = this;
+        MultiplePermissionsListener snackbarMultiplePermissionsListener =
+                SnackbarOnAnyDeniedMultiplePermissionsListener.Builder
+                        .with(this.findViewById(R.id.splash), "Необохдим доступ к вашему местоположению")
+                        .withOpenSettingsButton("Settings")
+                        .withCallback(new Snackbar.Callback() {
+                            @Override
+                            public void onShown(Snackbar snackbar) {
+                                // Event handler for when the given Snackbar has been dismissed
+                            }
+                            @Override
+                            public void onDismissed(Snackbar snackbar, int event) {
+                                // Event handler for when the given Snackbar is visible
+                            }
+                        })
+                        .build();
+        Dexter.withActivity(activity)
+                .withPermissions(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION)
+                .withListener(snackbarMultiplePermissionsListener)
+                .check();
         internetReceive.setOnInternetStatusChange(new InternetReceive.onInternetStatusChange() {
             @Override
             public void onSuccess() {
@@ -97,7 +123,9 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
 
                 mGoogleSignInClient = GoogleSignIn.getClient(activity, signInOptions);
 
-
+                db = new DataBaseHandler(activity);
+                nextPage();
+            }
 
             }
             @Override
@@ -240,14 +268,13 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         }
         return true;
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         this.unregisterReceiver(internetReceive);
     }
 
-    /**
-     * вызывается при нажатии на кнопку войти*/
     private void signIn() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, REQ_CODE);
@@ -263,7 +290,6 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
             Toast.makeText(this, message, Toast.LENGTH_LONG).show();
         }
     }
-
 
 
     private void handleSignInResult(@NonNull Task<GoogleSignInAccount> completedTask) {

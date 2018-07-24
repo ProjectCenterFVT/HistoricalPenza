@@ -5,4 +5,6 @@
     <color name="colorAccent">#47adcb</color>
     <color name="colorBlack">#000000</color>
     <color name="navItemBackground">#343434</color>
+    <color name="twoLineColor">#383838</color>
+    <color name="secondaryColor">#717171</color>
 </resources>
