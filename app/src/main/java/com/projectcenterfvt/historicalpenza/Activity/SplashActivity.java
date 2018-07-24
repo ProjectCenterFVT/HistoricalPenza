@@ -93,7 +93,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         activity = this;
         MultiplePermissionsListener snackbarMultiplePermissionsListener =
                 SnackbarOnAnyDeniedMultiplePermissionsListener.Builder
-                        .with(this.findViewById(R.id.splash), "Необохдим доступ к вашему местоположению")
+                        .with(this.findViewById(R.id.activity_splash_p), "Необохдим доступ к вашему местоположению")
                         .withOpenSettingsButton("Settings")
                         .withCallback(new Snackbar.Callback() {
                             @Override
@@ -123,11 +123,9 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
 
                 mGoogleSignInClient = GoogleSignIn.getClient(activity, signInOptions);
 
-                db = new DataBaseHandler(activity);
-                nextPage();
+                PermisionsIsGranted();
             }
 
-            }
             @Override
             public void onFailure() {
                 Log.d("Broadcast", "Получил callback от сервера: интернета нет");
@@ -144,9 +142,9 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
             }
             else {
                 //our app doesn't have permissions, So i m requesting permissions.
-                PermisionsIsGranted();
                 Log.d("perm", " могу найти перммшионс");
             }
+
 
 
     }
@@ -174,7 +172,6 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
 
         if (allowed){
             //дал все разрешения
-            PermisionsIsGranted();
         }
         else {
             // we will give warning to user that they haven't granted permissions.
@@ -186,14 +183,14 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
 //                    Intent intent = new Intent(getApplicationContext(), SplashActivity.class);
 //                    SplashActivity.this.startActivity(intent);
 //                    SplashActivity.this.finish();
-                    Handler handler = new Handler();
-                  handler.postDelayed(new Runnable() {
-                       public void run() {
-                           Intent intent = new Intent(getApplicationContext(), SplashActivity.class);
-                           SplashActivity.this.startActivity(intent);
-                           SplashActivity.this.finish();
-                       }
-                    }, 5000);
+//                    Handler handler = new Handler();
+//                  handler.postDelayed(new Runnable() {
+//                       public void run() {
+//                           Intent intent = new Intent(getApplicationContext(), SplashActivity.class);
+//                           SplashActivity.this.startActivity(intent);
+//                           SplashActivity.this.finish();
+//                       }
+//                    }, 5000);
 
                 } else {
                     showNoStoragePermissionSnackbar();
@@ -399,7 +396,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         }
         if (requestCode == REQ_CODE_PERM) {
             if (hasPermissions()){
-            PermisionsIsGranted();
+
             return;
             }
             else {
