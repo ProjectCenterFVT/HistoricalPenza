@@ -12,12 +12,14 @@ import android.location.Location;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.billingclient.api.BillingClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -51,15 +53,17 @@ public class ClusterHundler {
     private Context context;
     private Activity activity;
     private LocationManager locationManager;
-
+    private BillingManager mBillingManager;
+   // private AcquireFragment mAcquireFragment;
     public void setLocationManager(LocationManager locationManager) {
         this.locationManager = locationManager;
     }
 
-    public ClusterHundler(GoogleMap mMap, Context context, Activity activity) {
+    public ClusterHundler(GoogleMap mMap, Context context, Activity activity,BillingManager billingManager) {
         this.mMap = mMap;
         this.context = context;
         this.activity = activity;
+        this.mBillingManager = billingManager;
     }
 
     public void setupClusterManager() {
@@ -136,8 +140,14 @@ public class ClusterHundler {
                     first.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            Toast.makeText(activity, "Доступно в следующих версиях", Toast.LENGTH_SHORT).show();
-                        }
+
+                          //  Toast.makeText(activity, "Доступно в следующих версиях", Toast.LENGTH_SHORT).show();
+
+                            mBillingManager.initiatePurchaseFlow("open_all_objects_penza", null, BillingClient.SkuType.INAPP);
+                            Log.w("BillingManager","exite");
+                            alert.dismiss();
+
+                    }
                     });
                     if (mLastKnownLocation != null) {
                         int dist = DSightHandler.calculateDistance(mLastKnownLocation, sight.getLatitude(), sight.getLongitude());
@@ -182,7 +192,7 @@ public class ClusterHundler {
         render.getMarker(sight).setIcon(BitmapDescriptorFactory.fromBitmap(bitmap_unlock));
     }
 
-    private class MarkerRender extends DefaultClusterRenderer<Sight> {
+    class MarkerRender extends DefaultClusterRenderer<Sight> {
 
         public MarkerRender() {
             super(context, mMap, clusterManager);
