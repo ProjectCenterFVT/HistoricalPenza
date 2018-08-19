@@ -231,6 +231,7 @@ public class MapActivity extends AppCompatActivity
 
           billingManager = new BillingManager(MapActivity.this, new MyBillingUpdateListener());
 
+
     }
 
     @Override
@@ -293,6 +294,7 @@ public class MapActivity extends AppCompatActivity
         super.onStop();
         if (markerManager != null) {
             markerManager.removeMyMarker();
+            clusterHundler.clearMap();
         }
     }
 
@@ -506,7 +508,6 @@ public class MapActivity extends AppCompatActivity
         super.onPause();
         try{
             unregisterManagers();
-            clusterHundler.clearMap();
         } catch (Exception ex){
             ex.printStackTrace();
         }
