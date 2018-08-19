@@ -75,6 +75,7 @@ dependencies {
     compile 'com.google.maps.android:android-maps-utils:0.5'
     compile 'com.github.ksoichiro:android-observablescrollview:1.6.0'
     compile 'com.nineoldandroids:library:2.4.0'
+    implementation 'com.android.billingclient:billing:1.1'
 }
 
 

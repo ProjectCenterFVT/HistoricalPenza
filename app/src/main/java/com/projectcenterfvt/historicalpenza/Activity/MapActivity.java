@@ -42,6 +42,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.billingclient.api.BillingClient;
 import com.arlib.floatingsearchview.FloatingSearchView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -61,10 +62,12 @@ import com.projectcenterfvt.historicalpenza.Dialogs.AboutDialog;
 import com.projectcenterfvt.historicalpenza.Dialogs.HomestadeDialog;
 import com.projectcenterfvt.historicalpenza.Dialogs.LogoutDialog;
 import com.projectcenterfvt.historicalpenza.Dialogs.PageDialog;
+import com.projectcenterfvt.historicalpenza.Managers.BillingManager;
 import com.projectcenterfvt.historicalpenza.Managers.CameraManager;
 import com.projectcenterfvt.historicalpenza.Managers.ClusterHundler;
 import com.projectcenterfvt.historicalpenza.Managers.ImageCacheManager;
 import com.projectcenterfvt.historicalpenza.Managers.MarkerManager;
+import com.projectcenterfvt.historicalpenza.Managers.MyBillingUpdateListener;
 import com.projectcenterfvt.historicalpenza.Managers.PreferencesManager;
 import com.projectcenterfvt.historicalpenza.Managers.SearchManager;
 import com.projectcenterfvt.historicalpenza.R;
@@ -91,7 +94,7 @@ import java.util.Comparator;
  */
 
 public class MapActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks{
+        implements  NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks{
 
     private static final int SIGHT_KEY = 2;
     LocationService locationService;
@@ -123,6 +126,7 @@ public class MapActivity extends AppCompatActivity
     private DSightHandler dSightHandler;
 
     private Activity activity;
+   //Billing
 
     /**
      * !!!! Не трогать и не прикосаться. Это тестирующий вариант обработки местоположения. ТРЕБУЕТСЯ В ДОРАБОТКЕ И ТЕСТИРОВАНИИ
@@ -136,7 +140,7 @@ public class MapActivity extends AppCompatActivity
 
     private boolean isMapDraw = false;
     private boolean isMarkerClick = false;
-
+    BillingManager  billingManager;
     private LocationListener locationListener = new LocationListener() {
 
         @Override
@@ -224,6 +228,8 @@ public class MapActivity extends AppCompatActivity
         if (savedInstanceState != null){
             isMarkerClick = savedInstanceState.getBoolean("mapState");
         }
+
+          billingManager = new BillingManager(MapActivity.this, new MyBillingUpdateListener());
 
     }
 
@@ -405,7 +411,7 @@ public class MapActivity extends AppCompatActivity
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.getUiSettings().setMapToolbarEnabled(false);
-        clusterHundler = new ClusterHundler(mMap, this, activity);
+        clusterHundler = new ClusterHundler(mMap, this, activity,billingManager);
         clusterHundler.setLocationManager(locationManager);
         clusterHundler.setupClusterManager();
         if (!isMapDraw) {
@@ -432,6 +438,7 @@ public class MapActivity extends AppCompatActivity
         locationService.setdSightHandler(dSightHandler);
         locationService.setClusterHundler(clusterHundler);
         startService(serviceIntent);
+
     }
 
     @Override
