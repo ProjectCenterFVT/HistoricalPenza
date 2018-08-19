@@ -489,6 +489,9 @@ public class MapActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         checkForCrashes();
+        if (clusterHundler != null){
+            clusterHundler.restoreMap();
+        }
     }
 
     @Override

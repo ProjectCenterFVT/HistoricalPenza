@@ -20,8 +20,8 @@ android {
         applicationId "com.projectcenterfvt.historicalpenza"
         minSdkVersion 21
         targetSdkVersion 26
-        versionCode 12
-        versionName "0.4"
+        versionCode 13
+        versionName "0.4.1"
         multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         manifestPlaceholders = [HOCKEYAPP_APP_ID: "e242b3a6a5b04e47b9a49dd5de3f9828"]
