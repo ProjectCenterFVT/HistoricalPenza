@@ -3,13 +3,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-    <group android:checkableBehavior="single">
+    <group android:id="@+id/grp1" android:checkableBehavior="single">
         <item
             android:id="@+id/name_sight"
             android:title="@string/name_sight" />
+    </group>
+
+    <group android:id="@+id/grp2" android:checkableBehavior="single">
         <item
             android:id="@+id/name_helpProject"
             android:title="@string/name_helpProject" />
+    </group>
+
+    <group android:id="@+id/grp3" android:checkableBehavior="single">
         <item
             android:id="@+id/name_homestade"
             android:title="@string/homestade" />

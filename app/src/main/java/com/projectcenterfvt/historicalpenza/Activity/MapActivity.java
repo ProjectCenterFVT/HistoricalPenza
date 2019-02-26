@@ -1,11 +1,9 @@
 package com.projectcenterfvt.historicalpenza.Activity;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.ActivityInfo;
@@ -22,9 +20,7 @@ import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
@@ -39,10 +35,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.android.billingclient.api.BillingClient;
 import com.arlib.floatingsearchview.FloatingSearchView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -53,7 +46,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.projectcenterfvt.historicalpenza.BuildConfig;
 import com.projectcenterfvt.historicalpenza.DataBases.DSightHandler;
 import com.projectcenterfvt.historicalpenza.DataBases.DataBaseHandler;
@@ -65,13 +57,14 @@ import com.projectcenterfvt.historicalpenza.Dialogs.PageDialog;
 import com.projectcenterfvt.historicalpenza.Managers.BillingManager;
 import com.projectcenterfvt.historicalpenza.Managers.CameraManager;
 import com.projectcenterfvt.historicalpenza.Managers.ClusterHundler;
-import com.projectcenterfvt.historicalpenza.Managers.ImageCacheManager;
 import com.projectcenterfvt.historicalpenza.Managers.MarkerManager;
 import com.projectcenterfvt.historicalpenza.Managers.MyBillingUpdateListener;
 import com.projectcenterfvt.historicalpenza.Managers.PreferencesManager;
 import com.projectcenterfvt.historicalpenza.Managers.SearchManager;
 import com.projectcenterfvt.historicalpenza.R;
 import com.projectcenterfvt.historicalpenza.Service.LocationService;
+import com.projectcenterfvt.historicalpenza.data.Landmark;
+import com.projectcenterfvt.historicalpenza.data.network.LandmarksNetwork;
 
 import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.UpdateManager;
@@ -79,6 +72,7 @@ import net.hockeyapp.android.UpdateManager;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 /**
  * Вся основная работа происходит в этом классе. Однако основные задачи распределены по классам менеджерам.
@@ -193,7 +187,7 @@ public class MapActivity extends AppCompatActivity
         serviceIntent = new Intent(MapActivity.this, LocationService.class);
         setContentView(R.layout.activity_map);
         preferencesManager = new PreferencesManager(getApplicationContext());
-        btn_pos = findViewById(R.id.btn_position);
+        btn_pos = findViewById(R.id.myLocationButton);
         final LocationManager lM = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
         locationManager = new com.projectcenterfvt.historicalpenza.Managers.LocationManager(this, MapActivity.this);
@@ -214,15 +208,15 @@ public class MapActivity extends AppCompatActivity
                 .build();
         mGoogleApiClient.connect();
 
-        NavigationView navigationView = findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.navigationViewTop);
         navigationView.setNavigationItemSelectedListener(this);
 
-        NavigationView navigationView1 = findViewById(R.id.navigation_drawer_bottom);
+        NavigationView navigationView1 = findViewById(R.id.navigationViewBottom);
         navigationView1.setNavigationItemSelectedListener(this);
 
-        mDrawerLayout = findViewById(R.id.drawer_layout);
+        mDrawerLayout = findViewById(R.id.drawerLayout);
         searchManager = new SearchManager(this, mDrawerLayout);
-        searchManager.setSearchView((FloatingSearchView) findViewById(R.id.floating_search_view));
+        searchManager.setSearchView((FloatingSearchView) findViewById(R.id.floatingSearchView));
         checkForUpdates();
 
         if (savedInstanceState != null){
@@ -230,8 +224,6 @@ public class MapActivity extends AppCompatActivity
         }
 
           billingManager = new BillingManager(MapActivity.this, new MyBillingUpdateListener());
-
-
     }
 
     @Override
@@ -392,7 +384,7 @@ public class MapActivity extends AppCompatActivity
                 break;
         }
 
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawerLayout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -529,8 +521,6 @@ public class MapActivity extends AppCompatActivity
     }
 
     public void close_target(View view) {
-        final Animation animAlpha = AnimationUtils.loadAnimation(this, R.anim.scale);
-        view.startAnimation(animAlpha);
         try {
             if (mLastKnownLocation != null && cameraManager != null && dSightHandler != null) {
                 synchronized (dSightHandler) {

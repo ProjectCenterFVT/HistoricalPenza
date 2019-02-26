@@ -1,6 +1,9 @@
 package com.projectcenterfvt.historicalpenza.Dialogs;
 
+import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
+import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -9,10 +12,13 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
+import android.widget.LinearLayout;
 
 import com.projectcenterfvt.historicalpenza.Adapters.MyGuideFragmentPagerAdapter;
 import com.projectcenterfvt.historicalpenza.R;
@@ -30,6 +36,10 @@ public class PageDialog extends DialogFragment {
     private ViewPager pager;
     private PagerAdapter pagerAdapter;
     private Dialog dialog;
+
+    public PageDialog() {
+        this.setStyle(STYLE_NO_TITLE, R.style.MyAlertDialogTheme);
+    }
 
     @Nullable
     @Override
@@ -59,7 +69,6 @@ public class PageDialog extends DialogFragment {
         dialog = super.onCreateDialog(savedInstanceState);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         Window dialogWindow = dialog.getWindow();
-        dialogWindow.setLayout(200, 400);
         dialogWindow.setBackgroundDrawable(new ColorDrawable(0));
 
         return dialog;

@@ -17,7 +17,7 @@
         android:fontFamily="@font/sfuitext_light"
         android:gravity="center"
         android:text="Настройки"
-        android:textColor="@color/colorBlack"
+        android:textColor="@android:color/black"
         android:textSize="17sp"
         app:layout_constraintBottom_toTopOf="@+id/notifSwitch"
         app:layout_constraintEnd_toEndOf="parent"

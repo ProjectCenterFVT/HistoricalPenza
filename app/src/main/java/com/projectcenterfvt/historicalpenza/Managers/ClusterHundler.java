@@ -1,30 +1,24 @@
 package com.projectcenterfvt.historicalpenza.Managers;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.billingclient.api.BillingClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterItem;
@@ -32,13 +26,11 @@ import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.algo.GridBasedAlgorithm;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.projectcenterfvt.historicalpenza.Activity.InfoActivity;
-import com.projectcenterfvt.historicalpenza.Activity.LandmarkActivity;
 import com.projectcenterfvt.historicalpenza.DataBases.DSightHandler;
 import com.projectcenterfvt.historicalpenza.DataBases.Sight;
 import com.projectcenterfvt.historicalpenza.R;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * Created by roman on 12.07.2018.
@@ -96,7 +88,7 @@ public class ClusterHundler {
                 final AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 final LayoutInflater inflater = activity.getLayoutInflater();
                 final View view = inflater.inflate(R.layout.dialog, null);
-                view.setBackgroundResource(R.drawable.dialog_bgn);
+//                view.setBackgroundResource(R.drawable.dialog_bgn);
 
                 final TextView info = view.findViewById(R.id.dialog_text_info);
                 final TextView distance = view.findViewById(R.id.dialog_text_distance);
@@ -121,14 +113,14 @@ public class ClusterHundler {
                     first.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            Intent intent = new Intent(context, LandmarkActivity.class);
+                            Intent intent = new Intent(context, InfoActivity.class);
                             intent.putExtra("title", sight.getTitle());
                             intent.putExtra("description", sight.getDescription());
                             intent.putExtra("uml", sight.getImg());
                             if (sight.getType() == 1) {
                                 intent.putExtra("button", true);
                             }
-                            activity.startActivityForResult(intent, CAMERA_KEY);
+                            activity.startActivity(intent);
 //                            isMarkerClick = false;
                             alert.dismiss();
                         }

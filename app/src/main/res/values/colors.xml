@@ -3,8 +3,12 @@
     <color name="colorPrimary">#5fb0d4</color>
     <color name="colorPrimaryDark">#47adcb</color>
     <color name="colorAccent">#47adcb</color>
-    <color name="colorBlack">#000000</color>
-    <color name="navItemBackground">#343434</color>
+
     <color name="twoLineColor">#383838</color>
     <color name="secondaryColor">#717171</color>
+
+    <color name="navigationViewBackground">#3d3d3d</color>
+    <color name="navigationItemBackground">#343434</color>
+    <color name="navigationItemTextColor">#979797</color>
+    <color name="dividerColor">#00000000</color>
 </resources>

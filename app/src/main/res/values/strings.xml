@@ -27,4 +27,5 @@
     <string name="splesh_penza"> Пенза </string>
     <string name="client_server_id">732937176154-shj0athm5rsplqor87f1bj71ssh2e2fa.apps.googleusercontent.com</string>
     <string name="sort">Фильтры</string>
+    <string name="near_place_button_text">Ближайшее место</string>
 </resources>

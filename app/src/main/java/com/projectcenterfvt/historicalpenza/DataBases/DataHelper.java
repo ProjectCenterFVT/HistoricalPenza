@@ -66,14 +66,14 @@ public class DataHelper {
                 Pattern pattern = Pattern.compile(query.toLowerCase());
                 if (!(constraint == null || constraint.length() == 0)) {
                     for (PlaceSuggestion suggestion : sPlaceSuggestions) {
-//                        if (suggestion.getBody().toUpperCase()
-//                                .startsWith(constraint.toString().toUpperCase())) {
-//
-//                            suggestionList.add(suggestion);
-//                            if (limit != -1 && suggestionList.size() == limit) {
-//                                break;
-//                            }
-//                        }
+                        if (suggestion.getBody().toUpperCase()
+                                .startsWith(constraint.toString().toUpperCase())) {
+
+                            suggestionList.add(suggestion);
+                            if (limit != -1 && suggestionList.size() == limit) {
+                                break;
+                            }
+                        }
                         Matcher matcher = pattern.matcher(suggestion.getBody().toLowerCase());
                         if (matcher.find()){
                             suggestionList.add(suggestion);

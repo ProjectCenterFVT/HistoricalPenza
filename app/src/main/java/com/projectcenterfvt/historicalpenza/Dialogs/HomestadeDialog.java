@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 
-import com.projectcenterfvt.historicalpenza.CustomTextView.TextViewEx;
 import com.projectcenterfvt.historicalpenza.R;
 
 /**
@@ -23,13 +22,14 @@ public class HomestadeDialog extends android.support.v4.app.DialogFragment {
 
     private Dialog dialog;
 
+    public HomestadeDialog() {
+        this.setStyle(STYLE_NO_TITLE, R.style.MyAlertDialogTheme);
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.dialog_homestade, null);
-        TextViewEx txtViewEx =     v.findViewById(R.id.tvHome);
-        String text  = getString(R.string.HomestadeText).toString();
-        txtViewEx.setText(text,true);
         v.findViewById(R.id.homestadeButtonWeb).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -39,7 +39,7 @@ public class HomestadeDialog extends android.support.v4.app.DialogFragment {
                 startActivity(openlinkIntent);
             }
         });
-        v.findViewById(R.id.btnBackHome).setOnClickListener(new View.OnClickListener() {
+        v.findViewById(R.id.cancel_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 dialog.dismiss();
@@ -55,6 +55,7 @@ public class HomestadeDialog extends android.support.v4.app.DialogFragment {
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         Window dialogWindow = dialog.getWindow();
         dialogWindow.setBackgroundDrawable(new ColorDrawable(0));
+
         return dialog;
     }
 }
