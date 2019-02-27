@@ -10,17 +10,17 @@ public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListen
     private OnItemClickListener mListener;
 
     public interface OnItemClickListener {
-        void onItemClick(View view, SightAdapter adapter, int position);
+        void onItemClick(View view, LandmarksAdapter adapter, int position);
 
-        void onLongItemClick(View view, SightAdapter adapter, int position);
+        void onLongItemClick(View view, LandmarksAdapter adapter, int position);
     }
 
     private GestureDetector mGestureDetector;
-    private SightAdapter adapter;
+    private LandmarksAdapter adapter;
 
     public RecyclerItemClickListener(Context context, final RecyclerView recyclerView, OnItemClickListener listener) {
         mListener = listener;
-        adapter = (SightAdapter) recyclerView.getAdapter();
+        adapter = (LandmarksAdapter) recyclerView.getAdapter();
         mGestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onSingleTapUp(MotionEvent e) {

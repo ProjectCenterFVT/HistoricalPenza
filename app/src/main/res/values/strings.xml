@@ -28,4 +28,26 @@
     <string name="client_server_id">732937176154-shj0athm5rsplqor87f1bj71ssh2e2fa.apps.googleusercontent.com</string>
     <string name="sort">Фильтры</string>
     <string name="near_place_button_text">Ближайшее место</string>
+    <string name="landmarks_list_activity_title">Достопримечательности</string>
+    <string name="dialog_cancel_button">Назад</string>
+    <string name="about_dialog_title">О программе</string>
+    <string name="about_dialog_text_view_1">Историческая Пенза</string>
+    <string name="about_dialog_text_view_2">Центр проектного творчества\nСНО ФВТ ПГУ</string>
+    <string name="about_dialog_text_view_3">2018</string>
+    <string name="extra_project_dialog_title">По следам забытых усадеб</string>
+    <string name="link_button_text">Страница проекта</string>
+    <string name="landmark_dialog_title">Информация о месте</string>
+    <string name="is_opened_text">Вы тут были</string>
+    <string name="is_closed_text">Вы тут еще не были</string>
+    <string name="is_closed_button_text">Хочу открыть</string>
+    <string name="is_opened_button_text">Узнать больше</string>
+    <string name="help_project_dialog_title">Помощь проекту</string>
+    <string name="help_project_dialog_text">Есть редкая фотография или интересная история о Пензе? Хочешь стать частью нашей команды? У тебя есть печеньки? Напиши нам!</string>
+    <string name="help_project_dialog_button_text">Написать разработчикам</string>
+    <string name="guide_dialog_title">Информация об указателях</string>
+    <string name="notify_switch_text">Получать уведомления</string>
+    <string name="log_out_dialog_title">Выход из аккаунта</string>
+    <string name="log_out_dialog_text">Вы действительно хотите\n выйти из аккаунта?</string>
+    <string name="negative_button_text">Нет</string>
+    <string name="positive_button_text">Да</string>
 </resources>

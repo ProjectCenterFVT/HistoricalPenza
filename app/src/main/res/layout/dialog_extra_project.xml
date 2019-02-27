@@ -7,13 +7,13 @@
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/dialog_caption"
+        android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         android:fontFamily="@font/sfuitext_light"
         android:gravity="center"
-        android:text="По следам забытых усадеб"
+        android:text="@string/extra_project_dialog_title"
         android:textColor="@android:color/black"
         android:textSize="17sp" />
 
@@ -34,7 +34,7 @@
             app:srcCompat="@drawable/posledam_logo" />
 
         <com.codesgood.views.JustifiedTextView
-            android:id="@+id/tvHome"
+            android:id="@+id/description"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
@@ -47,27 +47,27 @@
             app:layout_constraintTop_toBottomOf="@id/logo" />
 
         <Button
-            android:id="@+id/homestadeButtonWeb"
+            android:id="@+id/linkButton"
             style="@style/Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:text="Страница проекта"
+            android:text="@string/link_button_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvHome" />
+            app:layout_constraintTop_toBottomOf="@id/description" />
 
     </android.support.constraint.ConstraintLayout>
 
     <Button
-        android:id="@+id/cancel_button"
+        android:id="@+id/cancelButton"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:background="@color/transparent"
         android:fontFamily="@font/sfuitext_light"
-        android:text="Назад"
+        android:text="@string/dialog_cancel_button"
         android:textColor="@android:color/black"
         android:textSize="16sp" />
 

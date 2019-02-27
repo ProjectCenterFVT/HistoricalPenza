@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
     android:background="@drawable/dialog_background"
     android:orientation="vertical">
 
@@ -14,15 +14,33 @@
         android:layout_margin="8dp"
         android:fontFamily="@font/sfuitext_light"
         android:gravity="center"
+        android:text="@string/guide_dialog_title"
         android:textColor="@android:color/black"
-        android:textSize="17sp"
-        tools:text="Диалог" />
+        android:textSize="17sp" />
 
-    <FrameLayout
-        android:id="@+id/content"
-        android:layout_weight="1"
+    <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp" />
+        android:layout_height="wrap_content"
+        android:paddingTop="24dp"
+        android:paddingBottom="32dp"
+        android:background="#FDFDFD">
+
+        <Switch
+            android:id="@+id/notifySwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:checked="true"
+            android:fontFamily="@font/sfuitext_light"
+            android:text="@string/notify_switch_text"
+            android:textColor="@color/black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.502"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </android.support.constraint.ConstraintLayout>
 
     <Button
         android:id="@+id/cancelButton"

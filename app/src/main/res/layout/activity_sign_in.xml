@@ -8,10 +8,30 @@
     android:background="@drawable/main_bgrnd"
     tools:context="com.projectcenterfvt.historicalpenza.Activity.SignInActivity">
 
+
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/sign_in_button"
+        android:layout_width="182dp"
+        android:layout_height="43dp"
+        android:layout_marginBottom="1dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="484dp"
+        android:textAlignment="center"
+        android:textDirection="inherit"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/textViewHistorical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
+        android:id="@+id/textViewHistorical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
         android:fontFamily="@font/sfuitext_light"
         android:text="@string/app_name"
         android:textSize="18sp"

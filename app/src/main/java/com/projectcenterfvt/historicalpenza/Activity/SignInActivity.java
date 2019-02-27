@@ -51,7 +51,7 @@ import com.projectcenterfvt.historicalpenza.Service.InternetReceive;
  * @since 1.0.0
  */
 
-public class SplashActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
+public class SignInActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
 
 
     static final String TAG = "server";
@@ -72,7 +72,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_splash);
+        setContentView(R.layout.activity_sign_in);
         preferencesManager = new PreferencesManager(getApplicationContext());
         sign_in_button = findViewById(R.id.sign_in_button);
         sign_in_button.setEnabled(false);
@@ -131,15 +131,15 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
 
                     Toast.makeText(this, "Без этого невозможно функционирование приложения", Toast.LENGTH_LONG).show();
                     //Toast.makeText(this,"Приложение будет закрыто",Toast.LENGTH_LONG).show();
-//                    Intent intent = new Intent(getApplicationContext(), SplashActivity.class);
-//                    SplashActivity.this.startActivity(intent);
-//                    SplashActivity.this.finish();
+//                    Intent intent = new Intent(getApplicationContext(), SignInActivity.class);
+//                    SignInActivity.this.startActivity(intent);
+//                    SignInActivity.this.finish();
 //                    Handler handler = new Handler();
 //                  handler.postDelayed(new Runnable() {
 //                       public void run() {
-//                           Intent intent = new Intent(getApplicationContext(), SplashActivity.class);
-//                           SplashActivity.this.startActivity(intent);
-//                           SplashActivity.this.finish();
+//                           Intent intent = new Intent(getApplicationContext(), SignInActivity.class);
+//                           SignInActivity.this.startActivity(intent);
+//                           SignInActivity.this.finish();
 //                       }
 //                    }, 5000);
 
@@ -153,7 +153,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
 
     public void showNoStoragePermissionSnackbar() {
 
-     final Snackbar snackbar2 =   Snackbar.make(SplashActivity.this.findViewById(R.id.activity_splash_p), "Разрешение на отслеживание местоположения не дано" , Snackbar.LENGTH_INDEFINITE);
+     final Snackbar snackbar2 =   Snackbar.make(SignInActivity.this.findViewById(R.id.activity_splash_p), "Разрешение на отслеживание местоположения не дано" , Snackbar.LENGTH_INDEFINITE);
         snackbar2.setAction("Настройки", new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -179,7 +179,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
                 Manifest.permission.ACCESS_COARSE_LOCATION)) {
             final String message = "Нам нужно ваше местополодения для функционироания приложения";
             final Snackbar snackBar = Snackbar.make(findViewById(R.id.activity_splash_p), message, Snackbar.LENGTH_INDEFINITE);
-            snackBar//.make//(SplashActivity.this.findViewById(R.id.activity_splash_p), message, Snackbar.LENGTH_LONG +300000)
+            snackBar//.make//(SignInActivity.this.findViewById(R.id.activity_splash_p), message, Snackbar.LENGTH_LONG +300000)
                     .setAction("Разрешить", new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -266,8 +266,8 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
 
                 idToServer();
                 Intent intent = new Intent(getApplicationContext(), GreetingActivity.class);
-                SplashActivity.this.startActivity(intent);
-                SplashActivity.this.finish();
+                SignInActivity.this.startActivity(intent);
+                SignInActivity.this.finish();
 
             }
 
@@ -360,9 +360,9 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
             return;
             }
             else {
-                Intent intent = new Intent(getApplicationContext(), SplashActivity.class);
-                SplashActivity.this.startActivity(intent);
-                SplashActivity.this.finish();
+                Intent intent = new Intent(getApplicationContext(), SignInActivity.class);
+                SignInActivity.this.startActivity(intent);
+                SignInActivity.this.finish();
             }
         }
     }
@@ -408,15 +408,15 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
 //                if (preferencesManager.getFirstTime()) {
 //
 //                    preferencesManager.setFirstTime(false);
-//                    intent = new Intent(SplashActivity.this, GreetingActivity.class);
-//                    SplashActivity.this.startActivity(intent);
-//                    SplashActivity.this.finish();
+//                    intent = new Intent(SignInActivity.this, GreetingActivity.class);
+//                    SignInActivity.this.startActivity(intent);
+//                    SignInActivity.this.finish();
 //
 //                } else {
 //
-//                    intent = new Intent(SplashActivity.this, MapActivity.class);
-//                    SplashActivity.this.startActivity(intent);
-//                    SplashActivity.this.finish();
+//                    intent = new Intent(SignInActivity.this, MapActivity.class);
+//                    SignInActivity.this.startActivity(intent);
+//                    SignInActivity.this.finish();
 //
 //                }
             }

@@ -7,6 +7,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,6 +22,7 @@ import com.android.billingclient.api.BillingClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.Cluster;
@@ -26,10 +31,15 @@ import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.algo.GridBasedAlgorithm;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.projectcenterfvt.historicalpenza.Activity.InfoActivity;
+import com.projectcenterfvt.historicalpenza.BuildConfig;
 import com.projectcenterfvt.historicalpenza.DataBases.DSightHandler;
 import com.projectcenterfvt.historicalpenza.DataBases.Sight;
+import com.projectcenterfvt.historicalpenza.Dialogs.LandmarkDialog;
 import com.projectcenterfvt.historicalpenza.R;
+import com.projectcenterfvt.historicalpenza.data.Landmark;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 
 /**
@@ -43,7 +53,7 @@ public class ClusterHundler {
     private ClusterManager<Sight> clusterManager;
     private GoogleMap mMap;
     private Context context;
-    private Activity activity;
+    private FragmentActivity activity;
     private LocationManager locationManager;
     private BillingManager mBillingManager;
    // private AcquireFragment mAcquireFragment;
@@ -51,7 +61,7 @@ public class ClusterHundler {
         this.locationManager = locationManager;
     }
 
-    public ClusterHundler(GoogleMap mMap, Context context, Activity activity,BillingManager billingManager) {
+    public ClusterHundler(GoogleMap mMap, Context context, FragmentActivity activity,BillingManager billingManager) {
         this.mMap = mMap;
         this.context = context;
         this.activity = activity;
@@ -85,75 +95,34 @@ public class ClusterHundler {
             @Override
             public boolean onClusterItemClick(final Sight sight) {
                 Location mLastKnownLocation = locationManager.getDeviceLocation();
-                final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                final LayoutInflater inflater = activity.getLayoutInflater();
-                final View view = inflater.inflate(R.layout.dialog, null);
-//                view.setBackgroundResource(R.drawable.dialog_bgn);
-
-                final TextView info = view.findViewById(R.id.dialog_text_info);
-                final TextView distance = view.findViewById(R.id.dialog_text_distance);
-                final TextView were = view.findViewById(R.id.dialog_text_were);
-
-                final Button first = view.findViewById(R.id.first_btn);
-                final Button second = view.findViewById(R.id.second_btn);
-
-                builder.setView(view);
-
-                final AlertDialog alert = builder.create();
-                info.setText(sight.getTitle());
-                if (sight.getFlag() | sight.getType() == 1) {
-                    were.setText("Вы тут были");
-                    first.setText("Узнать больше");
-
-                    if (mLastKnownLocation != null) {
-                        int dist = DSightHandler.calculateDistance(mLastKnownLocation, sight.getLatitude(), sight.getLongitude());
-                        distance.setText(dist + " м");
-                    }
-
-                    first.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            Intent intent = new Intent(context, InfoActivity.class);
-                            intent.putExtra("title", sight.getTitle());
-                            intent.putExtra("description", sight.getDescription());
-                            intent.putExtra("uml", sight.getImg());
-                            if (sight.getType() == 1) {
-                                intent.putExtra("button", true);
-                            }
-                            activity.startActivity(intent);
-//                            isMarkerClick = false;
-                            alert.dismiss();
-                        }
-                    });
-
-                } else {
-                    were.setText("Вы тут еще не были");
-                    first.setText("Хочу открыть");
-                    first.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-
-                          //  Toast.makeText(activity, "Доступно в следующих версиях", Toast.LENGTH_SHORT).show();
-
-                            mBillingManager.initiatePurchaseFlow("open_all_objects_penza", null, BillingClient.SkuType.INAPP);
-                            Log.w("BillingManager","exite");
-                            alert.dismiss();
-
-                    }
-                    });
-                    if (mLastKnownLocation != null) {
-                        int dist = DSightHandler.calculateDistance(mLastKnownLocation, sight.getLatitude(), sight.getLongitude());
-                        distance.setText(dist + " м");
-                    }
+                LatLng lastKnownLocation =
+                        new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
+                URL photoUrl = null;
+                try {
+                    photoUrl = new URL(BuildConfig.API_ENDPOINT + "img/" + sight.getImg());
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
                 }
-                alert.getWindow().setBackgroundDrawable(new ColorDrawable(0));
-                second.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        alert.dismiss();
-                    }
-                });
-                alert.show();
+                Landmark landmark = new Landmark(
+                        sight.getId(),
+                        sight.getTitle(),
+                        sight.getDescription(),
+                        photoUrl,
+                        new LatLng(sight.getLatitude(), sight.getLongitude()),
+                        Landmark.Type.EXTRA,
+                        sight.getFlag()
+                );
+
+                LandmarkDialog dialog = LandmarkDialog.Companion.newInstance(landmark, lastKnownLocation);
+
+                FragmentTransaction ft = activity.getSupportFragmentManager().beginTransaction();
+                Fragment prev = activity.getSupportFragmentManager().findFragmentByTag("dialog");
+                if (prev != null) {
+                    ft.remove(prev);
+                }
+                ft.addToBackStack(null);
+
+                dialog.show(ft, "dialog");
 
                 return true;
             }

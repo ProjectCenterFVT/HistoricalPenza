@@ -1,21 +1,16 @@
 package com.projectcenterfvt.historicalpenza.Activity
 
-import android.arch.lifecycle.Observer
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.widget.Toast
 import com.projectcenterfvt.historicalpenza.BuildConfig
-import com.projectcenterfvt.historicalpenza.Dialogs.HomestadeDialog
+import com.projectcenterfvt.historicalpenza.Dialogs.ExtraProjectDialog
 import com.projectcenterfvt.historicalpenza.R
-import com.projectcenterfvt.historicalpenza.data.LandmarksRepository
-import com.projectcenterfvt.historicalpenza.data.network.LandmarksNetwork
-import com.projectcenterfvt.historicalpenza.utils.toast
+import com.projectcenterfvt.historicalpenza.data.Landmark
+import com.projectcenterfvt.historicalpenza.utils.showDialog
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_info.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 
 class InfoActivity : AppCompatActivity() {
 
@@ -23,29 +18,24 @@ class InfoActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_info)
 
-        val landmarkName = intent.getStringExtra("title")
-        val description = intent.getStringExtra("description")
-        val uml = intent.getStringExtra("uml")
-        val check = intent.getBooleanExtra("button", false)
+        val landmark = intent.getParcelableExtra<Landmark>(LANDMARK_EXTRA)
 
         setSupportActionBar(toolbar)
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
-            title = landmarkName
+            title = landmark.title
         }
 
-        body.text = description
+        body.text = landmark.description
 
         Picasso.with(this)
-                .load("${BuildConfig.API_ENDPOINT}/img/$uml")
+                .load(landmark.photoUrl.toString())
                 .into(photo)
 
-        if (check) {
+        if (landmark.type == Landmark.Type.EXTRA) {
             fab.show()
             fab.setOnClickListener {
-                val fragmentManager = supportFragmentManager
-                val dialog = HomestadeDialog()
-                dialog.show(fragmentManager, "dialog")
+                showDialog(ExtraProjectDialog())
             }
         } else fab.hide()
     }
@@ -58,5 +48,17 @@ class InfoActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         finish()
         return true
+    }
+
+    companion object {
+
+        private const val LANDMARK_EXTRA = "landmark_extra"
+
+        fun getIntent(context: Context?, landmark: Landmark) : Intent {
+            return Intent(context, InfoActivity::class.java).apply {
+                putExtra(LANDMARK_EXTRA, landmark)
+            }
+        }
+
     }
 }

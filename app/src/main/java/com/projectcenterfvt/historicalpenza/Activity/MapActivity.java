@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -20,21 +19,19 @@ import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.Switch;
 
 import com.arlib.floatingsearchview.FloatingSearchView;
 import com.google.android.gms.common.ConnectionResult;
@@ -49,11 +46,12 @@ import com.google.android.gms.maps.model.LatLng;
 import com.projectcenterfvt.historicalpenza.BuildConfig;
 import com.projectcenterfvt.historicalpenza.DataBases.DSightHandler;
 import com.projectcenterfvt.historicalpenza.DataBases.DataBaseHandler;
-import com.projectcenterfvt.historicalpenza.DataBases.Sight;
 import com.projectcenterfvt.historicalpenza.Dialogs.AboutDialog;
-import com.projectcenterfvt.historicalpenza.Dialogs.HomestadeDialog;
-import com.projectcenterfvt.historicalpenza.Dialogs.LogoutDialog;
-import com.projectcenterfvt.historicalpenza.Dialogs.PageDialog;
+import com.projectcenterfvt.historicalpenza.Dialogs.ExtraProjectDialog;
+import com.projectcenterfvt.historicalpenza.Dialogs.HelpProjectDialog;
+import com.projectcenterfvt.historicalpenza.Dialogs.LogOutDialog;
+import com.projectcenterfvt.historicalpenza.Dialogs.GuideDialog;
+import com.projectcenterfvt.historicalpenza.Dialogs.SettingsDialog;
 import com.projectcenterfvt.historicalpenza.Managers.BillingManager;
 import com.projectcenterfvt.historicalpenza.Managers.CameraManager;
 import com.projectcenterfvt.historicalpenza.Managers.ClusterHundler;
@@ -63,16 +61,9 @@ import com.projectcenterfvt.historicalpenza.Managers.PreferencesManager;
 import com.projectcenterfvt.historicalpenza.Managers.SearchManager;
 import com.projectcenterfvt.historicalpenza.R;
 import com.projectcenterfvt.historicalpenza.Service.LocationService;
-import com.projectcenterfvt.historicalpenza.data.Landmark;
-import com.projectcenterfvt.historicalpenza.data.network.LandmarksNetwork;
 
 import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.UpdateManager;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 
 /**
  * Вся основная работа происходит в этом классе. Однако основные задачи распределены по классам менеджерам.
@@ -303,64 +294,47 @@ public class MapActivity extends AppCompatActivity
         switch (id) {
             case R.id.name_sight:
                 mLastKnownLocation = locationManager.getDeviceLocation();
-                ArrayList<Sight> sights = new DataBaseHandler(this).getAllSight();
-                Collections.sort(sights, new Comparator<Sight>() {
-                    @Override
-                    public int compare(Sight s0, Sight s1) {
-                        s0.setDistance(DSightHandler.calculateDistance(mLastKnownLocation, s0.getLocation()));
-                        s1.setDistance(DSightHandler.calculateDistance(mLastKnownLocation, s1.getLocation()));
-                        return s0.getDistance() - s1.getDistance();
-                    }
-                });
-                Intent intent = new Intent(this, SightActivity.class);
-                intent.putParcelableArrayListExtra("sights",sights);
+//                ArrayList<Sight> sights = new DataBaseHandler(this).getAllSight();
+//                Collections.sort(sights, new Comparator<Sight>() {
+//                    @Override
+//                    public int compare(Sight s0, Sight s1) {
+//                        s0.setDistance(DSightHandler.calculateDistance(mLastKnownLocation, s0.getLocation()));
+//                        s1.setDistance(DSightHandler.calculateDistance(mLastKnownLocation, s1.getLocation()));
+//                        return s0.getDistance() - s1.getDistance();
+//                    }
+//                });
+                Intent intent = new Intent(this, LandmarksListActivity.class);
+//                intent.putParcelableArrayListExtra("sights",sights);
                 startActivityForResult(intent, SIGHT_KEY);
                 break;
             case R.id.name_helpProject:
-                final AlertDialog.Builder builder_help = new AlertDialog.Builder(this);
-                LayoutInflater inflater_help = this.getLayoutInflater();
-                View view_help = inflater_help.inflate(R.layout.help_project_menu, null);
-                view_help.findViewById(R.id.buttonSendEm).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:"));
-                        intent.putExtra(Intent.EXTRA_EMAIL, new String[]{"creativityprojectcenter@gmail.com"});
-                        startActivity(intent);
-                    }
-                });
-                builder_help.setView(view_help);
-                final AlertDialog alert_help = builder_help.create();
-                alert_help.getWindow().setBackgroundDrawable(new ColorDrawable(0));
-                view_help.findViewById(R.id.btnBackThird).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        alert_help.dismiss();
-                    }
-                });
-                alert_help.show();
+                HelpProjectDialog dialog = new HelpProjectDialog();
+
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                Fragment prev = getSupportFragmentManager().findFragmentByTag("dialog");
+                if (prev != null) {
+                    ft.remove(prev);
+                }
+                ft.addToBackStack(null);
+
+                dialog.show(ft, "dialog");
                 break;
             case R.id.name_settings:
-                Log.d("click ", "нажал на кнопку сетингс");
-                AlertDialog.Builder builder_settings = new AlertDialog.Builder(this);
-                LayoutInflater inflater_settings = this.getLayoutInflater();
-                View view_settings = inflater_settings.inflate(R.layout.settings_menu, null);
-                //view.setBackgroundResource(R.drawable.dialog_bgn);
-                builder_settings.setView(view_settings);
-                checkNotifications(view_settings);
-                final AlertDialog alert_settings = builder_settings.create();
-                alert_settings.getWindow().setBackgroundDrawable(new ColorDrawable(0));
-                view_settings.findViewById(R.id.btnBackForth).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        alert_settings.dismiss();
-                    }
-                });
-                alert_settings.show();
+                SettingsDialog dialog1 = new SettingsDialog();
+
+                FragmentTransaction ft1 = getSupportFragmentManager().beginTransaction();
+                Fragment prev1 = getSupportFragmentManager().findFragmentByTag("dialog");
+                if (prev1 != null) {
+                    ft1.remove(prev1);
+                }
+                ft1.addToBackStack(null);
+
+                dialog1.show(ft1, "dialog");
                 break;
             case R.id.name_help:
                 Log.d("click ", "нажал на кнопку хелп");
                 FragmentManager fragmentManager_hp = getSupportFragmentManager();
-                PageDialog dialog_hp = new PageDialog();
+                GuideDialog dialog_hp = new GuideDialog();
                 dialog_hp.show(fragmentManager_hp, "dialog");
                 break;
             case R.id.name_about:
@@ -372,13 +346,13 @@ public class MapActivity extends AppCompatActivity
             case R.id.name_homestade:
                 Log.d("click ", "нажал на кнопку усадеб");
                 FragmentManager fragmentManager_homestade = getSupportFragmentManager();
-                HomestadeDialog dialog_homestade = new HomestadeDialog();
+                ExtraProjectDialog dialog_homestade = new ExtraProjectDialog();
                 dialog_homestade.show(fragmentManager_homestade, "dialog");
                 break;
             case R.id.name_logout:
                 Log.d("click", "Нажал на выйти из аккаунта");
                 FragmentManager fragmentManager_logout = getSupportFragmentManager();
-                LogoutDialog logoutDialog = new LogoutDialog();
+                LogOutDialog logoutDialog = new LogOutDialog();
                 logoutDialog.show(fragmentManager_logout, "dialog");
 
                 break;
@@ -405,7 +379,7 @@ public class MapActivity extends AppCompatActivity
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.getUiSettings().setMapToolbarEnabled(false);
-        clusterHundler = new ClusterHundler(mMap, this, activity,billingManager);
+        clusterHundler = new ClusterHundler(mMap, this, this ,billingManager);
         clusterHundler.setLocationManager(locationManager);
         clusterHundler.setupClusterManager();
         if (!isMapDraw) {
@@ -558,23 +532,6 @@ public class MapActivity extends AppCompatActivity
                 startActivity(intent);
             }
         }
-    }
-
-
-    public void checkNotifications(View view) {
-        Switch notifSwitch = view.findViewById(R.id.notifSwitch);
-        if (preferencesManager.getNotificationStatus()) {
-            notifSwitch.setChecked(true);
-        } else {
-            notifSwitch.setChecked(false);
-        }
-        preferencesManager.setNotificationStatus(notifSwitch.isChecked());
-        notifSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
-                preferencesManager.setNotificationStatus(checked);
-            }
-        });
     }
 
 }
