@@ -72,15 +72,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
 
-    implementation 'net.hockeyapp.android:HockeySDK:5.0.4'
-
-    implementation 'com.google.api-client:google-api-client:1.22.0'
-    implementation 'com.google.api-client:google-api-client-android:1.22.0'
-    implementation 'com.google.apis:google-api-services-people:v1-rev139-1.22.0'
-
-    implementation 'com.nineoldandroids:library:2.4.0'
-    implementation 'com.karumi:dexter:5.0.0'
-
     // Google Play Services
     implementation 'com.google.android.gms:play-services-maps:16.1.0'
     implementation 'com.google.maps.android:android-maps-utils:0.5'

@@ -1,4 +1,4 @@
-package com.projectcenterfvt.historicalpenza.Dialogs
+package com.projectcenterfvt.historicalpenza.dialogs
 
 import android.app.Dialog
 import android.content.Intent
@@ -7,20 +7,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 
-import com.projectcenterfvt.historicalpenza.Activity.SignInActivity
-import com.projectcenterfvt.historicalpenza.Managers.PreferencesManager
+import com.projectcenterfvt.historicalpenza.signIn.SignInActivity
+import com.projectcenterfvt.historicalpenza.data.Preferences
 import com.projectcenterfvt.historicalpenza.R
 import kotlinx.android.synthetic.main.dialog_log_out.*
 
 
 class LogOutDialog : BaseDialog() {
 
-    lateinit var preferences: PreferencesManager
-
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        preferences = PreferencesManager(context)
-
-        return super.onCreateDialog(savedInstanceState)
+    private val preferences: Preferences by lazy {
+        Preferences.getInstance(context!!)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -33,7 +29,7 @@ class LogOutDialog : BaseDialog() {
         positiveButton.setOnClickListener {
             with(preferences) {
                 token = ""
-                firstTime = true
+                shouldNotify = true
             }
 
             val intent = Intent(activity, SignInActivity::class.java).apply {

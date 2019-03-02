@@ -6,12 +6,12 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
-    <string name="name_sight">Достопримечательности</string>
-    <string name="name_helpProject">Помощь проекту</string>
-    <string name="name_settings">Настройки</string>
-    <string name="name_help">Помощь</string>
-    <string name="name_logout">Выйти из аккаунта</string>
-    <string name="name_about">О программе</string>
+    <string name="landmarks_menu_item_text">Достопримечательности</string>
+    <string name="help_project_menu_item_text">Помощь проекту</string>
+    <string name="settings_menu_item_text">Настройки</string>
+    <string name="help_menu_item_text">Помощь</string>
+    <string name="log_out_menu_item_text">Выйти из аккаунта</string>
+    <string name="about_menu_item_text">О программе</string>
     <string name="quote">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc iaculis enim quis hendrerit porttitor. Mauris ac interdum arcu. Cras convallis metus egestas erat gravida consequat. Aliquam et tellus fermentum, vulputate mi eget, sagittis nibh. Suspendisse potenti. Proin nisl ex, dapibus rutrum pellentesque euismod, varius at erat. Duis ac luctus orci.</string>
     <string name="description">Первая копия этого памятника была установлена в 1937 г. в Москве, в сквере Химкинского вокзала. Этот памятник был рекомендован сверху как образец, отливался из бетона и был установлен чуть ли не во всех областных центрах СССР. На нём два вождя сидят на скамейке. Дело в том, что этот памятник имел успех на выставке искусства в Москве в 1938 году. По слухам, он понравился самому Сталину, и в разных городах поспешили порадовать вождя народов. Устанавливать этот парный монумент массово
 начали в конце 1930-х годов.
@@ -21,7 +21,7 @@
     <string name="search">search</string>
     <string name="hist_penza1">Историческая</string>
     <string name="hist_penza2">Пенза</string>
-    <string name="homestade">По следам забытых усадеб</string>
+    <string name="extra_project_menu_item_text">По следам забытых усадеб</string>
     <string name="HomestadeText">Проект "По следам забытых усадеб Пензенской области" - результат совместной работы Молодежного парламента при Законодательном Собрании Пензенской области и студенческих отрядов, направленной на привлечение внимания общественности к проблеме упадка и разрушения старинных усадеб - объектов исключительного культурного наследия.</string>
     <string name="splesh_historic"> Историческая </string>
     <string name="splesh_penza"> Пенза </string>
@@ -33,7 +33,7 @@
     <string name="about_dialog_title">О программе</string>
     <string name="about_dialog_text_view_1">Историческая Пенза</string>
     <string name="about_dialog_text_view_2">Центр проектного творчества\nСНО ФВТ ПГУ</string>
-    <string name="about_dialog_text_view_3">2018</string>
+    <string name="about_dialog_text_view_3">2019</string>
     <string name="extra_project_dialog_title">По следам забытых усадеб</string>
     <string name="link_button_text">Страница проекта</string>
     <string name="landmark_dialog_title">Информация о месте</string>
@@ -41,6 +41,7 @@
     <string name="is_closed_text">Вы тут еще не были</string>
     <string name="is_closed_button_text">Хочу открыть</string>
     <string name="is_opened_button_text">Узнать больше</string>
+    <string name="landmark_dialog_distance_text">%1$d м</string>
     <string name="help_project_dialog_title">Помощь проекту</string>
     <string name="help_project_dialog_text">Есть редкая фотография или интересная история о Пензе? Хочешь стать частью нашей команды? У тебя есть печеньки? Напиши нам!</string>
     <string name="help_project_dialog_button_text">Написать разработчикам</string>
@@ -50,4 +51,6 @@
     <string name="log_out_dialog_text">Вы действительно хотите\n выйти из аккаунта?</string>
     <string name="negative_button_text">Нет</string>
     <string name="positive_button_text">Да</string>
+    <string name="preference_file_key">com.projectcenterfvt.historicalpenza.PREFERENCES</string>
+    <string name="continue_button_text">Продолжить</string>
 </resources>

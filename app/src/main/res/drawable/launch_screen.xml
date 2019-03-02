@@ -5,10 +5,10 @@
 
     <item android:drawable="@android:color/white"/>
 
-    <item>
+    <item android:gravity="center">
         <bitmap
             android:src="@drawable/logo_main"
-            android:gravity="fill_horizontal"/>
+            android:gravity="center"/>
 
     </item>
 

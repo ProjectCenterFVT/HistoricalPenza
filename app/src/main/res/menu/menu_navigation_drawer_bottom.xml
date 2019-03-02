@@ -5,26 +5,26 @@
 
     <group android:id="@+id/grp1" android:checkableBehavior="single">
         <item
-            android:id="@+id/name_settings"
-            android:title="@string/name_settings" />
+            android:id="@+id/settings_menu_item"
+            android:title="@string/settings_menu_item_text" />
     </group>
 
     <group android:id="@+id/grp2" android:checkableBehavior="single">
         <item
-            android:id="@+id/name_help"
-            android:title="@string/name_help" />
+            android:id="@+id/help_menu_item"
+            android:title="@string/help_menu_item_text" />
     </group>
 
     <group android:id="@+id/grp3" android:checkableBehavior="single">
         <item
-            android:id="@+id/name_about"
-            android:title="@string/name_about" />
+            android:id="@+id/about_menu_item"
+            android:title="@string/about_menu_item_text" />
     </group>
 
     <group android:id="@+id/grp4" android:checkableBehavior="single">
         <item
-            android:id="@+id/name_logout"
-            android:title="@string/name_logout" />
+            android:id="@+id/log_out_menu_item"
+            android:title="@string/log_out_menu_item_text" />
     </group>
 
 </menu>

@@ -14,10 +14,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BillingManager implements PurchasesUpdatedListener {
-  private   Activity activity;
-  private   BillingClient billingClient;
-   private boolean isServiceConnected = false;
-   private int billingClientResponseCode;
+    private Activity activity;
+    private BillingClient billingClient;
+    private boolean isServiceConnected = false;
+    private int billingClientResponseCode;
     BillingUpdatesListener billingUpdatesListener;
 
 
@@ -98,6 +98,7 @@ public class BillingManager implements PurchasesUpdatedListener {
             startServiceConnection(runnable);
         }
     }
+
     public void queryPurchases() {
         Runnable queryToExecute = new Runnable() {
             @Override

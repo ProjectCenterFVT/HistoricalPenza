@@ -18,14 +18,18 @@ class LandmarksRepository private constructor(context: Context) {
         db.getLandmarks()
     }
 
+    fun getLandmarkById(id: Long): Landmark? {
+        landmarks.value?.map { landmark ->
+            if (landmark.id == id) return landmark
+        }
+        return null
+    }
+
+    @Throws(Exception::class)
     suspend fun refreshLandmarks() {
         withContext(Dispatchers.IO) {
-            try {
-                val result = network.fetchLandmarks()
-                db.insertLandmarks(result)
-            } catch (ex: Exception) {
-                ex.printStackTrace()
-            }
+            val result = network.fetchLandmarks()
+            db.insertLandmarks(result)
         }
     }
 

@@ -16,6 +16,7 @@
     </style>
 
     <style name="AppTheme.Launcher">
+        <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowBackground">@drawable/launch_screen</item>
     </style>
 

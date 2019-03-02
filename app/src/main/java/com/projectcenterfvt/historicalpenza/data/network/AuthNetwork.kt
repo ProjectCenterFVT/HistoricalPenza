@@ -2,10 +2,10 @@ package com.projectcenterfvt.historicalpenza.data.network
 
 import android.content.Context
 import com.google.gson.Gson
+import com.google.gson.JsonSyntaxException
 import com.google.gson.reflect.TypeToken
 import com.projectcenterfvt.historicalpenza.BuildConfig
 import com.projectcenterfvt.historicalpenza.data.Preferences
-import com.projectcenterfvt.historicalpenza.data.Landmark
 import com.projectcenterfvt.historicalpenza.utils.Singleton
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.android.Android
@@ -17,8 +17,9 @@ import io.ktor.client.features.logging.Logger
 import io.ktor.client.features.logging.Logging
 import io.ktor.client.request.post
 import kotlinx.serialization.json.json
+import timber.log.Timber
 
-class LandmarksNetwork private constructor(context: Context) {
+class AuthNetwork private constructor(context: Context) {
 
     private val client = HttpClient(Android) {
         install(JsonFeature) {
@@ -32,26 +33,27 @@ class LandmarksNetwork private constructor(context: Context) {
 
     private var preferences = Preferences.getInstance(context)
 
-    private val mapper = LandMarkMapper()
-
-    suspend fun fetchLandmarks() : List<Landmark> {
+    @Throws(Exception::class)
+    suspend fun logIn(tokenId: String) {
         val str: String = client.post(URL_ENDPOINT) {
             body = json {
-                "type" to "getCoordinates"
-                "ver" to "0.0.0"
-                "enc_id" to preferences.token
+                "type" to "login"
+                "token" to tokenId
             }.toString()
         }
 
-        val type = object : TypeToken<LandmarksResponse>() {}.type
-        val response : LandmarksResponse = Gson().fromJson(str,type)
+        try {
+            val type = object : TypeToken<LogInResponse>() {}.type
+            val response : LogInResponse = Gson().fromJson(str,type)
 
-        return response.result.map {
-            mapper.mapToDomain(it)
+            preferences.token = response.result[0].enc_id
+        } catch (e: JsonSyntaxException) {
+            Timber.e(e)
+            throw Exception("Error occurred", e)
         }
     }
 
-    companion object : Singleton<LandmarksNetwork, Context>(::LandmarksNetwork) {
+    companion object : Singleton<AuthNetwork, Context>(::AuthNetwork) {
         const val URL_ENDPOINT = "${BuildConfig.API_ENDPOINT}api.request.php"
     }
 

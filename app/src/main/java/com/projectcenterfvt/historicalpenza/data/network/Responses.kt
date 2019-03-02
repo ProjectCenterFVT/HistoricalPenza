@@ -13,3 +13,7 @@ data class LandmarkEntity(
         val type: Int,
         val flag: Boolean
 )
+
+data class LogInResponse(val result: List<Token>)
+
+data class Token(val enc_id: String)

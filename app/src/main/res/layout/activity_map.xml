@@ -36,7 +36,7 @@
                     android:layout_gravity="top"
                     android:layout_alignParentTop="true"
                     app:headerLayout="@layout/nav_header_activity_map"
-                    app:menu="@menu/menu_navigation_drawer" />
+                    app:menu="@menu/menu_navigation_drawer_top" />
 
                 <android.support.design.widget.NavigationView
                     android:id="@+id/navigationViewBottom"

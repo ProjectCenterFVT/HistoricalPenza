@@ -33,9 +33,10 @@
                         </option>
                         <option name="values">
                           <map>
+                            <entry key="assetSourceType" value="FILE" />
                             <entry key="color" value="ffffff" />
-                            <entry key="outputName" value="ic_arrow" />
-                            <entry key="sourceFile" value="C:\Users\Dmitry" />
+                            <entry key="outputName" value="ic_my_position" />
+                            <entry key="sourceFile" value="C:\Users\Dmitry\Desktop\svgs\my_position.svg" />
                           </map>
                         </option>
                       </PersistentState>
