@@ -1,4 +1,4 @@
-package com.projectcenterfvt.historicalpenza.landmarksList
+package com.projectcenterfvt.historicalpenza.landmarks_list
 
 import com.projectcenterfvt.historicalpenza.data.Landmark
 

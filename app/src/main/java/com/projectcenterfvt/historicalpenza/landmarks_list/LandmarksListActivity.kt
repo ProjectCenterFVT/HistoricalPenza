@@ -1,4 +1,4 @@
-package com.projectcenterfvt.historicalpenza.landmarksList
+package com.projectcenterfvt.historicalpenza.landmarks_list
 
 import android.app.Activity
 import android.arch.lifecycle.Observer

@@ -1,4 +1,4 @@
-package com.projectcenterfvt.historicalpenza.signIn
+package com.projectcenterfvt.historicalpenza.sign_in
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders

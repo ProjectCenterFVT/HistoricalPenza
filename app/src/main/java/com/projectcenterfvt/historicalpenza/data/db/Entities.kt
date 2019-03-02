@@ -2,9 +2,6 @@ package com.projectcenterfvt.historicalpenza.data.db
 
 import android.arch.persistence.room.Entity
 import android.arch.persistence.room.PrimaryKey
-import com.google.android.gms.maps.model.LatLng
-import com.projectcenterfvt.historicalpenza.data.Landmark
-import java.net.URL
 
 @Entity(tableName = "Landmark")
 data class LandmarkEntity (

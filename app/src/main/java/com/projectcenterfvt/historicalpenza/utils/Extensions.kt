@@ -51,12 +51,12 @@ fun FragmentActivity.showDialog(dialog: DialogFragment) {
 fun Location.getLatLng() = LatLng(latitude, longitude)
 
 fun LatLng.distanceTo(location: LatLng): Long {
-    val  R = 6372795
+    val  radius = 6372795
     val x1 = latitude * Math.PI / 180
     val y1 = longitude * Math.PI / 180
     val x2 = location.latitude * Math.PI / 180
     val y2 = location.longitude * Math.PI / 180
-    val res = Math.acos(Math.sin(x1) * Math.sin(x2) + Math.cos(x1) * Math.cos(x2) * Math.cos(y1 - y2)) * R
+    val res = Math.acos(Math.sin(x1) * Math.sin(x2) + Math.cos(x1) * Math.cos(x2) * Math.cos(y1 - y2)) * radius
     return res.toLong()
 }
 

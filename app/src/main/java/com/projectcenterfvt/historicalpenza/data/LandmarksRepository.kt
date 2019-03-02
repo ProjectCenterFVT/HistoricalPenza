@@ -1,7 +1,6 @@
 package com.projectcenterfvt.historicalpenza.data
 
 import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.Transformations
 import android.content.Context
 import com.projectcenterfvt.historicalpenza.data.db.LandmarksDatabase
 import com.projectcenterfvt.historicalpenza.data.network.LandmarksNetwork

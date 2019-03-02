@@ -1,10 +1,9 @@
-package com.projectcenterfvt.historicalpenza.landmarksList
+package com.projectcenterfvt.historicalpenza.landmarks_list
 
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
 import com.projectcenterfvt.historicalpenza.R
-import com.projectcenterfvt.historicalpenza.data.Landmark
 import com.projectcenterfvt.historicalpenza.utils.inflate
 import kotlinx.android.synthetic.main.item_landmark.view.*
 

@@ -1,7 +1,6 @@
 package com.projectcenterfvt.historicalpenza.map
 
 import android.annotation.SuppressLint
-import android.os.Build
 import android.view.View
 import android.view.ViewTreeObserver
 import com.google.android.gms.maps.GoogleMap

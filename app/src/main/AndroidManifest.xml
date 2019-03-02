@@ -27,7 +27,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".signIn.SignInActivity"
+            android:name=".sign_in.SignInActivity"
             android:theme="@style/AppFullScreenTheme">
         </activity>
 
@@ -48,7 +48,7 @@
             android:noHistory="true"
             android:theme="@style/AppFullScreenTheme" />
         <activity
-            android:name=".landmarksList.LandmarksListActivity"
+            android:name=".landmarks_list.LandmarksListActivity"
             android:theme="@style/AppTheme.Toolbar"
             android:label="SightActivity"
             android:parentActivityName=".map.MapActivity" />

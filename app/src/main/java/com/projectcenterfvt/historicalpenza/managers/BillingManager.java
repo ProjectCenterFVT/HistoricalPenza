@@ -1,4 +1,4 @@
-package com.projectcenterfvt.historicalpenza.Managers;
+package com.projectcenterfvt.historicalpenza.managers;
 
 import android.app.Activity;
 import android.support.annotation.Nullable;

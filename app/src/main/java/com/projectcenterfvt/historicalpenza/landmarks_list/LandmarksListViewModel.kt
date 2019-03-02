@@ -1,15 +1,14 @@
-package com.projectcenterfvt.historicalpenza.landmarksList
+package com.projectcenterfvt.historicalpenza.landmarks_list
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
 import com.google.android.gms.maps.model.LatLng
-import com.projectcenterfvt.historicalpenza.data.Landmark
 import com.projectcenterfvt.historicalpenza.data.LandmarksRepository
 
-class LandmarksListViewModel(private val repository: LandmarksRepository,
-                             private val lastKnownLocation: LatLng?)
+class LandmarksListViewModel(repository: LandmarksRepository,
+                             lastKnownLocation: LatLng?)
     : ViewModel() {
 
     private val currentFiltering = MutableLiveData<Filtering>()

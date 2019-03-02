@@ -10,7 +10,7 @@ import android.net.NetworkInfo
 import com.projectcenterfvt.historicalpenza.utils.Singleton
 
 
-class ConnectionListener(private val context: Context) : LiveData<Connection>() {
+class ConnectionListener(context: Context) : LiveData<Connection>() {
 
     private val networkReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {

@@ -19,9 +19,9 @@ class MapViewModel(application: Application, private val repository: LandmarksRe
 
     val currentLocation = CurrentLocationListener.getInstance(application)
 
-    val _searchQuery = MutableLiveData<String>()
+    private val _searchQuery = MutableLiveData<String>()
 
-    val suggestions = Transformations.map(_searchQuery) { query ->
+    val suggestions: LiveData<List<Suggestion>> = Transformations.map(_searchQuery) { query ->
         val pattern = Pattern.compile(query.toLowerCase())
 
         val mapper = SuggestionMapper()

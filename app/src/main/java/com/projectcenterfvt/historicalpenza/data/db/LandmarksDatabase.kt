@@ -9,7 +9,7 @@ import com.projectcenterfvt.historicalpenza.utils.Singleton
 
 class LandmarksDatabase private constructor(context: Context) {
 
-    val dao = getDatabase(context).landmarkDao
+    private val dao = getDatabase(context).landmarkDao
 
     private val mapper = LandMarkMapper()
 

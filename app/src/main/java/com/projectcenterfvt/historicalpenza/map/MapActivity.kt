@@ -21,7 +21,7 @@ import com.projectcenterfvt.historicalpenza.dialogs.*
 import com.projectcenterfvt.historicalpenza.R
 import com.projectcenterfvt.historicalpenza.data.Landmark
 import com.projectcenterfvt.historicalpenza.data.LandmarksRepository
-import com.projectcenterfvt.historicalpenza.landmarksList.LandmarksListActivity
+import com.projectcenterfvt.historicalpenza.landmarks_list.LandmarksListActivity
 import com.projectcenterfvt.historicalpenza.utils.*
 import kotlinx.android.synthetic.main.activity_map.*
 import kotlinx.android.synthetic.main.activity_map_content.*
@@ -104,11 +104,6 @@ class MapActivity : AppCompatActivity(),
             override fun onFocusCleared() {}
 
         })
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.activity_map, menu)
-        return true
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {

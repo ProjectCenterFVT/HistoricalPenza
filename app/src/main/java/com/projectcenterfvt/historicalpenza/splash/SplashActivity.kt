@@ -1,14 +1,12 @@
 package com.projectcenterfvt.historicalpenza.splash
 
 import android.content.Intent
-import android.content.pm.ActivityInfo
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import com.projectcenterfvt.historicalpenza.signIn.SignInActivity
+import com.projectcenterfvt.historicalpenza.sign_in.SignInActivity
 import com.projectcenterfvt.historicalpenza.data.Preferences
 import com.projectcenterfvt.historicalpenza.R
 import com.projectcenterfvt.historicalpenza.map.MapActivity
-import kotlinx.coroutines.*
 
 class SplashActivity : AppCompatActivity() {
 

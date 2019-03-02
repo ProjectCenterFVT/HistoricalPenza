@@ -1,13 +1,12 @@
 package com.projectcenterfvt.historicalpenza.dialogs
 
-import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 
-import com.projectcenterfvt.historicalpenza.signIn.SignInActivity
+import com.projectcenterfvt.historicalpenza.sign_in.SignInActivity
 import com.projectcenterfvt.historicalpenza.data.Preferences
 import com.projectcenterfvt.historicalpenza.R
 import kotlinx.android.synthetic.main.dialog_log_out.*

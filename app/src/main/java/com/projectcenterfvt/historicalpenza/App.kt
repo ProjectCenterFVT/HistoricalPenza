@@ -1,8 +1,6 @@
 package com.projectcenterfvt.historicalpenza
 
 import android.app.Application
-import com.projectcenterfvt.historicalpenza.data.Connection
-import com.projectcenterfvt.historicalpenza.data.ConnectionListener
 import timber.log.Timber
 
 class App : Application() {

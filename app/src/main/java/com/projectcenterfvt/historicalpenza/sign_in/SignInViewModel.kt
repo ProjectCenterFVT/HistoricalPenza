@@ -1,7 +1,5 @@
-package com.projectcenterfvt.historicalpenza.signIn
+package com.projectcenterfvt.historicalpenza.sign_in
 
-import android.app.Application
-import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.ViewModel
 import android.content.Context
