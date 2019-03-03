@@ -1,11 +1,13 @@
 package com.projectcenterfvt.historicalpenza.landmarks_list
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.support.design.widget.BottomSheetDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
@@ -16,6 +18,8 @@ import com.projectcenterfvt.historicalpenza.R
 import com.projectcenterfvt.historicalpenza.data.LandmarksRepository
 import com.projectcenterfvt.historicalpenza.utils.viewModelFactory
 import kotlinx.android.synthetic.main.activity_landmarks_list.*
+import kotlinx.android.synthetic.main.sorting_bottom_sheet.*
+import kotlinx.android.synthetic.main.sorting_bottom_sheet.view.*
 
 
 class LandmarksListActivity : AppCompatActivity() {
@@ -66,9 +70,29 @@ class LandmarksListActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
-            R.id.sort -> viewModel.setFiltering()
+            R.id.sort -> {
+                showBottomSheet()
+            }
         }
         return false
+    }
+
+    @SuppressLint("InflateParams")
+    private fun showBottomSheet() {
+        val view = layoutInflater.inflate(R.layout.sorting_bottom_sheet, null)
+
+        val dialog = BottomSheetDialog(this)
+        dialog.setContentView(view)
+        dialog.show()
+
+        view.alphabeticSort.setOnClickListener {
+            viewModel.setFiltering(Filtering.ALPHABETIC)
+            dialog.dismiss()
+        }
+        view.distanceSort.setOnClickListener {
+            viewModel.setFiltering(Filtering.DISTANCE)
+            dialog.dismiss()
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {

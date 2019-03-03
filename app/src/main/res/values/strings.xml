@@ -62,4 +62,6 @@
     <string name="is_closed_button_text">Хочу открыть</string>
 
     <string name="dialog_cancel_button">Назад</string>
+    <string name="sort_by_distance_menu_text">Сортировать по расстоянию</string>
+    <string name="sort_by_alpha_menu_text">Сортировать по алфавиту</string>
 </resources>

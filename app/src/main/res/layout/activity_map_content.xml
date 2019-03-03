@@ -60,7 +60,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            android:drawableStart="@drawable/ic_location"
+            android:drawableStart="@drawable/ic_location_translucent"
             android:text="@string/near_place_button_text"
             android:background="@drawable/close_button_background"
             android:textColor="#888888"

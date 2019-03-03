@@ -45,10 +45,9 @@ class LandmarksListViewModel(repository: LandmarksRepository,
                 if (lastKnownLocation == null) Filtering.ALPHABETIC else Filtering.DISTANCE
     }
 
-    fun setFiltering() {
-        currentFiltering.value =
-                if (currentFiltering.value == Filtering.DISTANCE) Filtering.ALPHABETIC
-                else Filtering.DISTANCE
+    fun setFiltering(filtering: Filtering) {
+        if (currentFiltering.value == filtering) return
+        currentFiltering.value = filtering
     }
 
 }
