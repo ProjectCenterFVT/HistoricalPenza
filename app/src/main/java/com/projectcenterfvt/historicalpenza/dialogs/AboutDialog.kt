@@ -1,4 +1,4 @@
-package com.projectcenterfvt.historicalpenza.Dialogs
+package com.projectcenterfvt.historicalpenza.dialogs
 
 import android.os.Bundle
 import android.view.LayoutInflater

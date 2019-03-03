@@ -9,7 +9,7 @@
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clipToPadding="false">
+        android:fitsSystemWindows="true">
 
         <fragment
             android:id="@+id/mapFragment"
@@ -81,7 +81,7 @@
         app:floatingSearch_searchBarMarginLeft="8dp"
         app:floatingSearch_searchBarMarginRight="8dp"
         app:floatingSearch_searchBarMarginTop="8dp"
-        app:floatingSearch_searchHint="Поиск по городу"
+        app:floatingSearch_searchHint="@string/search_view_text"
         app:floatingSearch_showSearchKey="true"
         app:floatingSearch_suggestionsListAnimDuration="250" />
 

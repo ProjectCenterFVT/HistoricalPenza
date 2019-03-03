@@ -16,6 +16,14 @@ import android.view.ViewGroup
 import android.widget.Toast
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.support.v4.content.ContextCompat
+import android.graphics.drawable.Drawable
+import com.google.android.gms.maps.model.BitmapDescriptor
+
+
 
 
 fun Context.toast(message: String, duration: Int = Toast.LENGTH_SHORT) =
@@ -82,4 +90,13 @@ fun interpolate(fraction: Float, a: LatLng, b: LatLng): LatLng {
     }
     val lng = lngDelta * fraction + a.longitude
     return LatLng(lat, lng)
+}
+
+fun Context.bitmapDescriptorFromVector(vectorResId: Int): BitmapDescriptor {
+    val vectorDrawable = ContextCompat.getDrawable(this, vectorResId)
+    vectorDrawable!!.setBounds(0, 0, vectorDrawable.intrinsicWidth, vectorDrawable.intrinsicHeight)
+    val bitmap = Bitmap.createBitmap(vectorDrawable.intrinsicWidth, vectorDrawable.intrinsicHeight, Bitmap.Config.ARGB_8888)
+    val canvas = Canvas(bitmap)
+    vectorDrawable.draw(canvas)
+    return BitmapDescriptorFactory.fromBitmap(bitmap)
 }

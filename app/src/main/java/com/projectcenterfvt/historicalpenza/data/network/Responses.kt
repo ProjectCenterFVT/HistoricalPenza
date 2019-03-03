@@ -11,7 +11,7 @@ data class LandmarkEntity(
         val img: String,
         val coordinates: String,
         val type: Int,
-        val flag: Boolean
+        val flag: Int
 )
 
 data class LogInResponse(val result: List<Token>)

@@ -157,7 +157,7 @@ class MapActivity : AppCompatActivity(),
                 currentLocationMarker = map.addMarker(
                         MarkerOptions().apply {
                             position(location.getLatLng())
-                            icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_my_position))
+                            icon(bitmapDescriptorFromVector(R.drawable.ic_marker_my_position))
                         })
             }
         })
@@ -198,7 +198,7 @@ class MapActivity : AppCompatActivity(),
                             }
                             Landmark.Type.EXTRA -> R.drawable.ic_marker_extra_project
                         }
-                        markerOptions!!.icon(BitmapDescriptorFactory.fromResource(drawableRes))
+                        markerOptions!!.icon(bitmapDescriptorFromVector(drawableRes))
                     }
         }
 

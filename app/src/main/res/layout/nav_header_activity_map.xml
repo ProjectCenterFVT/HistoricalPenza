@@ -6,23 +6,16 @@
     android:gravity="bottom"
     android:orientation="vertical"
     android:paddingBottom="8dp"
-    android:paddingStart="16dp"
     android:paddingTop="32dp"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
     <TextView
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="bottom"
-        android:text="@string/hist_penza1"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textSize="20sp" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/hist_penza2"
-        android:textAlignment="viewStart"
+        android:text="@string/navigation_header_title"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textSize="20sp" />
 

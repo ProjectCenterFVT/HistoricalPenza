@@ -1,4 +1,4 @@
-package com.projectcenterfvt.historicalpenza.Dialogs
+package com.projectcenterfvt.historicalpenza.dialogs
 
 import android.app.Dialog
 import android.graphics.drawable.ColorDrawable
@@ -11,7 +11,7 @@ import com.projectcenterfvt.historicalpenza.R
 abstract class BaseDialog : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        setStyle(DialogFragment.STYLE_NO_TITLE, R.style.MyAlertDialogTheme)
+        setStyle(DialogFragment.STYLE_NO_TITLE, R.style.CustomDialogTheme)
 
         val dialog = super.onCreateDialog(savedInstanceState)
 

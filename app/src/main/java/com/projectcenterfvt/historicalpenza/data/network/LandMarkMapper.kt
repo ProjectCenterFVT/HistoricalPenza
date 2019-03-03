@@ -13,6 +13,9 @@ open class LandMarkMapper : Mapper<Landmark, LandmarkEntity> {
     }
 
     override fun mapToDomain(type: LandmarkEntity): Landmark {
+        val title = type.title.replace("&quot;", "\"").trim()
+        val description = type.description.replace("&quot;", "\"").trim()
+
         val x = type.coordinates.split(",")[0].toDouble()
         val y = type.coordinates.split(",")[1].toDouble()
         val latLng = LatLng(x, y)
@@ -23,12 +26,12 @@ open class LandMarkMapper : Mapper<Landmark, LandmarkEntity> {
 
         return Landmark(
                 type._id,
-                type.title,
-                type.description,
+                title,
+                description,
                 URL("${BuildConfig.API_ENDPOINT}img/${type.img}"),
                 latLng,
                 landmarkType,
-                type.flag
+                (type.flag == 1)
         )
     }
 

@@ -1,22 +1,17 @@
-package com.projectcenterfvt.historicalpenza.Dialogs
+package com.projectcenterfvt.historicalpenza.dialogs
 
-import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.projectcenterfvt.historicalpenza.Managers.PreferencesManager
 import com.projectcenterfvt.historicalpenza.R
+import com.projectcenterfvt.historicalpenza.data.Preferences
 import kotlinx.android.synthetic.main.dialog_settings.*
 
 class SettingsDialog : BaseDialog() {
 
-    lateinit var preferences: PreferencesManager
-
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        preferences = PreferencesManager(context)
-
-        return super.onCreateDialog(savedInstanceState)
+    private val preferences: Preferences by lazy {
+        Preferences.getInstance(context!!)
     }
 
     override fun onCreateView(inflater: LayoutInflater,
@@ -29,8 +24,9 @@ class SettingsDialog : BaseDialog() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        notifySwitch.isChecked = preferences.shouldNotify
         notifySwitch.setOnCheckedChangeListener { _, checked ->
-            preferences.notificationStatus = checked
+            preferences.shouldNotify = checked
         }
 
         cancelButton.setOnClickListener { dismiss() }
