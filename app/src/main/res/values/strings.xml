@@ -21,6 +21,8 @@
     <string name="landmarks_list_activity_title">Достопримечательности</string>
     <string name="sort">Фильтры</string>
     <string name="landmark_dialog_distance_text">%1$d м</string>
+    <string name="sort_by_distance_menu_text">Сортировать по расстоянию</string>
+    <string name="sort_by_alpha_menu_text">Сортировать по алфавиту</string>
 
     <!--Экран с приветствием-->
     <string name="continue_button_text">Продолжить</string>
@@ -62,6 +64,7 @@
     <string name="is_closed_button_text">Хочу открыть</string>
 
     <string name="dialog_cancel_button">Назад</string>
-    <string name="sort_by_distance_menu_text">Сортировать по расстоянию</string>
-    <string name="sort_by_alpha_menu_text">Сортировать по алфавиту</string>
+
+    <string name="allow_permission_dialog_text">Доступ к геопозиции является основным разрешением для этого приложения. Пожалуйста, разрешите доступ</string>
+
 </resources>

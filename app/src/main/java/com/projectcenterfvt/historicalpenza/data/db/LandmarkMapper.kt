@@ -20,6 +20,7 @@ open class LandMarkMapper : Mapper<Landmark, LandmarkEntity> {
                     photoUrl = photoUrl.toString(),
                     latitude = position.latitude,
                     longitude = position.longitude,
+                    range = range,
                     type = landmarkType,
                     isOpened = isOpened
             )
@@ -38,6 +39,7 @@ open class LandMarkMapper : Mapper<Landmark, LandmarkEntity> {
                     description = description,
                     photoUrl = URL(photoUrl),
                     position = LatLng(latitude, longitude),
+                    range = range,
                     type = landmarkType,
                     isOpened = isOpened
             )

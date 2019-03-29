@@ -28,13 +28,14 @@ android {
         applicationId "com.projectcenterfvt.historicalpenza"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 13
-        versionName "0.4.1"
+        versionCode 14
+        versionName "0.5.0"
         multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         manifestPlaceholders = [HOCKEYAPP_APP_ID: "e242b3a6a5b04e47b9a49dd5de3f9828"]
 
         buildConfigField "String", "API_ENDPOINT", '"http://hpenza.creativityprojectcenter.ru/"'
+        buildConfigField "String", "SKU", '"open_all_objects_penza"'
     }
     buildTypes {
         release {
@@ -104,11 +105,12 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     // Ktor - http-client
-    implementation "io.ktor:ktor-client-core:1.0.1"
-    implementation "io.ktor:ktor-client-android:1.0.1"
-    implementation "io.ktor:ktor-client-json-jvm:1.0.1"
-    implementation "io.ktor:ktor-client-json-jvm:1.0.1"
-    implementation "io.ktor:ktor-client-logging-jvm:1.0.1"
+    def ktor_version = "1.0.1"
+    implementation "io.ktor:ktor-client-core:$ktor_version"
+    implementation "io.ktor:ktor-client-android:$ktor_version"
+    implementation "io.ktor:ktor-client-json-jvm:$ktor_version"
+    implementation "io.ktor:ktor-client-json-jvm:$ktor_version"
+    implementation "io.ktor:ktor-client-logging-jvm:$ktor_version"
 
     // ViewModel and LiveData
     def lifecycle_version = "1.1.1"
@@ -119,4 +121,7 @@ dependencies {
     def room_version = "1.1.1"
     implementation "android.arch.persistence.room:runtime:$room_version"
     kapt "android.arch.persistence.room:compiler:$room_version"
+
+    // Anko
+    implementation "org.jetbrains.anko:anko:0.10.8"
 }

@@ -83,11 +83,13 @@
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
-        app:layout_anchor="@id/scroll"
-        android:layout_margin="16dp"
-        app:layout_anchorGravity="bottom|right|end"
-        android:layout_height="wrap_content"
         android:layout_width="wrap_content"
-        android:background="@drawable/homestead_btn" />
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/fab_margin"
+        android:background="@drawable/homestead_btn"
+        android:src="@drawable/extra_project_logo"
+        app:maxImageSize="36dp"
+        app:layout_anchor="@id/scroll"
+        app:layout_anchorGravity="bottom|right|end" />
 
 </android.support.design.widget.CoordinatorLayout>

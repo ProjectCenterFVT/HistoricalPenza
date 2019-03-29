@@ -21,12 +21,13 @@ class MapViewModel(application: Application, private val repository: LandmarksRe
 
     private val _searchQuery = MutableLiveData<String>()
 
-    val suggestions: LiveData<List<Suggestion>> = Transformations.map(_searchQuery) { query ->
+    val suggestions = Transformations.map(_searchQuery) { query ->
         val pattern = Pattern.compile(query.toLowerCase())
 
         val mapper = SuggestionMapper()
         val result = mutableListOf<Suggestion>()
-        landmarks.value?.map { landmark ->
+        landmarks.value?.forEach { landmark ->
+            if (result.size >= MAX_SUGGESTIONS) return@forEach
             val matcher = pattern.matcher(landmark.title.toLowerCase())
             if (matcher.find()) {
                 result.add(mapper.mapFromDomain(landmark))
@@ -34,7 +35,7 @@ class MapViewModel(application: Application, private val repository: LandmarksRe
         }
 
         result
-    }
+    }!!
 
     fun setSearchQuery(text: String) {
         _searchQuery.value = text
@@ -68,6 +69,12 @@ class MapViewModel(application: Application, private val repository: LandmarksRe
         }
 
         return result
+    }
+
+    companion object {
+
+        private const val MAX_SUGGESTIONS = 6
+
     }
 
 }

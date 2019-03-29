@@ -2,14 +2,16 @@ package com.projectcenterfvt.historicalpenza.info
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import com.projectcenterfvt.historicalpenza.dialogs.ExtraProjectDialog
 import com.projectcenterfvt.historicalpenza.R
 import com.projectcenterfvt.historicalpenza.data.Landmark
+import com.projectcenterfvt.historicalpenza.dialogs.ExtraProjectDialog
 import com.projectcenterfvt.historicalpenza.utils.showDialog
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_info.*
+
 
 class InfoActivity : AppCompatActivity() {
 
@@ -35,6 +37,16 @@ class InfoActivity : AppCompatActivity() {
             fab.show()
             fab.setOnClickListener {
                 showDialog(ExtraProjectDialog())
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                scroll.setOnScrollChangeListener { _, _, scrollY, _, oldScrollY ->
+                    if (scrollY > oldScrollY) {
+                        fab.hide()
+                    } else {
+                        fab.show()
+                    }
+                }
             }
         } else fab.hide()
     }

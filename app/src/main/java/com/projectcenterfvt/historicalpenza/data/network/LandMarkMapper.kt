@@ -30,6 +30,7 @@ open class LandMarkMapper : Mapper<Landmark, LandmarkEntity> {
                 description,
                 URL("${BuildConfig.API_ENDPOINT}img/${type.img}"),
                 latLng,
+                200L,
                 landmarkType,
                 (type.flag == 1)
         )

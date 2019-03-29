@@ -18,10 +18,9 @@ class LandmarksRepository private constructor(context: Context) {
     }
 
     fun getLandmarkById(id: Long): Landmark? {
-        landmarks.value?.map { landmark ->
-            if (landmark.id == id) return landmark
+        return landmarks.value?.find { landmark ->
+            landmark.id == id
         }
-        return null
     }
 
     @Throws(Exception::class)
@@ -29,6 +28,20 @@ class LandmarksRepository private constructor(context: Context) {
         withContext(Dispatchers.IO) {
             val result = network.fetchLandmarks()
             db.insertLandmarks(result)
+        }
+    }
+
+    @Throws(Exception::class)
+    suspend fun openLandmark(id: Long) {
+        withContext(Dispatchers.IO) {
+            network.openLandmark(id)
+            db.openLandmark(id)
+        }
+    }
+
+    suspend fun resetLandmarks() {
+        withContext(Dispatchers.IO) {
+            db.resetLandmarks()
         }
     }
 

@@ -16,6 +16,7 @@ import io.ktor.client.features.logging.LogLevel
 import io.ktor.client.features.logging.Logger
 import io.ktor.client.features.logging.Logging
 import io.ktor.client.request.post
+import kotlinx.io.IOException
 import kotlinx.serialization.json.json
 
 class LandmarksNetwork private constructor(context: Context) {
@@ -51,8 +52,25 @@ class LandmarksNetwork private constructor(context: Context) {
         }
     }
 
+    suspend fun openLandmark(id: Long) {
+        val str: String = client.post(URL_ENDPOINT) {
+            body = json {
+                "type" to "setPlaces"
+                "id" to id
+                "enc_id" to preferences.token
+            }.toString()
+        }
+
+        val type = object : TypeToken<Boolean>() {}.type
+        val response : Boolean = Gson().fromJson(str,type)
+
+        if (!response) throw HttpException(500, "Internal Server Error")
+    }
+
     companion object : Singleton<LandmarksNetwork, Context>(::LandmarksNetwork) {
         const val URL_ENDPOINT = "${BuildConfig.API_ENDPOINT}api.request.php"
     }
 
 }
+
+class HttpException(val code: Int, message: String) : IOException(message)

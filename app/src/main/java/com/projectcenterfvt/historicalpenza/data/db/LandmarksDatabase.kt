@@ -26,19 +26,29 @@ class LandmarksDatabase private constructor(context: Context) {
         }
     }
 
+    fun resetLandmarks() { dao.resetLandmarks() }
+
+    fun openLandmark(id: Long) { dao.openLandmark(id) }
+
     companion object : Singleton<LandmarksDatabase, Context>(::LandmarksDatabase)
 }
 
 @Dao
 interface LandmarkDao {
-    @Query("select * from Landmark")
+    @Query("select * from Landmarks")
     fun getAll(): LiveData<List<LandmarkEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(landmarks: List<LandmarkEntity>)
 
-    @Query("DELETE FROM Landmark")
+    @Query("DELETE FROM Landmarks")
     fun deleteAll()
+
+    @Query("UPDATE Landmarks SET isOpened = 0")
+    fun resetLandmarks()
+
+    @Query("UPDATE Landmarks SET isOpened = 1 WHERE id = :id")
+    fun openLandmark(id: Long)
 }
 
 @Database(entities = [LandmarkEntity::class], version = 1, exportSchema = false)

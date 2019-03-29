@@ -12,6 +12,7 @@ data class Landmark(
         val description: String,
         val photoUrl: URL,
         val position: LatLng,
+        val range: Long,
         val type: Type,
         val isOpened: Boolean
 ) : Parcelable {

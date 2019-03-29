@@ -3,7 +3,7 @@ package com.projectcenterfvt.historicalpenza.data.db
 import android.arch.persistence.room.Entity
 import android.arch.persistence.room.PrimaryKey
 
-@Entity(tableName = "Landmark")
+@Entity(tableName = "Landmarks")
 data class LandmarkEntity (
         @PrimaryKey val id: Long,
         val title: String,
@@ -11,6 +11,7 @@ data class LandmarkEntity (
         val photoUrl: String,
         val latitude: Double,
         val longitude: Double,
+        val range: Long,
         val type: Int,
         val isOpened: Boolean
 )

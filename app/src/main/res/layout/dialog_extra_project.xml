@@ -42,6 +42,8 @@
             android:layout_marginEnd="24dp"
             android:text="@string/extra_project_dialog_text"
             android:textSize="14sp"
+            android:fontFamily="@font/sfuitext_light"
+            android:textColor="@color/text_color"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/logo" />

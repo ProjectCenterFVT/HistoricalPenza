@@ -6,10 +6,11 @@
     android:gravity="bottom"
     android:orientation="vertical"
     android:paddingBottom="8dp"
-    android:paddingTop="32dp"
+    android:paddingTop="8dp"
     android:paddingStart="16dp"
     android:paddingEnd="16dp"
-    android:theme="@style/ThemeOverlay.AppCompat.Dark">
+    android:theme="@style/ThemeOverlay.AppCompat.Dark"
+    android:fitsSystemWindows="true">
 
     <TextView
         android:layout_width="wrap_content"

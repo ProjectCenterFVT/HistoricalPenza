@@ -7,8 +7,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
+import android.support.v4.view.ViewCompat
 import android.support.v7.app.AppCompatActivity
-import android.view.Menu
 import android.view.MenuItem
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -27,6 +27,7 @@ import kotlinx.android.synthetic.main.activity_map.*
 import kotlinx.android.synthetic.main.activity_map_content.*
 import com.arlib.floatingsearchview.FloatingSearchView
 import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion
+import com.projectcenterfvt.historicalpenza.services.LocationService
 
 
 class MapActivity : AppCompatActivity(),
@@ -62,6 +63,11 @@ class MapActivity : AppCompatActivity(),
 
         navigationViewTop.setNavigationItemSelectedListener(this)
         navigationViewBottom.setNavigationItemSelectedListener(this)
+
+        ViewCompat.setNestedScrollingEnabled(navigationViewBottom, false)
+
+        val intent = Intent(this, LocationService::class.java)
+        startService(intent)
     }
 
     private fun setupSearchView() {
@@ -111,7 +117,7 @@ class MapActivity : AppCompatActivity(),
             R.id.landmarks_menu_item -> {
                 val location = viewModel.currentLocation.value?.getLatLng()
                 val intent = LandmarksListActivity.getIntent(this, location)
-                startActivityForResult(intent, SIGHT_KEY)
+                startActivityForResult(intent, REQUEST_LANDMARK)
             }
             R.id.help_project_menu_item -> showDialog(HelpProjectDialog())
             R.id.settings_menu_item -> showDialog(SettingsDialog())
@@ -206,11 +212,12 @@ class MapActivity : AppCompatActivity(),
         map.setOnCameraIdleListener(clusterManager)
 
         clusterManager.setOnClusterClickListener { cluster ->
-            val builder = LatLngBounds.builder()
+            val boundsBuilder = LatLngBounds.builder()
             for (item in cluster.items) {
-                builder.include(item.position)
+                boundsBuilder.include(item.position)
             }
-            map.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 100))
+            val bounds = boundsBuilder.build()
+            map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
             true
         }
         clusterManager.setOnClusterItemClickListener { landmarkMarker ->
@@ -222,10 +229,8 @@ class MapActivity : AppCompatActivity(),
     }
 
     private fun showLandmark(id: Long) {
-        val landmark = viewModel.getLandmark(id) ?: return
-
         val currentLocation = viewModel.currentLocation.value?.getLatLng()
-        showDialog(LandmarkDialog.newInstance(landmark, currentLocation))
+        showDialog(LandmarkDialog.newInstance(id, currentLocation))
     }
 
     private fun addMarkersToMap(markers: List<LandmarkMarker>) {
@@ -235,7 +240,7 @@ class MapActivity : AppCompatActivity(),
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
-            SIGHT_KEY -> {
+            REQUEST_LANDMARK -> {
                 if (resultCode == Activity.RESULT_OK) {
                     val id = data?.getLongExtra(
                             LandmarksListActivity.LANDMARK_EXTRA_ID, -1) ?: return
@@ -249,29 +254,9 @@ class MapActivity : AppCompatActivity(),
         }
     }
 
-//    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-//        if ((requestCode == 34) or (requestCode == 35)) {
-//            if (grantResults.isEmpty()) {
-//                // If user interaction was interrupted, the permission request is cancelled and you
-//                // receive empty arrays.
-//            } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                // Permission granted.
-//                //getLastLocation();
-//            } else {
-//                val intent = Intent()
-//                intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-//                val uri = Uri.fromParts("package",
-//                        BuildConfig.APPLICATION_ID, null)
-//                intent.data = uri
-//                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-//                startActivity(intent)
-//            }
-//        }
-//    }
-
     companion object {
 
-        private const val SIGHT_KEY = 400
+        private const val REQUEST_LANDMARK = 400
         private const val DEFAULT_ZOOM = 15.0F
         private const val ANIMATE_CAMERA_DURATION = 1000
 
