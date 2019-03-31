@@ -11,7 +11,7 @@ import com.projectcenterfvt.historicalpenza.R
 abstract class BaseDialog : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        setStyle(DialogFragment.STYLE_NO_TITLE, R.style.CustomDialogTheme)
+        setStyle(DialogFragment.STYLE_NO_TITLE, R.style.MyAlertDialogTheme)
 
         val dialog = super.onCreateDialog(savedInstanceState)
 
