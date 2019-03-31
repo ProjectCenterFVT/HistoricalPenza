@@ -1,59 +1,74 @@
 <resources>
 
-    <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:windowAnimationStyle">@style/DownUpActivity</item>
-        <item name="android:buttonStyle">@style/SFUITextLightButton</item>
-        <item name="android:textViewStyle">@style/SFUITextLightTextView</item>
+
+        <item name="listPreferredItemHeightSmall">18dp</item>
     </style>
 
-    <style name="SFUITextLightButton" parent="android:Widget.Material.Button">
-        <item name="android:fontFamily">@font/sfuitext_light</item>
+
+    <style name="AppTheme.Launcher">
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowBackground">@drawable/launch_screen</item>
     </style>
-    <style name="SFUITextLightTextView" parent="android:Widget.Material.TextView">
-        <item name="android:fontFamily">@font/sfuitext_light</item>
+
+    <style name="AppTheme.NoToolBar" parent="Theme.AppCompat.Light.NoActionBar" />
+
+    <style name="AppTheme.FullScreen" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
     </style>
+
+    <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowTranslucentNavigation">true</item>
+    </style>
+
     <style name="AppTheme.Toolbar" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="DownUpActivity" parent="@android:style/Animation.Activity">
-        <item name="android:activityOpenEnterAnimation">@anim/activity_down_up_enter</item>
-        <item name="android:activityOpenExitAnimation">@anim/activity_down_up_exit</item>
-        <item name="android:activityCloseExitAnimation">@anim/activity_down_up_close_exit</item>
-        <item name="android:activityCloseEnterAnimation">@anim/activity_down_up_close_enter</item>
+    <style name="AppTheme.CollapsingToolbar" parent="AppTheme.Toolbar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
-    <style name="AppTheme.NoActionBar" parent="AppTheme">
-        <item name="windowActionBar">false</item>
+    <style name="CustomDialogTheme" parent="Base.Theme.AppCompat.Light.Dialog.Alert">
+        <item name="windowFixedWidthMajor">90%</item>
+        <item name="windowFixedWidthMinor">90%</item>
     </style>
 
-    <style name="MyTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="colorPrimary">#2196F3</item>
-        <item name="android:colorAccent">#ffffff</item>
+    <style name="NavigationView"  parent="Base.Theme.AppCompat">
+        <item name="android:listDivider">@color/dividerColor</item>
+        <item name="android:elevation">0dp</item>
+        <item name="itemBackground">@color/navigationItemBackground</item>
+        <item name="itemTextAppearance">@style/NavigationItemAppearance</item>
     </style>
 
-    <style name="AppFullScreenTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowActionBar">false</item>
-        <item name="android:windowFullscreen">true</item>
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowAnimationStyle">@style/DownUpActivity</item>
+    <style name="NavigationItemAppearance" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textColor">@color/navigationItemTextColor</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:fontFamily">@font/sfuitext_light</item>
+    </style>
+
+    <style name="Button" parent="Base.Widget.AppCompat.Button">
+        <item name="android:background">@drawable/button_background</item>
+        <item name="android:stateListAnimator">@null</item>
+        <item name="android:outlineProvider">background</item>
+        <item name="android:elevation">2dp</item>
+        <item name="android:paddingStart">8dp</item>
+        <item name="android:paddingEnd">8dp</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:minHeight">40dp</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">@font/sfuitext_light</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-    <style name="Toolbar" parent="Theme.AppCompat">
-        <item name="colorPrimary">@color/colorPrimaryDark</item>
-        <item name="colorPrimaryDark">@color/colorAccent</item>
-        <item name="colorAccent">@color/colorBlack</item>
-    </style>
 
 </resources>

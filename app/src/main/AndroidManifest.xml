@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.projectcenterfvt.historicalpenza">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -8,58 +9,58 @@
     <uses-permission android:name="com.android.vending.BILLING" />
 
     <application
-        android:allowBackup="true"
-        android:hardwareAccelerated="false"
+        android:name=".App"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/MyTheme">
+        android:theme="@style/AppTheme"
+        tools:ignore="GoogleAppIndexingWarning">
+
         <activity
-            android:name=".Activity.SplashActivity"
-            android:theme="@style/AppFullScreenTheme">
+            android:name=".splash.SplashActivity"
+            android:theme="@style/AppTheme.Launcher">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".sign_in.SignInActivity"
+            android:theme="@style/AppTheme.NoToolBar" />
+        <activity
+            android:name=".info.InfoActivity"
+            android:theme="@style/AppTheme.CollapsingToolbar" />
+        <activity
+            android:name=".map.MapActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".greeting.GreetingActivity"
+            android:theme="@style/AppTheme.FullScreen" />
+        <activity
+            android:name=".landmarks_list.LandmarksListActivity"
+            android:theme="@style/AppTheme.Toolbar" />
+
+        <service android:name=".services.FetchLandmarksService" />
+        <service android:name=".services.LocationService" />
+        <service
+            android:name=".services.FetchLandmarksJobService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+        <service
+            android:name=".services.OpenLandmarkJobService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
-        <activity android:name=".Activity.LandmarkActivity"
-            android:label="LandmarkActivity"
-            android:theme="@style/AppTheme.Toolbar"
-            android:parentActivityName=".Activity.MapActivity" />
-        <activity
-            android:name=".Activity.MapActivity"
-            android:label="@string/title_activity_map" />
-        <activity
-            android:name=".Activity.GreetingActivity"
-            android:noHistory="true"
-            android:theme="@style/AppFullScreenTheme" />
-        <activity
-            android:name=".Activity.InfoActivity"
-            android:parentActivityName=".Activity.MapActivity" />
-        <activity android:name=".Activity.SightActivity"
-            android:parentActivityName=".Activity.MapActivity"
-            android:label="SightActivity"/>
 
-        <meta-data
-            android:name="net.hockeyapp.android.appIdentifier"
-            android:value="${HOCKEYAPP_APP_ID}" />
-
-        <service
-            android:name=".Service.LocationService"
-            android:enabled="true"
-            android:exported="true" />
-
-        <receiver
-            android:name=".Service.InternetReceive"
-            android:enabled="true"
-            android:exported="true"></receiver>
     </application>
 
 </manifest>
