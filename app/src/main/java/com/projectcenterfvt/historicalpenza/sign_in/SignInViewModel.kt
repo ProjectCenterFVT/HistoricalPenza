@@ -1,7 +1,7 @@
 package com.projectcenterfvt.historicalpenza.sign_in
 
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.ViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
 import android.content.Context
 import com.projectcenterfvt.historicalpenza.data.Connection
 import com.projectcenterfvt.historicalpenza.data.ConnectionListener

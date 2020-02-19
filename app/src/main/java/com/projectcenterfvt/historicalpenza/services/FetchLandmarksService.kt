@@ -1,7 +1,7 @@
 package com.projectcenterfvt.historicalpenza.services
 
-import android.arch.lifecycle.LifecycleService
-import android.arch.lifecycle.Observer
+import androidx.lifecycle.LifecycleService
+import androidx.lifecycle.Observer
 import com.projectcenterfvt.historicalpenza.data.Connection
 import com.projectcenterfvt.historicalpenza.data.ConnectionListener
 import com.projectcenterfvt.historicalpenza.data.LandmarksRepository

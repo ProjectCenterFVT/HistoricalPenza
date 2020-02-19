@@ -2,24 +2,34 @@ package com.projectcenterfvt.historicalpenza.landmarks_list
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.BottomSheetDialog
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.DividerItemDecoration
-import android.support.v7.widget.LinearLayoutManager
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import androidx.core.view.ViewCompat
+import androidx.core.view.updatePadding
 import com.google.android.gms.maps.model.LatLng
 import com.projectcenterfvt.historicalpenza.R
 import com.projectcenterfvt.historicalpenza.data.LandmarksRepository
 import com.projectcenterfvt.historicalpenza.utils.viewModelFactory
 import kotlinx.android.synthetic.main.activity_landmarks_list.*
-import kotlinx.android.synthetic.main.sorting_bottom_sheet.*
+import kotlinx.android.synthetic.main.activity_landmarks_list.toolbar
 import kotlinx.android.synthetic.main.sorting_bottom_sheet.view.*
+import android.graphics.drawable.LayerDrawable
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.GradientDrawable
+import android.util.DisplayMetrics
+import android.app.Dialog
+import android.graphics.Color
+import android.os.Build
+import androidx.annotation.RequiresApi
 
 
 class LandmarksListActivity : AppCompatActivity() {
@@ -37,6 +47,15 @@ class LandmarksListActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_landmarks_list)
+
+        window.decorView.apply {
+            systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+        }
+        ViewCompat.setOnApplyWindowInsetsListener(appbar) { v, insets ->
+            v.updatePadding(top = insets.systemWindowInsetTop)
+            insets
+        }
 
         setSupportActionBar(toolbar)
         supportActionBar?.apply {
@@ -79,20 +98,14 @@ class LandmarksListActivity : AppCompatActivity() {
 
     @SuppressLint("InflateParams")
     private fun showBottomSheet() {
-        val view = layoutInflater.inflate(R.layout.sorting_bottom_sheet, null)
-
-        val dialog = BottomSheetDialog(this)
-        dialog.setContentView(view)
-        dialog.show()
-
-        view.alphabeticSort.setOnClickListener {
+        val dialog = SortingBottomDialog()
+        dialog.setOnAlphabeticSortListener {
             viewModel.setFiltering(Filtering.ALPHABETIC)
-            dialog.dismiss()
         }
-        view.distanceSort.setOnClickListener {
+        dialog.setOnDistanceSortListener {
             viewModel.setFiltering(Filtering.DISTANCE)
-            dialog.dismiss()
         }
+        dialog.show(supportFragmentManager, "sorting_dialog_fragment")
     }
 
     override fun onSupportNavigateUp(): Boolean {

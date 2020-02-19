@@ -1,79 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.projectcenterfvt.historicalpenza.map.MapActivity">
 
-    <android.support.constraint.ConstraintLayout
+    <fragment
+        android:id="@+id/mapFragment"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <fragment
-            android:id="@+id/mapFragment"
-            android:name="com.google.android.gms.maps.SupportMapFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="64dp"
-            android:layout_marginEnd="8dp"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.3">
-
-            <Button
-                android:id="@+id/zoomInButton"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:alpha="0.3"
-                android:background="@drawable/ic_zoom_in" />
-
-            <Button
-                android:id="@+id/zoomOutButton"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginTop="8dp"
-                android:alpha="0.3"
-                android:background="@drawable/ic_zoom_out" />
-
-            <Button
-                android:id="@+id/myLocationButton"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginTop="8dp"
-                android:alpha="0.3"
-                android:background="@drawable/ic_my_position" />
-
-        </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true"
+        android:layout_marginTop="64dp"
+        android:layout_marginEnd="8dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.3">
 
         <Button
-            android:id="@+id/nearPlaceButton"
-            style="@style/Button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:drawableStart="@drawable/ic_location_translucent"
-            android:text="@string/near_place_button_text"
-            android:background="@drawable/close_button_background"
-            android:textColor="#888888"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            android:id="@+id/zoomInButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:alpha="0.3"
+            android:background="@drawable/ic_zoom_in" />
 
-    </android.support.constraint.ConstraintLayout>
+        <Button
+            android:id="@+id/zoomOutButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:alpha="0.3"
+            android:background="@drawable/ic_zoom_out" />
+
+        <Button
+            android:id="@+id/myLocationButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:alpha="0.3"
+            android:background="@drawable/ic_my_position" />
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/nearPlaceButton"
+        style="@style/Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true"
+        android:layout_marginBottom="8dp"
+        android:drawableStart="@drawable/ic_location_translucent"
+        android:text="@string/near_place_button_text"
+        android:background="@drawable/close_button_background"
+        android:textColor="#888888"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <com.arlib.floatingsearchview.FloatingSearchView
         android:id="@+id/searchView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:fitsSystemWindows="true"
         app:floatingSearch_close_search_on_keyboard_dismiss="false"
         app:floatingSearch_dimBackground="false"
         app:floatingSearch_dismissOnOutsideTouch="true"
@@ -83,6 +81,9 @@
         app:floatingSearch_searchBarMarginTop="8dp"
         app:floatingSearch_searchHint="@string/search_view_text"
         app:floatingSearch_showSearchKey="true"
-        app:floatingSearch_suggestionsListAnimDuration="250" />
+        app:floatingSearch_suggestionsListAnimDuration="250"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
 
-</android.support.design.widget.CoordinatorLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

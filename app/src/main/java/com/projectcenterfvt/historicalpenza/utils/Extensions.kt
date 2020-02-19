@@ -4,11 +4,11 @@ import android.animation.ObjectAnimator
 import android.animation.TypeEvaluator
 import android.content.Context
 import android.location.Location
-import android.support.annotation.LayoutRes
-import android.support.annotation.StringRes
-import android.support.design.widget.Snackbar
-import android.support.v4.app.DialogFragment
-import android.support.v4.app.FragmentActivity
+import androidx.annotation.LayoutRes
+import androidx.annotation.StringRes
+import com.google.android.material.snackbar.Snackbar
+import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.FragmentActivity
 import android.util.Property
 import android.view.LayoutInflater
 import android.view.View
@@ -19,7 +19,7 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.support.v4.content.ContextCompat
+import androidx.core.content.ContextCompat
 import android.graphics.drawable.Drawable
 import com.google.android.gms.maps.model.BitmapDescriptor
 

@@ -2,9 +2,9 @@ package com.projectcenterfvt.historicalpenza.greeting
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentPagerAdapter
-import android.support.v7.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentPagerAdapter
+import androidx.appcompat.app.AppCompatActivity
 import com.projectcenterfvt.historicalpenza.R
 import com.projectcenterfvt.historicalpenza.map.MapActivity
 import kotlinx.android.synthetic.main.activity_greeting.*

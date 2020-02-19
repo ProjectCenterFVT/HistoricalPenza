@@ -7,8 +7,8 @@ import android.app.TaskStackBuilder
 import android.app.job.JobParameters
 import android.app.job.JobService
 import android.content.Context
-import android.support.v4.app.NotificationCompat
-import android.support.v4.app.NotificationManagerCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import com.projectcenterfvt.historicalpenza.R
 import com.projectcenterfvt.historicalpenza.data.LandmarksRepository
 import com.projectcenterfvt.historicalpenza.data.Preferences

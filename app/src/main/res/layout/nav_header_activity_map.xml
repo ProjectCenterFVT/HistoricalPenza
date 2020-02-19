@@ -3,19 +3,15 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/colorPrimary"
-    android:gravity="bottom"
     android:orientation="vertical"
-    android:paddingBottom="8dp"
-    android:paddingTop="8dp"
-    android:paddingStart="16dp"
-    android:paddingEnd="16dp"
     android:theme="@style/ThemeOverlay.AppCompat.Dark"
     android:fitsSystemWindows="true">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="bottom"
+        android:paddingTop="8dp"
+        android:paddingStart="16dp"
         android:text="@string/navigation_header_title"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textSize="20sp" />

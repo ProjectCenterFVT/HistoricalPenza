@@ -1,8 +1,8 @@
 package com.projectcenterfvt.historicalpenza.data.db
 
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.Transformations
-import android.arch.persistence.room.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Transformations
+import androidx.room.*
 import android.content.Context
 import com.projectcenterfvt.historicalpenza.data.Landmark
 import com.projectcenterfvt.historicalpenza.utils.Singleton

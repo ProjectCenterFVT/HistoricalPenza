@@ -5,17 +5,16 @@ import android.app.job.JobScheduler
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.projectcenterfvt.historicalpenza.sign_in.SignInActivity
 import com.projectcenterfvt.historicalpenza.data.Preferences
 import com.projectcenterfvt.historicalpenza.R
-import com.projectcenterfvt.historicalpenza.map.MapActivity
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
+import com.projectcenterfvt.historicalpenza.map.MapActivity
 import com.projectcenterfvt.historicalpenza.services.FetchLandmarksJobService
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
 
 
 class SplashActivity : AppCompatActivity() {

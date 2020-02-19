@@ -5,7 +5,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:paddingBottom="8dp"
-    android:paddingTop="8dp">
+    android:paddingTop="8dp"
+    android:fitsSystemWindows="true">
 
     <LinearLayout
         android:id="@+id/distanceSort"
@@ -15,10 +16,10 @@
         android:focusable="true"
         android:foreground="?attr/selectableItemBackground"
         android:orientation="horizontal"
-        android:paddingBottom="12dp"
+        android:paddingBottom="16dp"
         android:paddingLeft="8dp"
         android:paddingRight="8dp"
-        android:paddingTop="12dp"
+        android:paddingTop="16dp"
         tools:ignore="UnusedAttribute">
 
         <ImageView
@@ -46,10 +47,10 @@
         android:focusable="true"
         android:foreground="?attr/selectableItemBackground"
         android:orientation="horizontal"
-        android:paddingBottom="12dp"
+        android:paddingBottom="16dp"
         android:paddingLeft="8dp"
         android:paddingRight="8dp"
-        android:paddingTop="12dp"
+        android:paddingTop="16dp"
         tools:ignore="UnusedAttribute">
 
         <ImageView
