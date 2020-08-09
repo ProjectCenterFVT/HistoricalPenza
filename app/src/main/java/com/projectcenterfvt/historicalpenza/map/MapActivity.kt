@@ -1,15 +1,18 @@
 package com.projectcenterfvt.historicalpenza.map
 
+import android.annotation.SuppressLint
 import android.app.Activity
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.NavigationView
-import android.support.v4.view.GravityCompat
-import android.support.v4.view.ViewCompat
-import android.support.v7.app.AppCompatActivity
+import com.google.android.material.navigation.NavigationView
+import androidx.core.view.GravityCompat
+import androidx.core.view.ViewCompat
+import androidx.appcompat.app.AppCompatActivity
 import android.view.MenuItem
+import android.view.View
+import androidx.core.view.updatePadding
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
@@ -55,23 +58,44 @@ class MapActivity : AppCompatActivity(),
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map)
 
+        window.decorView.apply {
+            systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+        }
+//        ViewCompat.setOnApplyWindowInsetsListener(searchView) { v, insets ->
+//            v.updatePadding(top = insets.systemWindowInsetTop)
+//            insets
+//        }
+
+        root.setOnApplyWindowInsetsListener { _, insets ->
+            mapControls.updatePadding(
+                    left = insets.systemWindowInsetLeft,
+                    top = insets.systemWindowInsetTop,
+                    right = insets.systemWindowInsetRight,
+                    bottom = insets.systemWindowInsetBottom
+            )
+            navigationView.onApplyWindowInsets(insets)
+            insets
+        }
+
+//        content.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+//                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+//                View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+
         remainCameraPosition = savedInstanceState != null
 
         OnMapAndViewReadyListener(mapFragment as SupportMapFragment, this)
 
         setupSearchView()
 
-        navigationViewTop.setNavigationItemSelectedListener(this)
-        navigationViewBottom.setNavigationItemSelectedListener(this)
-
-        ViewCompat.setNestedScrollingEnabled(navigationViewBottom, false)
+        navigationView.setNavigationItemSelectedListener(this)
 
         val intent = Intent(this, LocationService::class.java)
         startService(intent)
     }
 
     private fun setupSearchView() {
-        searchView.attachNavigationDrawerToMenuButton(drawerLayout)
+        searchView.attachNavigationDrawerToMenuButton(drawer)
 
         viewModel.suggestions.observe(this, Observer { suggestions ->
             suggestions ?: return@Observer
@@ -126,7 +150,7 @@ class MapActivity : AppCompatActivity(),
             R.id.extra_project_menu_item -> showDialog(ExtraProjectDialog())
             R.id.log_out_menu_item -> showDialog(LogOutDialog())
         }
-        drawerLayout.closeDrawer(GravityCompat.START)
+        drawer.closeDrawer(GravityCompat.START)
         return true
     }
 
@@ -238,6 +262,7 @@ class MapActivity : AppCompatActivity(),
         clusterManager.addItems(markers)
     }
 
+    @SuppressLint("MissingSuperCall")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
             REQUEST_LANDMARK -> {

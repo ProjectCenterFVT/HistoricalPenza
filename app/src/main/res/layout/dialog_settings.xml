@@ -11,13 +11,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        android:fontFamily="@font/sfuitext_light"
         android:gravity="center"
         android:text="@string/settings_dialog_title"
         android:textColor="@android:color/black"
         android:textSize="17sp" />
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="24dp"
@@ -31,7 +30,6 @@
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             android:checked="true"
-            android:fontFamily="@font/sfuitext_light"
             android:textColor="@color/text_color"
             android:text="@string/notify_switch_text"
             app:layout_constraintEnd_toEndOf="parent"
@@ -39,7 +37,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <Button
         android:id="@+id/cancelButton"
@@ -48,7 +46,6 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:background="@color/transparent"
-        android:fontFamily="@font/sfuitext_light"
         android:text="@string/dialog_cancel_button"
         android:textColor="@android:color/black"
         android:textSize="16sp" />

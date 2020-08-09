@@ -1,7 +1,7 @@
 package com.projectcenterfvt.historicalpenza
 
 import android.app.Application
-import android.arch.lifecycle.ProcessLifecycleOwner
+import androidx.lifecycle.ProcessLifecycleOwner
 import com.projectcenterfvt.historicalpenza.managers.BillingManager
 import timber.log.Timber
 

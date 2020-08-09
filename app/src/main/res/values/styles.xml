@@ -5,7 +5,16 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
 
+        <item name="fontFamily">@font/sfuitext_light</item>
+
         <item name="listPreferredItemHeightSmall">18dp</item>
+
+        <item name="android:navigationBarColor">
+            @android:color/transparent
+        </item>
+        <item name="android:statusBarColor">
+            @android:color/transparent
+        </item>
     </style>
 
 
@@ -14,25 +23,31 @@
         <item name="android:windowBackground">@drawable/launch_screen</item>
     </style>
 
-    <style name="AppTheme.NoToolBar" parent="Theme.AppCompat.Light.NoActionBar" />
+    <style name="AppTheme.NoToolBar" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="fontFamily">@font/sfuitext_bold</item>
+    </style>
 
     <style name="AppTheme.FullScreen" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowContentOverlay">@null</item>
     </style>
 
-    <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:windowTranslucentNavigation">true</item>
+    <style name="AppTheme.NoActionBar" parent="Theme.MaterialComponents.NoActionBar">
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
     <style name="AppTheme.Toolbar" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 
     <style name="AppTheme.CollapsingToolbar" parent="AppTheme.Toolbar">
         <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 
     <style name="CustomDialogTheme" parent="Base.Theme.AppCompat.Light.Dialog.Alert">
@@ -40,7 +55,7 @@
         <item name="windowFixedWidthMinor">90%</item>
     </style>
 
-    <style name="NavigationView"  parent="Base.Theme.AppCompat">
+    <style name="NavigationView" parent="Base.Theme.AppCompat">
         <item name="android:listDivider">@color/dividerColor</item>
         <item name="android:elevation">0dp</item>
         <item name="itemBackground">@color/navigationItemBackground</item>

@@ -5,26 +5,26 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:paddingBottom="8dp"
-    android:paddingTop="8dp">
+    android:paddingTop="8dp"
+    android:fitsSystemWindows="true">
 
     <LinearLayout
         android:id="@+id/distanceSort"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="56dp"
         android:clickable="true"
         android:focusable="true"
         android:foreground="?attr/selectableItemBackground"
         android:orientation="horizontal"
-        android:paddingBottom="12dp"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        android:paddingTop="12dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
         tools:ignore="UnusedAttribute">
 
         <ImageView
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginEnd="32dp"
+            android:layout_gravity="center_vertical"
             android:src="@drawable/ic_location"
             android:tint="#737373" />
 
@@ -34,28 +34,27 @@
             android:layout_gravity="center_vertical"
             android:text="@string/sort_by_distance_menu_text"
             android:textColor="#737373"
-            android:textSize="16sp" />
+            android:textSize="18sp" />
 
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/alphabeticSort"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="56dp"
         android:clickable="true"
         android:focusable="true"
         android:foreground="?attr/selectableItemBackground"
         android:orientation="horizontal"
-        android:paddingBottom="12dp"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        android:paddingTop="12dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
         tools:ignore="UnusedAttribute">
 
         <ImageView
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginEnd="32dp"
+            android:layout_gravity="center_vertical"
             android:src="@drawable/ic_sort_by_alpha"
             android:tint="#737373" />
 
@@ -65,7 +64,7 @@
             android:layout_gravity="center_vertical"
             android:text="@string/sort_by_alpha_menu_text"
             android:textColor="#737373"
-            android:textSize="16sp" />
+            android:textSize="18sp" />
 
     </LinearLayout>
 

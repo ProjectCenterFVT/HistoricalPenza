@@ -1,6 +1,6 @@
 package com.projectcenterfvt.historicalpenza.landmarks_list
 
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
 import com.projectcenterfvt.historicalpenza.R

@@ -3,8 +3,8 @@ package com.projectcenterfvt.historicalpenza.services
 import android.app.Service
 import android.app.job.JobInfo
 import android.app.job.JobScheduler
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ProcessLifecycleOwner
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ProcessLifecycleOwner
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
