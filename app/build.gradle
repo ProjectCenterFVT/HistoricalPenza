@@ -8,19 +8,21 @@ androidExtensions {
     experimental = true
 }
 
+// Load keystore
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
 android {
     signingConfigs {
-        config {
-            keyAlias 'HistoricalPenza'
-            keyPassword 'RedmiNote3Pro'
-            storeFile file('./keystore.jks')
-            storePassword 'RedmiNote3Pro'
-        }
-        my_key_store {
-            keyAlias 'Creativity Project Center'
-            keyPassword 'fd5df2e122ff4e88e02b46375759df5d'
-            storeFile file('./my_key_store.jks')
-            storePassword '0e72ae7177d74be65adeb5b875719e96'
+        release {
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+
+            v1SigningEnabled true
+            v2SigningEnabled true
         }
     }
     compileSdkVersion 29
@@ -28,23 +30,17 @@ android {
         applicationId "com.projectcenterfvt.historicalpenza"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 14
-        versionName "0.5.0"
+        versionCode 15
+        versionName "0.6.0"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        manifestPlaceholders = [HOCKEYAPP_APP_ID: "e242b3a6a5b04e47b9a49dd5de3f9828"]
 
         buildConfigField "String", "API_ENDPOINT", '"http://hpenza.creativityprojectcenter.ru/"'
         buildConfigField "String", "SKU", '"open_all_objects_penza"'
     }
     buildTypes {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.my_key_store
-        }
-        debug {
-            signingConfig signingConfigs.my_key_store
+            signingConfig signingConfigs.release
         }
     }
     configurations.all {

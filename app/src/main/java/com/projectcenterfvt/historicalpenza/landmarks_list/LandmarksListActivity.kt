@@ -30,6 +30,7 @@ import android.app.Dialog
 import android.graphics.Color
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatDelegate
 
 
 class LandmarksListActivity : AppCompatActivity() {
@@ -47,6 +48,8 @@ class LandmarksListActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_landmarks_list)
+        supportFragmentManager
+
 
         window.decorView.apply {
             systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
@@ -64,7 +67,7 @@ class LandmarksListActivity : AppCompatActivity() {
         }
 
         list.layoutManager = LinearLayoutManager(this)
-        list.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
+//        list.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         viewModel.adapterItems.observe(this, Observer { adapterItems ->
             adapterItems?.let {
                 if (list.adapter == null) {

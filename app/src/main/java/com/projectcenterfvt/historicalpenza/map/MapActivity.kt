@@ -58,34 +58,29 @@ class MapActivity : AppCompatActivity(),
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map)
 
-//        window.decorView.apply {
-//            systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
-//                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-//        }
+        window.decorView.apply {
+            systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+        }
 //        ViewCompat.setOnApplyWindowInsetsListener(searchView) { v, insets ->
 //            v.updatePadding(top = insets.systemWindowInsetTop)
 //            insets
 //        }
 
-        content.setOnApplyWindowInsetsListener { v, insets ->
-            // Let the view draw it's navigation bar divider
-            v.onApplyWindowInsets(insets)
-
-            // Consume any horizontal insets and pad all content in. There's not much we can do
-            // with horizontal insets
-            v.updatePadding(
+        root.setOnApplyWindowInsetsListener { _, insets ->
+            mapControls.updatePadding(
                     left = insets.systemWindowInsetLeft,
-                    right = insets.systemWindowInsetRight
+                    top = insets.systemWindowInsetTop,
+                    right = insets.systemWindowInsetRight,
+                    bottom = insets.systemWindowInsetBottom
             )
-            insets.replaceSystemWindowInsets(
-                    0, insets.systemWindowInsetTop,
-                    0, insets.systemWindowInsetBottom
-            )
+            navigationView.onApplyWindowInsets(insets)
+            insets
         }
 
-        content.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
-                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
-                View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+//        content.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+//                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+//                View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
 
         remainCameraPosition = savedInstanceState != null
 

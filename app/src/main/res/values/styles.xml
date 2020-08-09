@@ -5,6 +5,8 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
 
+        <item name="fontFamily">@font/sfuitext_light</item>
+
         <item name="listPreferredItemHeightSmall">18dp</item>
 
         <item name="android:navigationBarColor">
@@ -21,14 +23,16 @@
         <item name="android:windowBackground">@drawable/launch_screen</item>
     </style>
 
-    <style name="AppTheme.NoToolBar" parent="Theme.AppCompat.Light.NoActionBar" />
+    <style name="AppTheme.NoToolBar" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="fontFamily">@font/sfuitext_bold</item>
+    </style>
 
     <style name="AppTheme.FullScreen" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowContentOverlay">@null</item>
     </style>
 
-    <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="AppTheme.NoActionBar" parent="Theme.MaterialComponents.NoActionBar">
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
